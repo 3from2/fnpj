@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>八郎湖FNPJ ― フィールドノートプロジェクトの記録</title>
+<meta name="description" content="八郎湖のフィールドノートを素材にしたワークショップの記録。カードの並びと、そこから生まれた言葉をvol.1として公開しています。運営：Three from Two｜調査事務所">
+<meta property="og:title" content="八郎湖FNPJ ― フィールドノートプロジェクトの記録">
+<meta property="og:description" content="八郎湖のフィールドノートを素材にしたワークショップの記録。カードの並びと、そこから生まれた言葉をvol.1として公開しています。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fnpj.3from2.com/vol1/">
+<meta property="og:image" content="https://fnpj.3from2.com/vol1/images/vol1/gallery_04.jpg">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500&family=Noto+Serif+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #fbfaf6;
+  --ink: #1a1a1a;
+  --line: rgba(26,26,26,0.14);
+  --line-soft: rgba(26,26,26,0.08);
+  --mid: #888;
+  --mk-pink: #e8639f;
+  --mk-green: #3fae66;
+  --mk-blue: #4f93d9;
+  --mk-yellow: #b8901f;
+  --mk-black: #8f8f8f;
+  --mk-red: #d1495b;
+  --mk-orange: #c97a2e;
+  --mk-unknown: #7a7a7a;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15.5px;
+  line-height: 1.95;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* HERO: 全幅・左揃え（タイトル＋このプロジェクトについて） */
+.hero-wrap {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 96px 36px 88px;
+}
+.hero-wrap .doc-header {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.hero-wrap .doc-title {
+  font-size: clamp(34px, 5.5vw, 54px);
+}
+.hero-wrap .doc-lead {
+  max-width: none;
+}
+.hero-about {
+  padding-top: 80px;
+}
+.hero-about p.body {
+  max-width: none;
+}
+
+/* LAYOUT: 左インデックス + 本文1カラム（2章以降） */
+.layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 680px);
+  gap: 72px;
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 36px;
+  border-top: 1px solid var(--line);
+}
+
+/* TOC */
+#toc {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  padding: 56px 0 40px;
+  font-family: 'Figtree', sans-serif;
+  overflow-y: auto;
+}
+.toc-title {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin-bottom: 24px;
+}
+#toc ol {
+  list-style: none;
+}
+#toc li { margin-bottom: 2px; }
+#toc a {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 13px;
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.5;
+  border-left: 2px solid transparent;
+  padding-left: 12px;
+  margin-left: -14px;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+#toc a:hover { opacity: 0.9; }
+#toc a.active { opacity: 1; border-left-color: var(--ink); }
+.toc-num {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.55;
+  min-width: 14px;
+}
+.toc-foot {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 11.5px;
+  line-height: 1.7;
+  opacity: 0.4;
+}
+
+/* MAIN */
+main { padding: 56px 0 140px; }
+
+/* DOC HEADER */
+.doc-header { padding-bottom: 48px; border-bottom: 1px solid var(--line); }
+.doc-eyebrow {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin-bottom: 24px;
+}
+.doc-title {
+  font-size: clamp(30px, 4.5vw, 42px);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  margin-bottom: 20px;
+}
+.doc-lead {
+  font-size: 16px;
+  line-height: 2.0;
+  opacity: 0.8;
+  max-width: 600px;
+}
+.doc-meta {
+  margin-top: 36px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12.5px;
+  opacity: 0.55;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+}
+
+/* SECTIONS */
+section { padding-top: 72px; }
+section + section { margin-top: 72px; border-top: 1px solid var(--line); }
+section:first-of-type { border-top: none; }
+
+h2 {
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.sec-num {
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0.4;
+  font-variant-numeric: tabular-nums;
+}
+h3 {
+  font-size: 17.5px;
+  font-weight: 500;
+  margin: 60px 0 18px;
+  letter-spacing: 0.01em;
+}
+p.body {
+  max-width: 640px;
+  margin-bottom: 20px;
+}
+.note-small {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12.5px;
+  opacity: 0.5;
+  max-width: 640px;
+  line-height: 1.75;
+  margin-top: 14px;
+}
+
+/* FIGURES */
+figure { margin: 36px 0; }
+figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--line-soft);
+}
+figcaption {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  opacity: 0.5;
+  margin-top: 10px;
+  line-height: 1.7;
+}
+.fig-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 36px 0;
+}
+.fig-pair figure { margin: 0; }
+
+/* FACTS ROW（概要の数値） */
+.facts {
+  display: flex;
+  gap: 48px;
+  margin-top: 44px;
+  flex-wrap: wrap;
+  font-family: 'Figtree', sans-serif;
+}
+.fact-num {
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1;
+  display: block;
+}
+.fact-label {
+  font-size: 12px;
+  opacity: 0.5;
+  margin-top: 6px;
+}
+
+/* SCOPE TABLE（実施概要） */
+.scope-list { margin: 36px 0 8px; max-width: 640px; }
+.scope-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line-soft);
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 20px;
+  align-items: baseline;
+}
+.scope-item:first-child { border-top: 1px solid var(--line); }
+.scope-key {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.42;
+  padding-top: 5px;
+}
+.scope-val { font-size: 14.5px; line-height: 1.8; }
+
+/* WORDS（気づきのハイライト）: 罫線×透かし数字（案B・2026-07-07採用） */
+.words-list { margin-top: 36px; }
+.word-item {
+  position: relative;
+  padding: 56px 0 52px;
+  border-top: 1px solid var(--line);
+  overflow: hidden;
+}
+.word-item:last-child { border-bottom: 1px solid var(--line); }
+.word-ghost {
+  position: absolute;
+  top: 6px; right: -6px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 150px;
+  font-weight: 600;
+  line-height: 1;
+  color: rgba(26,26,26,0.05);
+  user-select: none;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+.word-title {
+  position: relative;
+  font-size: clamp(24px, 3.4vw, 34px);
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  margin-bottom: 18px;
+  max-width: 540px;
+}
+.word-body {
+  position: relative;
+  font-size: 14px;
+  line-height: 2.0;
+  opacity: 0.76;
+  max-width: 560px;
+}
+
+/* NOTES LIST（申し送り） */
+.notes-list { margin-top: 12px; max-width: 640px; list-style: none; }
+.notes-list li {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 14px;
+  line-height: 1.85;
+  opacity: 0.8;
+}
+
+/* METHOD STEPS */
+.method-grid { margin-top: 36px; max-width: 640px; border-top: 1px solid var(--line); }
+.method-card {
+  padding: 26px 0;
+  border-bottom: 1px solid var(--line-soft);
+  display: grid;
+  grid-template-columns: 44px 130px 1fr;
+  gap: 18px;
+  align-items: baseline;
+}
+.method-num {
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  opacity: 0.35;
+}
+.method-title { font-size: 17px; font-weight: 500; }
+.method-body { font-size: 13.5px; line-height: 1.85; opacity: 0.72; }
+
+/* TRACE（カードの並び）: グレー背景のブロック2つ（イントロ＋チームA／チームB） */
+.trace-block {
+  background: #e9e7e1;
+  padding: 56px 48px 64px;
+}
+.trace-block + .trace-block { margin-top: 56px; }
+.trace-block > .trace-chain:first-child { margin-top: 0; }
+
+.trace-chain { margin-top: 48px; max-width: 680px; }
+.trace-chain-header { margin-bottom: 28px; }
+.trace-chain-title { font-size: 17.5px; font-weight: 500; margin-bottom: 8px; }
+.trace-chain-desc { font-size: 13.5px; opacity: 0.65; line-height: 1.85; }
+.trace-chain-body { position: relative; }
+.trace-chain-body.collapsed { max-height: 860px; overflow: hidden; }
+.trace-chain-body.collapsed::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 180px;
+  background: linear-gradient(to bottom, rgba(233,231,225,0), #e9e7e1);
+  pointer-events: none;
+}
+.trace-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px 0;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.trace-more:hover { background: rgba(255,255,255,0.6); }
+.trace-more .arrow {
+  font-size: 11px;
+  transition: transform 0.2s;
+}
+.trace-more.open .arrow { transform: rotate(180deg); }
+
+.trace-first-tag {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  margin-bottom: 10px;
+}
+.trace-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 0 rgba(26,26,26,0.04);
+}
+.trace-card-photo { border-style: dashed; }
+.trace-card-num {
+  font-family: 'Figtree', sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  margin-bottom: 10px;
+}
+.trace-card-text { font-size: 14px; line-height: 1.9; }
+.trace-card-text.photo-desc { font-style: italic; opacity: 0.8; }
+.trace-card-marks { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.mark-chip {
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  padding: 3px 11px;
+  border-radius: 12px;
+  border: 1px solid;
+  opacity: 0.92;
+  white-space: nowrap;
+}
+.mk-pink   { color: var(--mk-pink);   border-color: var(--mk-pink); }
+.mk-green  { color: var(--mk-green);  border-color: var(--mk-green); }
+.mk-blue   { color: var(--mk-blue);   border-color: var(--mk-blue); }
+.mk-yellow { color: var(--mk-yellow); border-color: var(--mk-yellow); }
+.mk-black  { color: var(--mk-black);  border-color: var(--mk-black); }
+.mk-red    { color: var(--mk-red);    border-color: var(--mk-red); }
+.mk-orange { color: var(--mk-orange); border-color: var(--mk-orange); }
+.mk-blue_yellow, .mk-green_yellow { border: 1px solid transparent; color: inherit; }
+.mk-blue_yellow  { border-image: linear-gradient(90deg, var(--mk-blue), var(--mk-yellow)) 1; }
+.mk-green_yellow { border-image: linear-gradient(90deg, var(--mk-green), var(--mk-yellow)) 1; }
+
+/* 本文中の下線（当日のペン色を再現） */
+.trace-card-text .ul {
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-skip-ink: none;
+}
+.trace-card-text .ul-pink   { text-decoration-color: var(--mk-pink); }
+.trace-card-text .ul-green  { text-decoration-color: var(--mk-green); }
+.trace-card-text .ul-blue   { text-decoration-color: var(--mk-blue); }
+.trace-card-text .ul-yellow { text-decoration-color: var(--mk-yellow); }
+.trace-card-text .ul-black  { text-decoration-color: var(--mk-black); }
+.trace-card-text .ul-red    { text-decoration-color: var(--mk-red); }
+.trace-card-text .ul-orange { text-decoration-color: var(--mk-orange); }
+/* 2色の下線＝色別に2本重ねて引く（上段＝1色目、下段＝2色目） */
+.trace-card-text .ul-blue_yellow, .trace-card-text .ul-green_yellow {
+  text-decoration-line: none;
+  padding-bottom: 5px;
+  background-repeat: no-repeat;
+  background-position: 0 calc(100% - 3px), 0 100%;
+  background-size: 100% 2px, 100% 2px;
+}
+.trace-card-text .ul-blue_yellow {
+  background-image: linear-gradient(var(--mk-blue), var(--mk-blue)),
+                    linear-gradient(var(--mk-yellow), var(--mk-yellow));
+}
+.trace-card-text .ul-green_yellow {
+  background-image: linear-gradient(var(--mk-green), var(--mk-green)),
+                    linear-gradient(var(--mk-yellow), var(--mk-yellow));
+}
+
+.trace-connector {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 8px 14px 26px;
+  font-size: 12.5px;
+  font-family: 'Figtree', sans-serif;
+  opacity: 0.65;
+  line-height: 1.7;
+}
+.trace-connector::before {
+  content: '';
+  position: absolute;
+  left: 11px; top: 0; bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+.connector-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+  z-index: 1;
+}
+.dot-pink    { background: var(--mk-pink); }
+.dot-green   { background: var(--mk-green); }
+.dot-blue    { background: var(--mk-blue); }
+.dot-yellow  { background: var(--mk-yellow); }
+.dot-black   { background: var(--mk-black); }
+.dot-red     { background: var(--mk-red); }
+.dot-unknown { background: var(--mk-unknown); }
+.connector-low { opacity: 0.75; }
+
+/* FOOTER */
+footer {
+  margin-top: 100px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  font-family: 'Figtree', sans-serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.footer-credit { font-size: 12px; opacity: 0.4; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .hero-wrap { padding: 56px 24px 40px; }
+  .hero-wrap .doc-title { font-size: 27px; }
+  .hero-about { padding-top: 56px; }
+  .layout { grid-template-columns: 1fr; gap: 0; padding: 0 24px; }
+  .trace-block { margin-left: -24px; margin-right: -24px; padding: 40px 24px 48px; }
+  #toc {
+    position: static;
+    height: auto;
+    padding: 40px 0 0;
+  }
+  #toc ol { display: flex; flex-wrap: wrap; gap: 2px 20px; }
+  #toc a { border-left: none; margin-left: 0; padding-left: 0; }
+  #toc a.active { border-left: none; }
+  .toc-foot { display: none; }
+  main { padding: 40px 0 100px; }
+  .fig-pair { grid-template-columns: 1fr; }
+  .word-ghost { font-size: 96px; top: 10px; right: 0; }
+  .method-card { grid-template-columns: 36px 1fr; }
+  .method-body { grid-column: 2; }
+  .scope-item { grid-template-columns: 105px 1fr; gap: 14px; }
+  .facts { gap: 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ヒーロー：タイトル＋このプロジェクトについて（全幅センター） -->
+<div class="hero-wrap">
+
+<header class="doc-header">
+  <h1 class="doc-title">八郎湖FNPJ<br>フィールドノートプロジェクトの記録</h1>
+  <p class="doc-lead">フィールドノートを素材に、八郎湖との関わりを言葉にしていくワークショップの記録です。</p>
+  <div class="doc-meta">
+    <span>運営：Three from Two｜調査事務所</span>
+    <span>秋田県・八郎湖</span>
+    <span>最終更新：2026年7月7日</span>
+  </div>
+  <figure style="margin-bottom:0;">
+    <img src="images/vol1/gallery_04.jpg" alt="ワークショップ会場。畳の上に2つのカードの列とカードの束が広がっている">
+    <figcaption>第1回ワークショップの会場。2チームがそれぞれの列をつくっている（2026年6月14日）。</figcaption>
+  </figure>
+</header>
+
+<!-- 1. 概要 -->
+<section id="summary" class="hero-about">
+  <h2><span class="sec-num">1</span>このプロジェクトについて</h2>
+  <p class="body">
+    八郎湖でのフィールドワークでは、いろいろなことが起こります。生きものを観察しながら話したり、名前をつけたり、顕微鏡を覗き込んだり。このプロジェクトでは、参加者が書いたフィールドノートを素材に、それを読み直すワークショップを行い、そこで見つかったことを言葉として記録しています。
+  </p>
+  <p class="body">
+    八郎湖は、アオコや水質の問題として語られることの多い場所です。ここで扱うのは、その手前にある記録です。人がこの場所で実際に何をして、何に気づいているのか。できあいの言葉を当てはめるのではなく、ノートに書かれたことから出てきた言葉で書き留めることを方針としています。
+  </p>
+  <p class="body">
+    ワークショップは今後も繰り返し行い、言葉は回ごとに増えていきます。このサイトは、その記録の置き場です。
+  </p>
+  <div class="facts">
+    <div>
+      <span class="fact-num">1</span>
+      <p class="fact-label">回の開催</p>
+    </div>
+    <div>
+      <span class="fact-num">59</span>
+      <p class="fact-label">枚の書き起こしたカード（2列）</p>
+    </div>
+    <div>
+      <span class="fact-num">7</span>
+      <p class="fact-label">の生まれた言葉</p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="layout">
+
+<nav id="toc" aria-label="目次">
+  <p class="toc-title">八郎湖FNPJ<br>記録</p>
+  <ol>
+    <li><a href="#summary"><span class="toc-num">1</span>概要</a></li>
+    <li><a href="#record"><span class="toc-num">2</span>第1回ワークショップの記録</a></li>
+    <li><a href="#trace"><span class="toc-num">3</span>カードの並び</a></li>
+    <li><a href="#methods"><span class="toc-num">4</span>方法</a></li>
+    <li><a href="#contact"><span class="toc-num">5</span>連絡先</a></li>
+  </ol>
+  <p class="toc-foot">八郎湖FNPJ<br>3from2｜調査事務所</p>
+</nav>
+
+<main>
+
+<!-- 2. 第1回の記録 -->
+<section id="record">
+  <h2><span class="sec-num">2</span>第1回ワークショップの記録</h2>
+  <p class="body">
+    2026年6月14日、生物調査合宿のフィールドノートを素材にした半日のワークショップを行いました。以下はその記録です。
+  </p>
+
+  <div class="scope-list">
+    <div class="scope-item">
+      <p class="scope-key">日付</p>
+      <p class="scope-val">2026年6月14日（約3.5時間）</p>
+    </div>
+    <div class="scope-item">
+      <p class="scope-key">会場</p>
+      <p class="scope-val">旧渡邉幸四郎邸（秋田市・新屋）</p>
+    </div>
+    <div class="scope-item">
+      <p class="scope-key">素材</p>
+      <p class="scope-val">八郎湖・生物調査合宿（2026年5月16–17日）のフィールドノート</p>
+    </div>
+    <div class="scope-item">
+      <p class="scope-key">ノートの書き手</p>
+      <p class="scope-val">5名</p>
+    </div>
+    <div class="scope-item">
+      <p class="scope-key">当日の参加</p>
+      <p class="scope-val">7名</p>
+    </div>
+    <div class="scope-item">
+      <p class="scope-key">方法</p>
+      <p class="scope-val">v1.0（「方法」の節を参照）</p>
+    </div>
+  </div>
+
+  <h3>素材となった合宿</h3>
+  <p class="body">
+    一泊二日の合宿では、鯉の解剖、顕微鏡でのミジンコの観察、網での水生生物の採集、釣ったブラックバスの調理、カヌー、スケッチなどを行いました。参加者はそれぞれフィールドノートを書きました。観察の内容だけでなく、移動中の会話や食事のこと、その場で思ったことも、そのまま書かれています。
+  </p>
+
+  <h3>当日行ったこと</h3>
+  <p class="body">
+    まず、ノートをすべてカードに切り分けました。1冊でおよそ60枚になります。二人一組になり、片方が気になるカードを1枚出し、もう片方が「似ている」と感じたカードを自分の手札から出して隣に置いていきます。このとき、カードのどこに注目したかを、それぞれ別の色のペンで線を引いて残します。つながらなくなったら列を区切り、次の列を始めます。
+  </p>
+  <div class="fig-pair">
+    <figure>
+      <img src="images/vol1/gallery_07.jpg" alt="畳の上に広げられた、切り分けられたテキストカードの束">
+      <figcaption>切り分けられたカード。1冊のノートがおよそ60枚になる。</figcaption>
+    </figure>
+    <figure>
+      <img src="images/vol1/gallery_05.jpg" alt="3人の参加者が畳に寝そべり、カードに色ペンで線を引いている">
+      <figcaption>注目した箇所に、それぞれ別の色のペンで線を引いていく。</figcaption>
+    </figure>
+  </div>
+  <p class="body">
+    後半では、合宿の写真を切ったカードも混ぜて、同じ作業を続けました。文字だけのときよりも連想が出やすくなりました。最後に、できあがった列を2チームで見せ合い、列の中に繰り返し現れているパターンについて話し合いました。
+  </p>
+  <figure>
+    <img src="images/vol1/gallery_02.jpg" alt="参加者が畳に広がった写真カードの中から1枚を選んでいる">
+    <figcaption>後半は、合宿の写真を切ったカードを混ぜて続けた。</figcaption>
+  </figure>
+
+  <h3>結果</h3>
+  <p class="body">
+    当日は、大きく2つの列ができました。一方は40枚（テキストと写真をあわせたもの）、もう一方は19枚です。列そのものは「カードの並び」の節に掲載しています。
+  </p>
+  <p class="body">
+    共有の場では、「何かをしながら話している場面が多い」「名前をつける場面が繰り返し出てくる」「顕微鏡で見るときと歩いて見るときで視点が入れ替わる」といったパターンが確認されました。こうした当日の議論と、その後の書き起こしの整理から、八郎湖との関わり方を表す7の言葉をまとめました。
+  </p>
+  <figure>
+    <img src="images/vol1/gallery_03.jpg" alt="カードの列のそばに置かれた菓子の包みと黄色い付箋、色つきの丸シール">
+    <figcaption>列のそばに置かれた付箋と丸シール。気づきはその場で書き留められた。</figcaption>
+  </figure>
+
+  <h3>気づきのハイライト</h3>
+  <p class="body">
+    当日の議論と書き起こしの整理から生まれた、八郎湖との関わり方を表す7つの言葉です。学術的な分類ではなく、その場の観察や会話から出てきた言い回しを書き留めたものです。
+  </p>
+  <div class="words-list">
+    <div class="word-item">
+      <p class="word-ghost">1</p>
+      <p class="word-title">名付けることで関わる</p>
+      <p class="word-body">太ったウシガエルを「ビール腹ガエル」と呼んだ瞬間、それは話題にでき、思い出せる存在になる。生き物のあだ名、子供の名前、ゆるキャラのネーミング。名前は対象を切り分ける道具ではなく、関わりの入り口で、名前の数だけ関わり方が増えていく。</p>
+    </div>
+    <div class="word-item">
+      <p class="word-ghost">2</p>
+      <p class="word-title">ながら話で気づきがこぼれる</p>
+      <p class="word-body">顕微鏡を覗きながら、スケッチしながら、口が動く。正面から尋ねると出てこない話が、手と目が対象に向かっているときに限ってこぼれてくる。</p>
+    </div>
+    <div class="word-item">
+      <p class="word-ghost">3</p>
+      <p class="word-title">神の目と虫の目を行き来する</p>
+      <p class="word-body">湖岸を歩くとき、自分がどこにいるか地図の位置を想像する。顕微鏡でミジンコを見るとき、ミジンコと同じ世界にいる気がする。八郎湖では、この二つの目が一日のうちに何度も入れ替わる。</p>
+    </div>
+    <div class="word-item">
+      <p class="word-ghost">4</p>
+      <p class="word-title">スケッチする・鳥の声は書きとれない</p>
+      <p class="word-body">みんなスケッチをたくさんして記録に残す。しかし鳥の鳴き声は「ピョ、ピピヤァ」と言葉、しかも当て字にしかならず、後で読んでも思い出せない。記録は「見る」に偏り、「聞く」を取りこぼしていく。</p>
+    </div>
+    <div class="word-item">
+      <p class="word-ghost">5</p>
+      <p class="word-title">まっすぐな道、ぐねぐねの航跡</p>
+      <p class="word-body">干拓地の道は人間の意志だけで引かれた直線。ボートは波と風と腕の力が噛み合って、まっすぐには進まない。二種類の線が同じ風景に同居している。</p>
+    </div>
+    <div class="word-item">
+      <p class="word-ghost">6</p>
+      <p class="word-title">ところどころに標識</p>
+      <p class="word-body">オロナミンCの空き瓶が「ここは釣れる」の目印になり、「現湖岸は急に深くなる」が小学生への標語になる。湖のあちこちに、通う人だけが読める印が置かれている。</p>
+    </div>
+    <div class="word-item">
+      <p class="word-ghost">7</p>
+      <p class="word-title">合わないものの異国感</p>
+      <p class="word-body">ビールにマシュマロは合わない。干拓地にぽつんと立つモアイ。なじまないものは、その場所に何が「合う」のかを逆から照らし出す。</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- 3. カードの並び -->
+<section id="trace">
+  <div class="trace-block">
+  <h2><span class="sec-num">3</span>カードの並び</h2>
+  <p class="body">
+    当日できた2つの列を、記録写真から書き起こして掲載します。各カードの本文、線が引かれた箇所、前のカードとのつながりについての説明を、並んだ順に載せています。
+  </p>
+  <p class="note-small">※記録写真からの書き起こしのため、一部の接続の解釈と線の色は推定を含みます（該当箇所に「※推定」と付記）。カード番号の重複は、両チームで同じカードが参照された可能性があります。</p>
+  <div class="fig-pair">
+    <figure>
+      <img src="images/vol1/gallery_06.jpg" alt="畳の上を縦に伸びるカードの列。テキストカードと写真カードが交互に並ぶ">
+      <figcaption>当日のカードの列（部分）。上から下へ進む。</figcaption>
+    </figure>
+    <figure>
+      <img src="images/vol1/gallery_01.jpg" alt="写真カードの列。それぞれの写真に色ペンで注目箇所が囲まれている">
+      <figcaption>写真カードの列（部分）。線は注目した箇所の記録。</figcaption>
+    </figure>
+  </div>
+
+  <div class="trace-chain" id="trace-chain-a">
+    <div class="trace-chain-header">
+      <p class="trace-chain-title">チームA ― 名付けから食われるまで（40枚）</p>
+      <p class="trace-chain-desc">名付け、異物感、初めての経験、生物への接近、食物連鎖が中心に見える列。最終共有では「鯉の頭に大興奮・解剖好き」から「食われる」へ至る連鎖として語られた。</p>
+    </div>
+    <div class="trace-chain-body collapsed">
+
+    <p class="trace-first-tag">列の初手</p>
+    <div class="trace-card"><p class="trace-card-num">カード 3</p><p class="trace-card-text">コイの頭部。盛口くん、<span class="ul ul-pink"><span class="ul ul-green">大興奮</span></span>。解剖が好き。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「大興奮」→「ハイテンション」― 強い感情・テンションの高さで接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 9</p><p class="trace-card-text">帰り際、すぐ近くに謎のモアイ像（なぜか土台には「萌」の文字）があり、イースター島のモアイに<span class="ul ul-green">あこがれる佐藤さん</span>が<span class="ul ul-green">ハイテンション</span>に。五社さんがたくさん写真を撮っていたので、<span class="ul ul-blue_yellow">私は自粛したため写真が無い</span>。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「モアイ／イースター島」→「行きたい国」― 海外・異国への想像で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 65</p><p class="trace-card-text"><span class="ul ul-green">行きたい国</span>の話になり、かまへーさんは「タイや台湾に行ったことがあるし、もう行きたい国とかは特にない」と言う。私はチリとモンゴルに行きたいと話した。そしたら、かまへーさんの知り合いが、子供や障害のある方が技術を身につけるようなプログラムを企画運営する仕事をしていて、今やっているプログラムがモンゴルに行くプランなんだという話を教えてくれた。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「行きたい国」→「大潟村の温泉、面白い」― 場所性・異国感・面白さで接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 5</p><p class="trace-card-text"><span class="ul ul-green">大潟村の温泉、面白い</span>。<span class="ul ul-pink">昔の植物の成分</span>が出てきて、ワインレッドを少し酸化させたみたいな色のアルカリ泉。透明な白湯、アブクの湯、サウナ。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-pink"></span><p>「面白い」→「名前なんだろう？」― 面白さが、名前への疑問に移る。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 40</p><p class="trace-card-text">ヒツジグサがたくさんいる水槽があった。なんで水の中の生き物なのに<span class="ul ul-pink">「ヒツジ」グサという名前</span>なんだろう？かまへーさんに聞くが答えを知らない模様。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-pink"></span><p>「名前」→「名付けていた」― 名前への疑問から、実際に名付ける行為へ接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 58</p><p class="trace-card-text">帰り際、みんなでアマガエルを発見した。お腹が膨れていたので、五社さんが<span class="ul ul-pink">「<span class="ul ul-green">ビール腹ガエル</span>」と名付けていた</span>。不名誉すぎる。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-blue"></span><p>「名付け」→「共通言語」― 名前・記号・目印が、仲間内の共有言語へ広がる。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 47</p><p class="trace-card-text">ナミンCの空き瓶が刺さっている。これはバス釣りをする人たちがつけた<span class="ul ul-blue">目印らしい</span>。「ここはバスが釣れる場所ですよ」というのを意味するマークだそう。これを聞いて私は最初、バス釣りをする人が自分のためにつけたマークだと思ったが、これは釣りをする人たちの間の共通する行動だとすると、<span class="ul ul-blue">共通言語のようなもの</span>、仲間のようなものに見えてくる。共通言語とは<span class="ul ul-blue">他者と同じ認識・思いやり</span>などが含まれているはず。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「バス釣り」→「ブラックバス」― バス釣りの目印から、実際のブラックバスへ接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 6</p><p class="trace-card-text">朝食は斗沢くんが釣った<span class="ul ul-green">ブラックバス</span>。<span class="ul ul-pink">支度してカヌーへ</span>。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「支度」→「急いで荷物をまとめる」― 出発前の支度という行動で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 36</p><p class="trace-card-text">朝、<span class="ul ul-green">急いで荷物をまとめる</span>。昨日何もせずに寝てしまったのがよくなかったと後悔。集合時間の8:30に間に合いそうにないので、かまへーさんにLINEで数分遅れることを伝える。<span class="ul ul-green">昨日喧嘩した父に行ってきますと言って家を出る</span>。</p></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-blue"></span><p>「家を出る」→「食／豆腐鍋」― 家庭・食事・選ばれ方の話へ展開している可能性。※推定</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 51</p><p class="trace-card-text">五社さんに豆腐鍋定食の豆腐を一つもらった。豆腐鍋定食なんて<span class="ul ul-blue">初めて見た</span>けど、すごく美味しかった。この鍋がないというか、子供からおばあちゃんまで大好きな「肉」とか王道の品ではなく、<span class="ul ul-blue">子供はあまり選ばない</span>かもねというようなポジションの「豆腐鍋」で勝負している時点で美味しいことは間違いない。</p></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-green"></span><p>「選ばない／好き」→「生きもの好き界隈」― 好み・界隈・真面目さへの連想として接続している可能性。※推定</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 8</p><p class="trace-card-text">こちらのテーブルは高橋・伽羅谷・斗沢・盛口・鎌田だったが、<span class="ul ul-green">真面目にメモやスケッチをしながら話をしていた</span>。盛口さんのお父さんが<span class="ul ul-green">生きもの好き界隈で有名</span>な、大学の先生だと判明（なにわほねほね団？）。高橋さんが超驚いていた。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「界隈で有名／覚えている」→「よく覚えている」― 記憶のされ方・主観的な覚え方で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 52</p><p class="trace-card-text">払戸小学校の閉校に伴い、払戸小学校にあったモグリウムを<span class="ul ul-green">船越小学校に持ってきたらしい</span>。払戸小学校はよく知っている小学校なので閉校したと聞いてとても悲しい。私は小学校でバスケ部だったが、払戸小学校はバスケ部がすごく弱く、メンバー全員が優しそうな子たちだったので、<span class="ul ul-green">あまり良い覚え方ではないけどよく覚えている</span>。</p></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-pink"></span><p>「覚えている」→「名推理で感動する」― 記憶・認識から推理・納得へ接続している可能性。※推定</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 57</p><p class="trace-card-text">そのあと<span class="ul ul-green">ザリガニ池にいく</span>。途中で木の下に緑色の空の小さい卵（うずらの卵のようなサイズ）が割れて落ちていた。そのそばにはフンが落ちており、斗沢さんによると「フンがまだ乾いていないので、おそらくこの木の上に鳥が住んでいるんだろう」と言っていて、なるほどなと納得した。斗沢さんのこれらの証拠から導いた答えが<span class="ul ul-pink">名推理で感動する</span>。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-pink"></span><p>「気づく／推理」→「気づく」― 観察して気づくことの連鎖。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 19</p><p class="trace-card-text">16時頃。温泉。盛口さんの<span class="ul ul-pink">髪が意外と長い</span>ことに気づく。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-blue"></span><p>「気づく」→「気づく／手には馴染む」― 身体で触れて気づくことへ展開。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 64</p><p class="trace-card-text">今回使ったカヌーのボートは秋田杉でできていて、全て<span class="ul ul-blue">手作り</span>。パドルも秋田杉で手作りなので、触ってみると、大部均等ではほぼ円だけど完全に正円の円柱ではないことに気づく。「<span class="ul ul-blue">均等な形ではないけれど、そのほうが人間の手には馴染む</span>」と、ニツ井のカヌー体験をやっている方は言う。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-blue"></span><p>「人間の手には馴染む」→「手が動く／特徴がはっきりわかってくる」― 手の働き・身体化された観察で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 62</p><p class="trace-card-text">盛口くんはスケッチをしていた。私はあまりスケッチをしないので、<span class="ul ul-blue">こんなにたくさん手が動くなんてすごい</span>なと思う。斗沢さん曰く「生物観察においてスケッチはとても重要なのだ」と言う。確かに、顕微鏡の写真を撮ることはできるが、スケッチすることでその<span class="ul ul-pink">生物の特徴がはっきりわかってくる</span>ような気がする。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「手が動く」→「触って遊んでいた／家を破壊」― 手を動かす観察から、触って壊してしまう行為へ接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 25</p><p class="trace-card-text">蜘蛛の巣があって、主がいない物だと思って触って遊んでいたら持ち主の蜘蛛がいたので、<span class="ul ul-green">家を破壊</span>してごめん〜〜と思った。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「家を破壊」→「圧死しないタイプ」― 生き物を壊す／壊さない、扱い方の倫理で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 61</p><p class="trace-card-text">今日モグリウムで採取してきたミジンコたちを顕微鏡で観察した。ミジンコ下敷きで答え合わせをしながら観察していく。今回はミジンコを潰すタイプのプレパラートではなく、真ん中の部分が窪んでいて<span class="ul ul-green">生き物が圧死しないタイプのプレパラート</span>にした。そしたら、ミジンコたちがすごい動き回っていて、<span class="ul ul-green">こう言う速さで、動きで動くんだなと感動した</span>。普段は潰すタイプのプレパラートだったので、<span class="ul ul-green">動き回っているところをあまり見たことがなかった</span>。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「見たことがなかった」→「実物にあえて感動する」― 見たことがなかったものを実際に見る感動で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 38</p><p class="trace-card-text">車に乗って、ついついかまへーさんや五社さんと話してしまったが、<span class="ul ul-green">初対面の盛口くんと互いに自己紹介する</span>。粘菌研究クラブの活動記録写真でよく見かけるので、<span class="ul ul-green">実物にあえて感動する</span>。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-pink"></span><p>「初対面／実物にあえて感動」→「人生初ビール」― 初めて会う・初めて経験することへの接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 60</p><p class="trace-card-text"><span class="ul ul-pink">人生初ビール</span>を飲んだ。ビールはおいしさではなく、疲れたときに飲むから良いのだと聞いていたので、すごくまずいんだろうなと思っていたが、普通に美味しい。最近のビールはいろんな改良がされているんだろうと感じる。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-unknown"></span><p>「ビール」→「バーベキュー／食事」― ビールから夜の食事・バーベキューへ接続。</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 夜のバーベキューで、網の上の食材を複数人が串で焼いている写真。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「異物感」→「本物ではないモアイ像」― 食事写真の異物感から、場違いなモアイ像へ接続した可能性。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 55</p><p class="trace-card-text">モアイ像が置いてある。昔、学生が作ったらしい。小さいモアイ像が乗っている台の部分に「<span class="ul ul-green">萌</span>」と刻まれている。文体はゆるい感じ。四方から写真を撮り、五社さんにツーショットを撮ってもらう。日本には、<span class="ul ul-green">本物のモアイ像</span>もあるが、本物ではないモアイ像も各地に存在しており、また「モアイ」がつく名前のお店もある。「日本人にとってのモアイ像」について調べたくなった。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「萌／名前」→「萌／名前のまとまり」― モアイ台座の文字と、生物名の書き込みを接続。</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 紙にミジンコなどの名前が書かれ、赤い線で囲まれている写真。下に緑色で「<span class="ul ul-green">萌</span>」の書き込み。</p><div class="trace-card-marks"><span class="mark-chip mk-red">名前のまとまり</span></div></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-red"></span><p>「生物名」→「採集・観察する人々」― 生き物の名前から、生き物に関わる人々へ接続。</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 草地で複数人が採集・観察をしている写真。赤線で<span class="ul ul-red">人物群</span>が囲まれている。</p></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-red"></span><p>「採集する人々」→「立っている人々」― 人の種類・立ち振る舞いへの連想。※推定</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 屋外で複数人が立って作業している写真。赤線で空や人物周辺が囲まれている。</p><div class="trace-card-marks"><span class="mark-chip mk-red">空／人物周辺</span></div></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-unknown"></span><p>「屋外の場」→「鳥の声」― 屋外の写真から、音・鳥の声の記録へ移る。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 24</p><p class="trace-card-text">鳥の声が聞こえる。鳥の鳴き声はすごくいい当てが妙で、当て字できないし文字にもできない。なんかノートにはピョ、ピピヤァと書かれているよ。でも、その文字を聞いても私はその声をもう思い出せないし、この字を書いたときもいや、違うなあと思った。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-red"></span><p>「鳥の声」→「鳥が食べた<span class="ul ul-red">魚の骨</span>」― 鳥の存在から、鳥が食べた魚の骨へ接続。</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 手の上に魚の顎骨のような白い骨が乗っている写真。赤線で骨が囲まれている。</p></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-pink"></span><p>「骨／魚」→「水を蹴る／ヤゴ」― 生き物の身体・水辺の採集行為へ接続。※推定</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 28</p><p class="trace-card-text">網で捕まえるために水を蹴る時、爆弾を落としたみたいな暴力をしている感覚で後ろめたさがある。ヤゴがいた。糸トンボのヤゴと言われた気がする。<span class="ul ul-pink">形がかっこいい</span>。</p></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-black"></span><p>「暴力／後ろめたさ」→「食べ物が落ちている」― 食べられるもの・食われるものへの連想として暫定記録。※推定</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 地面に落ちたパンまたは食べ物のようなもの。黒と赤の線で囲まれている。</p><div class="trace-card-marks"><span class="mark-chip mk-black">落ちた食べ物</span><span class="mark-chip mk-red">周囲</span></div></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-red"></span><p>「落ちた食べ物」→「整備された自然／風景」― 個別の食べ物から、場所・風景へ視点が移る。※推定</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 水辺・草地・遠景の写真。赤線で横長に囲まれ、黒い矢印が描かれている。</p><div class="trace-card-marks"><span class="mark-chip mk-red">水辺の風景</span><span class="mark-chip mk-black">遠景への矢印</span></div></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-red"></span><p>「風景」→「寝そべって見る」― 風景を眺めるのではなく、身体を低くして観察する態度へ接続。</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 水辺で人が寝そべるように観察している写真。赤線で人の身体が囲まれている。</p><div class="trace-card-marks"><span class="mark-chip mk-red">寝そべる身体</span></div></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-red"></span><p>「寝そべる身体」→「座り込む身体」― 身体姿勢の類似で接続。</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 屋内で床に座り込んでいる人物の写真。赤線で身体が囲まれている。</p><div class="trace-card-marks"><span class="mark-chip mk-red">座り込む身体</span></div></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-red"></span><p>「身体」→「カヌーを持つ身体」― 身体の姿勢・使い方で接続。</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 複数人がカヌーを持って歩いている写真。赤線で集団が囲まれている。</p><div class="trace-card-marks"><span class="mark-chip mk-red">カヌーを持つ人々</span><span class="mark-chip mk-green">中央付近の人物</span></div></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「カヌー／移動」→「モグリウムへ」― 移動・現場へ向かう流れで接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 10</p><p class="trace-card-text">続いて、生態系公園のモグリウムへ。去年追加設置した水槽には、イトモ・センニンモに加えて、<span class="ul ul-green">トリゲモの新芽らしきものが生えていた</span>！うたせ館のバケツで育ててもなかなか増えなかったので、<span class="ul ul-green">これは嬉しい</span>。追加水槽は水がきれいだが、もう一つの水槽は濁っていてほとんど中が見えない。水草の生育もイマイチで、今後が悩ましい。</p></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-green"></span><p>「生えていた／嬉しい」→「植物・燃える素材」― 植物由来のもの、使われ方への連想。※推定</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 木炭または松ぼっくり・燃料のようなものの写真。緑の手書きで「<span class="ul ul-green">杉</span>」と読める。</p><div class="trace-card-marks"><span class="mark-chip mk-orange">燃料らしき部分</span></div></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-pink"></span><p>「燃える／食事の場」→「カツ重」― 火・食事への接続、または名前への再接続。※推定</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 4</p><p class="trace-card-text">メニューが多く悩んだ末、<span class="ul ul-pink">カツ重に決定</span>。五社さん／高山さんは私好みで談義。その後、<span class="ul ul-blue">津田さんのお子さんのお名前</span>何だろうになる。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「お子さんのお名前」→「朝日」― 津田さんの子の名前「朝日」と写真の朝日の語で接続。</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 水面または湖面の写真。手書きで「<span class="ul ul-black">朝日</span>」と書かれている。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「朝日」→「光に集まる」― 朝日・光から、光に集まるミジンコへ接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 42</p><p class="trace-card-text">モグリウムをみんなで眺める。私がのぞいてるところは光が当たる場所だったので、<span class="ul ul-green">ミジンコたちがよく見える</span>。斗沢さんによると「<span class="ul ul-green">ミジンコは光に集まる習性がある</span>」と言う。なんでだろう？暖かいからだろうか？</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-red"></span><p>「ミジンコ」→「容器内の小さな対象」― ミジンコ・水中の小さなものを視覚的に接続。</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード</p><p class="trace-card-text photo-desc">📷 透明な容器の中に小さな生物または水があり、赤丸で<span class="ul ul-red">小さな対象</span>が囲まれている写真。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「小さな生物」→「食べ物」― 食物連鎖・食われるオチへの接続として暫定記録。</p></div>
+    <div class="trace-card trace-card-photo"><p class="trace-card-num">写真カード（列の最後）</p><p class="trace-card-text photo-desc">📷 皿または鍋の中の<span class="ul ul-black">食べ物</span>の写真。黒線で食べ物が囲まれている。</p></div>
+    </div>
+    <button class="trace-more" type="button" data-label-all="すべて表示（40枚）"><span class="label">すべて表示（40枚）</span><span class="arrow">▼</span></button>
+  </div>
+  </div>
+
+  <div class="trace-block">
+  <div class="trace-chain" id="trace-chain-b">
+    <div class="trace-chain-header">
+      <p class="trace-chain-title">チームB ― ながら話・帰属・記録方法（19枚）</p>
+      <p class="trace-chain-desc">人の行動、帰属する場所、昔と今、視点の入れ替わり、記録方法へ展開する列。最終共有では、人の立ち振る舞いから帰属・断絶／継続・視点・記録方法へ向かう連鎖として語られた。</p>
+    </div>
+    <div class="trace-chain-body collapsed">
+
+    <p class="trace-first-tag">列の初手</p>
+    <div class="trace-card"><p class="trace-card-num">カード 28</p><p class="trace-card-text">網で捕まえるために水を蹴る時、<span class="ul ul-green_yellow">爆弾を落としたみたいな暴力</span>をしている感覚で<span class="ul ul-green">後ろめたさがある</span>。ヤゴがいた。糸トンボの<span class="ul ul-black">ヤゴと言われた気がする</span>。形がかっこいい。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-yellow"></span><p>「暴力／後ろめたさ」→「外来種食が人気」― 生き物への暴力性・後ろめたさと、外来種を食べてしまうことへの違和感で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 13</p><p class="trace-card-text">朝食は斗沢さんが用意した<span class="ul ul-yellow">ブラックバスのムニエル</span>と、塩おにぎり。思った以上においしくて驚いた。ブラックバスは草木谷のある、山田付近のため池で斗沢さんが釣ったらしい。学生部内ではなぜあんなに<span class="ul ul-yellow">外来種食が人気</span>なのだろうか（苦笑）。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-yellow"></span><p>「外来種食が人気」→「喧嘩した父に行ってきます」― 良い／悪いで割り切れないが自分には大事なもの、という接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 36</p><p class="trace-card-text">朝、急いで荷物をまとめる。昨日何もせずに寝てしまったのがよくなかったと後悔。集合時間の8:30に間に合いそうにないので、かまへーさんにLINEで数分遅れることを伝える。<span class="ul ul-black">昨日<span class="ul ul-yellow">喧嘩した父に行ってきます</span>と言って家を出る</span>。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-yellow"></span><p>「父／家を出る」→「家を破壊」― 家・帰属する場所の象徴性で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 25</p><p class="trace-card-text">蜘蛛の巣があって、主がいない物だと思って<span class="ul ul-black">触って遊んでいた</span>ら持ち主の蜘蛛がいたので、<span class="ul ul-yellow">家を破壊</span>してごめん〜〜と思った。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-yellow"></span><p>「触って遊んでいた／家を破壊」→「悪ガキ／覗き込みながら」― 気になるものに手当たり次第触る悪ガキ的行動から、覗き込みながら会話する行動へ接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 53</p><p class="trace-card-text">五社さんが、かまへーさんの小学生に授業をする仕事について「コロナの時期を経て子供達の性格などに変化があった（外出が制限されたことによりおとなしい子が増えたとか？）」らしいが、実際子供達と仕事をしていて、悪ガキはいろんなですか？というような質問をした。そしたら、かまへーさんが<span class="ul ul-yellow">モグリウムを覗き込みながら</span>「いるねー、ミツヅコ」と言っていて、<span class="ul ul-yellow">噛み合っていない会話</span>に合宿で1番の笑いが起こる。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「覗き込みながら」→「メモやスケッチをしながら話」― 何かをしながら話す、という「ながら話」へ接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 8</p><p class="trace-card-text">こちらのテーブルは高橋・伽羅谷・斗沢・盛口・鎌田だったが、真面目に<span class="ul ul-black">メモやスケッチをしながら話をしていた</span>。盛口さんのお父さんが<span class="ul ul-yellow">生きもの好き界隈</span>で有名な、大学の先生だと判明（なにわほねほね団？）。高橋さんが超驚いていた。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-yellow"></span><p>「生きもの好き界隈／覚え」→「よく覚えている」― 人や場所の主観的な覚え方で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 52</p><p class="trace-card-text">払戸小学校の閉校に伴い、払戸小学校にあったモグリウムを<span class="ul ul-yellow">船越小学校に持ってきたらしい</span>。払戸小学校はよく知っている小学校なので閉校したと聞いてとても悲しい。私は小学校でバスケ部だったが、払戸小学校はバスケ部がすごく弱く、メンバー全員が優しそうな子たちだったので、<span class="ul ul-yellow">あまり良い覚え方ではないけどよく覚えている</span>。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-yellow"></span><p>「閉校／持ってきた」→「閉園間近／すっからかん」― 場所の閉鎖、移転、失われた場所で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 56</p><p class="trace-card-text">生態系公園は2年前の閉園間近にもて以来だ。温室のなかが<span class="ul ul-yellow">すっからかんになっていて少し寂しい気持ち</span>になった。すごくいい空間なので何か活用できないかなと思う。かまへーさんは以前この建物の中でWSだかレクチャーだかを行ったと言っていた。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「以前この建物の中で」→「前はNGOに所属していた」― 過去の活動・以前の所属で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 16</p><p class="trace-card-text">9時半。名取先生の車で現湖岸、植生再生地点へ移動。名取先生の車の中で先生が、自分は広い意味で環境が専門で現地調査が得意で<span class="ul ul-black">前はNGOに所属していた</span>ことを明かす。<span class="ul ul-black">地図でどこに来ているかわからない</span>。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「地図でどこに来ているかわからない」→「顕微鏡で観察」― 地表の視点と、顕微鏡での神の視点の対比で接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 61</p><p class="trace-card-text">今日モグリウムで採取してきた<span class="ul ul-black">ミジンコたちを顕微鏡で観察</span>した。ミジンコ下敷きで答え合わせをしながら観察していく。今回はミジンコを潰すタイプのプレパラートではなく、真ん中の部分が窪んでいて<span class="ul ul-black">生き物が圧死しないタイプのプレパラート</span>にした。そしたら、ミジンコたちがすごい動き回っていて、こう言う速さで、動きで動くんだなと感動した。普段は潰すタイプのプレパラートだったので、動き回っているところをあまり見たことがなかった。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「視点」→「人為的に作られた道／鳥の道路」― 人間の視点と非人間の視点の入れ替わり。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 21</p><p class="trace-card-text">まっすぐな道が多い。<span class="ul ul-black">人為的に作られた道が真っ直ぐ</span>にのっすっと入り込むかたち。でも、道路整備をしたらそうなるほかないなあ。大潟村で、例えば鳥が土地を開拓する権利を持っていて、<span class="ul ul-yellow">鳥という種族のための道路</span>を作るとしたら何を作るんだろう。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「まっすぐな道」→「完全に正円ではない／手には馴染む」― 直線・均質さと、手に馴染む不均質さの対比。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 64</p><p class="trace-card-text">今回使ったカヌーのボートは秋田杉でできていて、<span class="ul ul-black">全て手作り</span>。パドルも秋田杉で手作りなので、触ってみると、大部均等ではほぼ円だけど完全に正円の円柱ではないことに気づく。「均等な形ではないけれど、<span class="ul ul-black">そのほうが人間の手には馴染む</span>」と、ニツ井のカヌー体験をやっている方は言う。</p></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-black"></span><p>「手作り／形」→「景色／形」― 人工物の形と風景の見え方で接続。※推定</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 48</p><p class="trace-card-text">鏡のような穏やかな水面に、<span class="ul ul-black">そだ小破堤が連なっている</span>。その奥には湖と山々がみえる。この<span class="ul ul-black">景色の浮世絵がありそう</span>だと思った。それくらいすごく胸に残るものがある。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「景色」→「現湖岸」― 風景としての湖岸から、危険を記録するキーワードへ接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 46</p><p class="trace-card-text">また、「<span class="ul ul-black">現湖岸は急に深くなる</span>」というのは、ただ生態系を知る上で大切なキーワードなのではない。これはかまへーさんが、八郎湖の見学に来る小学生たちに<span class="ul ul-black">一番メモをとってもらっているキーワード</span>なのだそう。現湖岸は急に深くなって危険なので、現湖岸に入らないように教えているのだ。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「メモをとる／キーワード」→「活動記録写真」― 記録のされ方・記録写真へ接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 38</p><p class="trace-card-text">車に乗って、ついついかまへーさんや五社さんと話してしまったが、<span class="ul ul-black">初対面の盛口くんと互いに自己紹介する</span>。粘菌研究クラブの活動記録写真でよく見かけるので、実物にあえて感動する。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「活動記録写真」→「写真／スケッチ」― 写真とスケッチという記録方法の違いへ接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 62</p><p class="trace-card-text">盛口くんは<span class="ul ul-black">スケッチをしていた</span>。私はあまりスケッチをしないので、こんなにたくさん手が動くなんてすごいなと思う。斗沢さん曰く「生物観察においてスケッチはとても重要なのだ」と言う。確かに、顕微鏡の<span class="ul ul-black">写真を撮ることはできるが、スケッチすることで</span>その<span class="ul ul-black">生物の特徴がはっきりわかってくる</span>ような気がする。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-black"></span><p>「記録方法」→「文字にもできない／思い出せない」― スケッチ・写真・文字・音声記録の限界へ接続。</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 24</p><p class="trace-card-text">鳥の声が聞こえる。鳥の鳴き声はすごくいい当てが妙で、当て字できないし<span class="ul ul-black">文字にもできない</span>。なんかノートにはピョ、ピピヤァと書かれているよ。でも、その文字を聞いても私は<span class="ul ul-black">その声をもう思い出せない</span>し、この字を書いたときもいや、違うなあと思った。</p></div>
+
+    <div class="trace-connector connector-low"><span class="connector-dot dot-green"></span><p>「思い出せない／残らない」→「新芽らしきものが生えていた」― 見えるもの・残るものへの復帰、または観察対象の発見で接続している可能性。※推定</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 10</p><p class="trace-card-text">続いて、生態系公園のモグリウムへ。去年追加設置した水槽には、イトモ・センニンモに加えて、<span class="ul ul-green">トリゲモの新芽らしきものが生えていた</span>！うたせ館のバケツで育ててもなかなか増えなかったので、<span class="ul ul-green">これは嬉しい</span>。追加水槽は水がきれいだが、もう一つの水槽は濁っていてほとんど中が見えない。水草の生育もイマイチで、今後が悩ましい。</p></div>
+
+    <div class="trace-connector"><span class="connector-dot dot-green"></span><p>「水槽／生育」→「現湖岸／餌場」― 水中の生育環境から、現湖岸の生物環境へ接続。（この列の最後）</p></div>
+    <div class="trace-card"><p class="trace-card-num">カード 45</p><p class="trace-card-text">かまへーさん曰く「現湖岸は急に深くなる」そうだ。ミジンコや浮葉植物は、かまへーさんが湖に入りながら<span class="ul ul-green">自分の体を指差して説明してくれた</span>が、人間の膝から腰くらいまでの高さに住むことを好む。つまり、その高さのエリアが広い現湖岸では、ミジンコや浮葉植物がおらず、今は<span class="ul ul-yellow">ブラックバスたちの餌場</span>になっているそうだ。</p></div>
+    </div>
+    <button class="trace-more" type="button" data-label-all="すべて表示（19枚）"><span class="label">すべて表示（19枚）</span><span class="arrow">▼</span></button>
+  </div>
+  </div>
+
+</section>
+
+<!-- 4. 方法 -->
+<section id="methods">
+  <h2><span class="sec-num">4</span>方法 ― メソッド v1.0</h2>
+  <p class="body">
+    フィールドノートを書くことは、文化人類学の基本的な方法です。その場に加わりながら、同時に少し距離をとって観察する。何が重要かをあらかじめ決めずに、体験を文章にする。人類学の調査では、こうして書きためたノートを、半年から一年ほどかけて少しずつ切り分け、どことどこがつながるかを探していきます。このワークショップは、その作業を一日に縮めて行うものです。
+  </p>
+  <div class="method-grid">
+    <div class="method-card">
+      <p class="method-num">01</p>
+      <p class="method-title">切る</p>
+      <p class="method-body">一続きのノートのままでは並べ替えられないため、まずカードに切り分けます。</p>
+    </div>
+    <div class="method-card">
+      <p class="method-num">02</p>
+      <p class="method-title">つなぐ</p>
+      <p class="method-body">二人一組で、似ていると感じるカードを交互に出し、注目した箇所に線を引きながら列をつくります。</p>
+    </div>
+    <div class="method-card">
+      <p class="method-num">03</p>
+      <p class="method-title">名前をつける</p>
+      <p class="method-body">できた列を見て、そこに繰り返し現れているパターンに名前をつけ、付箋に書き留めます。</p>
+    </div>
+  </div>
+
+  <h3>基準</h3>
+  <p class="body">
+    このワークショップには、いくつかの決まりごとがあります。
+  </p>
+  <div class="scope-list">
+    <div class="scope-item">
+      <p class="scope-key">素材の限定</p>
+      <p class="scope-val">ノートに書かれたことだけを使います。記憶や、すでに持っている考えを持ち込むと、頭の中にある結論をなぞることになるためです。書かれた断片どうしのつながりから、予想していなかった発見を探します。</p>
+    </div>
+    <div class="scope-item">
+      <p class="scope-key">つなぎ方</p>
+      <p class="scope-val">種類ではなく、動作でつなぎます。「魚の話」「食べ物の話」でまとめると、分類ができるだけで、八郎湖で人が何をしているのかは見えてきません。「覗き込む」「名前をつける」「壊す」といった動作でつなぐと、行動のパターンが浮かび上がります。</p>
+    </div>
+    <div class="scope-item">
+      <p class="scope-key">粒度</p>
+      <p class="scope-val">手がかりは動詞くらいの大きさを目安にします。固有名詞は他のカードとつながりにくく、大きな概念からは当たり前の話しか出てきません。その中間にある動作の言葉から始めます。</p>
+    </div>
+    <div class="scope-item">
+      <p class="scope-key">写真の併用</p>
+      <p class="scope-val">文字どうしのつながりが行き詰まったとき、写真は別の種類の連想を開きます。</p>
+    </div>
+    <div class="scope-item">
+      <p class="scope-key">枠組み</p>
+      <p class="scope-val">人間中心か、自然中心か、といった出来合いの枠組みには当てはめません。一対一のやりとりの中から、この場所の記録からしか出てこない言葉を見つけることを目指しています。</p>
+    </div>
+  </div>
+
+  <h3>版の管理</h3>
+  <p class="body">
+    この方法は版として管理し、回ごとの記録と申し送りをもとに改訂していきます。今回の版はv1.0です。
+  </p>
+</section>
+
+<!-- 5. 連絡先 -->
+<section id="contact">
+  <h2><span class="sec-num">5</span>連絡先</h2>
+  <p class="body">
+    このプロジェクトについてのお問い合わせは、下記までお願いします。<br><br>
+    運営：Three from Two｜調査事務所<br>
+    <a href="mailto:tsuda@3from2.com" style="color:inherit;">tsuda@3from2.com</a>
+  </p>
+</section>
+
+<footer>
+  <p class="footer-name">八郎湖FNPJ｜3from2｜調査事務所 © 2026</p>
+  <p class="footer-credit">秋田県・八郎湖</p>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 左インデックスのスクロール連動（scroll-spy）
+const tocLinks = document.querySelectorAll('#toc a');
+const sections = [...document.querySelectorAll('main section, .hero-about')];
+const spy = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => spy.observe(s));
+
+// カードの並び：冒頭数枚のプレビュー＋すべて表示の開閉
+document.querySelectorAll('.trace-more').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const chain = btn.closest('.trace-chain');
+    const body = chain.querySelector('.trace-chain-body');
+    body.classList.toggle('collapsed');
+    const isOpen = !body.classList.contains('collapsed');
+    btn.classList.toggle('open', isOpen);
+    btn.querySelector('.label').textContent = isOpen ? '閉じる' : btn.dataset.labelAll;
+    if (!isOpen) chain.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
