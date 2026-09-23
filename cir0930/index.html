@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="CIR0930">
+<meta property="og:description" content="文化創造館 メンテナンスクラブの記録カード323枚を連なりに束ねたAIの仮構成">
+<title>CIR0930</title>
+<style>
+  :root{
+    --ground:#F6F4F3; --ink:#4C4640; --ink2:#4C464099; --ink3:#4C464055; --panel:#FAF8F5;
+    --serif:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+    --sans:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;
+    --mono:"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;overflow:hidden;}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);}
+  header{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:14px 20px 10px;
+    background:linear-gradient(#F6F4F3F2,#F6F4F3D8 70%,#F6F4F300);pointer-events:none;}
+  header *{pointer-events:auto;}
+  h1{font-family:var(--serif);font-size:1.15rem;letter-spacing:.14em;font-weight:600;}
+  h1 small{font-family:var(--sans);font-size:.62rem;letter-spacing:.08em;color:var(--ink2);font-weight:400;margin-left:.8em;}
+  .stats{font-size:.68rem;color:var(--ink2);letter-spacing:.05em;}
+  .hint{margin-left:auto;font-size:.68rem;color:var(--ink2);letter-spacing:.04em;background:#FAF8F5CC;border-radius:999px;padding:5px 14px;box-shadow:0 2px 12px #8D603222;}
+  .spread{margin-left:8px;font-size:.66rem;color:var(--ink2);letter-spacing:.04em;background:#FAF8F5CC;border-radius:999px;padding:5px 12px 5px 14px;box-shadow:0 2px 12px #8D603222;display:flex;align-items:center;gap:8px;}
+  .spread input{-webkit-appearance:none;appearance:none;width:130px;height:3px;border-radius:2px;background:#4C464033;outline:none;cursor:pointer;}
+  .spread input::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:linear-gradient(160deg,#2593B8,#A2CEDB);box-shadow:0 1px 4px #2B768A55;}
+  .spread input::-moz-range-thumb{width:13px;height:13px;border:none;border-radius:50%;background:linear-gradient(160deg,#2593B8,#A2CEDB);}
+  .spread .v{font-family:var(--mono);font-size:.58rem;color:var(--ink3);width:2.4em;text-align:right;}
+  kbd{font-family:var(--mono);font-size:.9em;background:#F0EDE8;border-radius:4px;padding:1px 5px;color:var(--ink);}
+  #legend{position:fixed;left:16px;top:76px;bottom:20px;z-index:25;width:250px;min-width:250px;max-width:70vw;display:flex;flex-direction:column;}
+  #lg-resize{position:absolute;top:0;bottom:0;right:-6px;width:12px;cursor:col-resize;z-index:26;}
+  #lg-resize::after{content:"";position:absolute;top:40%;bottom:40%;left:5px;width:2px;border-radius:1px;background:#4C464022;}
+  #lg-resize:hover::after,#legend.resizing #lg-resize::after{background:#2593B8AA;}
+  #legend .lg-head{font-size:.66rem;letter-spacing:.16em;color:var(--ink2);margin-bottom:8px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+  #legend .lg-head .tri{transition:transform .25s;font-size:.6rem;}
+  #legend.closed .tri{transform:rotate(-90deg);}
+  #legend .lg-body{overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:5px;padding-right:6px;scrollbar-width:thin;}
+  #legend.closed .lg-body{display:none;}
+  .big-head{margin-top:10px;padding:7px 9px 6px;border-radius:10px;cursor:pointer;user-select:none;display:flex;flex-direction:column;gap:2px;
+    background:transparent;transition:background .2s;}
+  .big-head:hover{background:#FAF8F5B8;}
+  .big-head.on{background:#FAF8F5;box-shadow:0 2px 10px #36428630;}
+  .big-head .bn{font-family:var(--serif);font-size:.8rem;letter-spacing:.06em;font-weight:600;display:flex;align-items:center;gap:8px;}
+  .big-head .bn .sw{width:14px;height:14px;border-radius:50%;flex:none;position:relative;overflow:hidden;}
+  .big-head .bn .sw::after{content:"";position:absolute;inset:10% 50% 50% 10%;background:radial-gradient(ellipse at 40% 35%,#ffffffA8,#ffffff00 70%);border-radius:50%;}
+  .big-head .bn .n{margin-left:auto;font-family:var(--mono);font-size:.58rem;color:var(--ink3);font-weight:400;}
+  .big-head .bn .car{font-size:.6rem;color:var(--ink3);transition:transform .2s;flex:none;font-weight:400;}
+  .big-block.open .big-head .bn .car{transform:rotate(90deg);}
+  .big-body{display:none;flex-direction:column;gap:5px;}
+  .big-block.open .big-body{display:flex;}
+  .big-head .br{font-size:.6rem;line-height:1.6;color:var(--ink2);letter-spacing:.02em;padding-left:22px;}
+  body.has-big .big-head:not(.on){opacity:.5;}
+  .sq{background:#FAF8F5B8;border-radius:10px;margin-left:10px;transition:background .2s, box-shadow .2s, opacity .3s;}
+  .sq:hover{background:#FAF8F5;}
+  .sq.on{box-shadow:0 2px 10px #36428630;background:#FAF8F5;}
+  body.has-active .sq:not(.on){opacity:.4;}
+  body.has-active .big-head:not(.on){opacity:.5;}
+  .sq-head{display:flex;align-items:center;gap:8px;font-size:.69rem;line-height:1.35;letter-spacing:.02em;padding:6px 9px;cursor:pointer;user-select:none;}
+  .sq-head .sw{width:22px;height:12px;border-radius:6px;flex:none;position:relative;overflow:hidden;}
+  .sq-head .sw::after{content:"";position:absolute;inset:10% 55% 45% 8%;background:radial-gradient(ellipse at 40% 35%,#ffffffA8,#ffffff00 70%);border-radius:50%;}
+  .sq-head .n{color:var(--ink3);font-size:.6rem;margin-left:auto;font-family:var(--mono);}
+  .sq-head .car{font-size:.55rem;color:var(--ink3);transition:transform .2s;flex:none;}
+  .sq.open .sq-head .car{transform:rotate(90deg);}
+  .sq-cards{display:none;flex-direction:column;gap:1px;padding:0 6px 7px;}
+  .sq.open .sq-cards{display:flex;}
+  .sq-card{display:flex;align-items:baseline;gap:7px;font-size:.66rem;line-height:1.5;color:var(--ink2);padding:3px 6px 3px 8px;border-radius:7px;cursor:pointer;transition:background .15s;}
+  .sq-card:hover{background:#F0EDE8;}
+  .sq-card.cur{color:var(--ink);font-weight:600;background:#F0EDE8;}
+  .sq-card .no{font-family:var(--mono);font-size:.56rem;color:var(--ink3);width:1.3em;flex:none;}
+  .sq-names{padding:0 10px 9px 10px;font-size:.6rem;line-height:1.7;color:var(--ink3);letter-spacing:.02em;display:none;}
+  .sq.open .sq-names{display:block;}
+  .sq-names b{font-weight:400;color:var(--ink2);}
+  .lo-head{margin-top:14px;font-size:.62rem;letter-spacing:.12em;color:var(--ink3);padding:6px 9px 2px;font-family:var(--mono);cursor:pointer;user-select:none;}
+  .lo-list{display:none;flex-direction:column;gap:1px;padding:0 6px 10px 16px;}
+  .lo-list.open{display:flex;}
+  #keys{position:fixed;right:16px;top:76px;z-index:25;width:236px;max-height:calc(100vh - 100px);display:flex;flex-direction:column;}
+  #keys .lg-head{font-size:.66rem;letter-spacing:.16em;color:var(--ink2);margin-bottom:8px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;justify-content:flex-end;}
+  #keys .lg-head .tri{transition:transform .25s;font-size:.6rem;}
+  #keys.closed .tri{transform:rotate(-90deg);}
+  #keys .lg-body{overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:5px;padding-left:6px;scrollbar-width:thin;}
+  #keys.closed .lg-body{display:none;}
+  .key-block{background:#FAF8F5B8;border-radius:10px;}
+  .key-head{display:flex;flex-direction:column;gap:2px;padding:7px 9px 6px;cursor:pointer;user-select:none;}
+  .key-head .kn{font-family:var(--serif);font-size:.78rem;letter-spacing:.06em;font-weight:600;display:flex;align-items:center;gap:8px;}
+  .key-head .kn .car{font-size:.6rem;color:var(--ink3);transition:transform .2s;font-weight:400;}
+  .key-block.open .key-head .kn .car{transform:rotate(90deg);}
+  .key-head .kn .n{margin-left:auto;font-family:var(--mono);font-size:.58rem;color:var(--ink3);font-weight:400;}
+  .key-head .ks{font-size:.58rem;line-height:1.6;color:var(--ink2);padding-left:16px;}
+  .key-list{display:none;flex-direction:column;gap:1px;padding:0 6px 8px;}
+  .key-block.open .key-list{display:flex;}
+  .key-card{display:flex;align-items:center;gap:7px;font-size:.66rem;line-height:1.5;color:var(--ink2);padding:3px 6px 3px 8px;border-radius:7px;cursor:pointer;}
+  .key-card:hover{background:#F0EDE8;}
+  .key-card.cur{color:var(--ink);font-weight:600;background:#F0EDE8;}
+  .key-card .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .key-card .id{font-family:var(--mono);font-size:.55rem;color:var(--ink3);margin-left:auto;flex:none;}
+  #lake{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none;display:block;}
+  #lake.dragging{cursor:grabbing;}
+  #bubble{position:fixed;z-index:40;width:min(466px,88vw);background:var(--panel);border-radius:14px;padding:16px 17px 10px;display:none;box-shadow:0 6px 26px #36428626;}
+  #bubble.show{display:block;}
+  #bb-accent{position:absolute;top:0;left:0;right:0;height:5px;border-radius:14px 14px 0 0;}
+  #bb-close{position:absolute;right:8px;top:11px;width:22px;height:22px;border:none;border-radius:50%;cursor:pointer;background:#F0EDE8;color:var(--ink2);font-size:12px;line-height:1;}
+  #bb-label{font-family:var(--serif);font-size:.95rem;font-weight:600;letter-spacing:.06em;padding-right:26px;}
+  #bb-text{font-family:var(--serif);font-size:.82rem;line-height:2.05;margin-top:9px;color:var(--ink);max-height:44vh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+  #bb-text mark{background-color:transparent;color:inherit;mix-blend-mode:multiply;-webkit-box-decoration-break:clone;box-decoration-break:clone;
+    background-image:linear-gradient(90deg,#FFF0 0,var(--c) 3%,var(--c) 97%,#FFF0 100%);background-size:100% 1.04em;background-position:0 .16em;background-repeat:no-repeat;padding:0 .1em;opacity:.85;}
+  #bb-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:10px;font-size:.6rem;letter-spacing:.05em;color:var(--ink2);}
+  #bb-meta .dot{width:9px;height:9px;border-radius:50%;flex:none;cursor:pointer;box-shadow:0 0 0 1.5px #FAF8F5;}
+  #bb-meta .dot.cur{outline:2px solid var(--ink2);outline-offset:1.5px;}
+  #bb-meta .src{font-family:var(--mono);font-size:.92em;color:var(--ink3);}
+  #bb-nav{display:flex;align-items:center;gap:6px;margin-top:8px;border-top:1px solid #4C464018;padding-top:8px;}
+  #bb-nav.hide{display:none;}
+  #bb-nav button{border:none;cursor:pointer;font-family:var(--sans);color:var(--ink);background:#F0EDE8;border-radius:9px;font-size:.66rem;letter-spacing:.03em;padding:6px 10px;transition:background .15s;}
+  #bb-nav button:hover{background:#E9E4DC;}
+  #bb-nav button:disabled{opacity:.3;cursor:default;}
+  #bb-nav .sp{flex:1;text-align:center;font-size:.58rem;color:var(--ink3);font-family:var(--mono);}
+  #bb-both{margin-top:7px;font-size:.58rem;line-height:1.7;color:var(--ink2);background:#F0EDE8;border-radius:8px;padding:6px 9px;display:none;}
+  #bb-both.show{display:block;}
+  #guide{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:#F6F4F3D6;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);opacity:1;transition:opacity .45s;}
+  #guide.hide{opacity:0;pointer-events:none;}
+  .gd-card{width:min(470px,88vw);max-height:86vh;overflow-y:auto;overscroll-behavior:contain;background:var(--panel);border-radius:20px;padding:26px 28px 22px;box-shadow:0 10px 44px #36428630;position:relative;}
+  .gd-card::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;border-radius:20px 20px 0 0;
+    background:linear-gradient(90deg,#BC4931,#D28326,#CDBE27,#98BE2B,#46AE50,#2593B8,#3A55A7,#C0A8D4,#A84E92,#AF4771);opacity:.75;}
+  .gd-card h2{font-family:var(--serif);font-size:1.25rem;letter-spacing:.16em;font-weight:600;}
+  .gd-lead{font-size:.72rem;line-height:1.9;color:var(--ink2);margin-top:8px;letter-spacing:.03em;}
+  .gd-whole{font-family:var(--serif);font-size:.95rem;letter-spacing:.08em;margin-top:12px;color:var(--ink);}
+  .gd-step{display:flex;gap:12px;margin-top:15px;align-items:flex-start;}
+  .gd-ico{width:24px;height:24px;border-radius:50%;flex:none;margin-top:2px;position:relative;}
+  .gd-ico::after{content:"";position:absolute;inset:12% 48% 48% 12%;background:radial-gradient(ellipse at 40% 35%,#ffffffB0,#ffffff00 70%);border-radius:50%;}
+  .gd-step b{font-size:.78rem;letter-spacing:.05em;}
+  .gd-step p{font-size:.7rem;line-height:1.75;color:var(--ink2);margin-top:3px;letter-spacing:.02em;}
+  .gd-note{font-size:.64rem;line-height:1.8;color:var(--ink3);margin-top:14px;border-top:1px solid #4C464018;padding-top:10px;}
+  #gd-start{display:block;width:100%;margin-top:20px;border:none;cursor:pointer;border-radius:13px;padding:12px 0;font-family:var(--sans);font-size:.85rem;letter-spacing:.14em;color:#FAF8F5;font-weight:600;background:linear-gradient(160deg,#2593B8,#A2CEDB);position:relative;overflow:hidden;transition:box-shadow .2s;}
+  #gd-start::after{content:"";position:absolute;inset:10% 55% 45% 6%;background:radial-gradient(ellipse at 40% 35%,#ffffff80,#ffffff00 70%);border-radius:50%;}
+  #gd-start:hover{box-shadow:0 4px 18px #2B768A40;}
+  #help{position:fixed;right:18px;bottom:18px;z-index:36;width:34px;height:34px;border:none;border-radius:50%;cursor:pointer;background:#FAF8F5;color:var(--ink2);font-size:15px;font-family:var(--serif);box-shadow:0 2px 12px #8D603230;transition:box-shadow .2s,color .2s;}
+  #help:hover{color:var(--ink);box-shadow:0 4px 16px #8D603245;}
+  @media (max-width:640px){
+    #legend{display:none;} #keys{display:none;} .hint{display:none;} .spread{margin-left:0;}
+    header{padding:10px 14px 8px;gap:4px;flex-direction:column;} h1{font-size:1rem;} .stats{font-size:.6rem;}
+    #bb-text{max-height:32vh;} .gd-card{padding:22px 20px 18px;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>CIR0930<small>2026.09.23 AIの仮構成</small></h1>
+  <div class="stats" id="stats"></div>
+  <div class="hint">ドラッグで湖を回す／カードを選んで <kbd>←</kbd><kbd>→</kbd> たどる・<kbd>↑</kbd><kbd>↓</kbd> 乗り換える</div>
+  <label class="spread" title="ノード間の距離" id="spread-box">間隔 <input type="range" id="spread" min="0.6" max="2.6" step="0.05" value="1"><span class="v" id="spread-v">1.0</span></label>
+</header>
+<div id="legend">
+  <div class="lg-head" id="lg-toggle"><span class="tri">▼</span>大きな連なり <span id="lg-count"></span></div>
+  <div class="lg-body" id="lg-body"></div>
+  <div id="lg-resize" title="ドラッグで幅を変える"></div>
+</div>
+<div id="keys">
+  <div class="lg-head" id="ky-toggle">橋のカードと核のカード <span class="tri">▼</span></div>
+  <div class="lg-body" id="ky-body"></div>
+</div>
+<canvas id="lake"></canvas>
+<div id="bubble">
+  <div id="bb-accent"></div>
+  <button id="bb-close">×</button>
+  <div id="bb-label"></div>
+  <div id="bb-text"></div>
+  <div id="bb-meta"></div>
+  <div id="bb-both"></div>
+  <div id="bb-nav"><button id="nv-prev">← 前</button><span class="sp" id="bb-pos"></span><button id="nv-next">次 →</button></div>
+</div>
+<div id="guide">
+  <div class="gd-card">
+    <h2>CIR0930</h2>
+    <p class="gd-lead">9/23の山札323枚（8/15・8/16・9/13のフィールドノート・書き手7名）を、機械的にシャッフルしてから並置し、連なりに束ねた。<b>AIの仮構成</b>であり、参加者が並べたものではない。連なりの名は「発見の名」＝並置が新たに知らせたことを、雑でも動詞で言ったもの。</p>
+    <p class="gd-whole">全体の名（仮）：誰も宣言しないまま、手と耳と目が先に決めている</p>
+    <div class="gd-step"><span class="gd-ico" style="background:linear-gradient(160deg,#D28326,#E7C9A7)"></span><div><b>ドラッグで湖を回す</b><p>湖に浮いている大きな字が「大きな連なり」（上位の束）。左の一覧で押すと、その束に入る連なりだけが灯る。</p></div></div>
+    <div class="gd-step"><span class="gd-ico" style="background:linear-gradient(160deg,#2593B8,#A2CEDB)"></span><div><b>カードを選ぶと、原文がひらく</b><p>本文の色は「継ぎ目」＝その札が前後の札とつながる語句。連なりごとに違う場所が塗られる。</p></div></div>
+    <div class="gd-step"><span class="gd-ico" style="background:linear-gradient(160deg,#A84E92,#D4A0C7)"></span><div><b><kbd>←</kbd><kbd>→</kbd> でたどる・<kbd>↑</kbd><kbd>↓</kbd> で乗り換える</b><p>2本の連なりに入る札は環が二色になる。乗り換えると同じ本文の別の語句が塗られる。どの連なりにも入らなかった札は「落穂」として小さく浮いている。</p></div></div>
+    <div class="gd-note"><b>選ばなかった束ね方</b>　補修の工程順（見つける→バラす→打つ→塗る→館へ戻す）で束ねる｜工程順だと会は手順として完了する。現行では各段で決め手が欠け、手と耳が代行するのが立つ<br>補修の会なのに、決める場面が一つも書かれていない。決まりは手・耳・目・場所・昨日の手に散っていて、宣言だけがない</div>
+    <button id="gd-start">湖へ入る</button>
+  </div>
+</div>
+<button id="help" title="つかいかたを見る">?</button>
+<script>
+const FAMILIES=[
+  {name:"珊瑚", hot:"#BC4931", glaze:"#E5AFA7", deep:"#883C32"},
+  {name:"琥珀", hot:"#D28326", glaze:"#E7C9A7", deep:"#8D6032"},
+  {name:"檸檬", hot:"#CDBE27", glaze:"#E3DCA2", deep:"#8A8632"},
+  {name:"若草", hot:"#98BE2B", glaze:"#C2D8A0", deep:"#6D863B"},
+  {name:"翡翠", hot:"#46AE50", glaze:"#A4D2AF", deep:"#358340"},
+  {name:"浅葱", hot:"#2593B8", glaze:"#A2CEDB", deep:"#2B768A"},
+  {name:"瑠璃", hot:"#3A55A7", glaze:"#A1B3DF", deep:"#364286"},
+  {name:"藤",   hot:"#C0A8D4", glaze:"#E4D8EE", deep:"#563676"},
+  {name:"菖蒲", hot:"#A84E92", glaze:"#D4A0C7", deep:"#833E77"},
+  {name:"躑躅", hot:"#AF4771", glaze:"#DBA3B6", deep:"#813B55"},
+];
+const NEUTRAL={name:"灰", hot:"#B9B3AA", glaze:"#E3DFD9", deep:"#8A8578"};
+const GROUND={r:246,g:244,b:243};
+const KEYCARDS=[{"title": "橋のカード", "sub": "多くの経路が通る＝別の束へ乗り換える点（媒介中心性）", "cards": ["242", "545", "397", "037", "533", "163", "404", "310"]}, {"title": "核のカード", "sub": "つながりの密な塊の中心＝同じ話が戻ってくる場所（固有ベクトル中心性）", "cards": ["084", "241", "379", "367", "276", "154", "212", "282"]}, {"title": "橋でも核でもある", "sub": "抜くと島が割れ、かつ核にもいる", "cards": ["358", "371"]}];
+const BIGS=[
+{"id": "B1", "name": "壊れは目が先に決める", "relation": "差異＝見つけて何をするか（寄せる／通過／欲しがる／持ち帰る）×地＝壊れを探す目に館全体が候補になる"},
+{"id": "B2", "name": "図面がなく、手元のものが図面になる", "relation": "差異＝制限の出どころ（図面なし／手元の材／元の形／とりあえず）×地＝設計図のない補修"},
+{"id": "B3", "name": "打ちまくるうちに黙って上手くなる", "relation": "差異＝手数の受け取られ方（比喩／歓声／総当たり／姿勢／味気なさ）×地＝穴を許す木とビス"},
+{"id": "B4", "name": "壁がなく、音とシートが仕切る", "relation": "差異＝聞く距離（手元／隣／三階／外）×地＝仕切りのない館でインパクトドライバーが鳴る"},
+{"id": "B5", "name": "揺れは止まらず、預け先が変わる", "relation": "差異＝揺れの預け先（重さ／二人目の手／芝／自分の身体）×地＝直してもなおグラつく什器"},
+{"id": "B6", "name": "誰も割り振らないのに、手が役を決める", "relation": "差異＝役の決まり方（沈黙／獲物／視線／手際／拍手）×地＝一人と一脚を囲む輪"},
+{"id": "B7", "name": "意図のない一致ばかり目に留まる", "relation": "差異＝揃う／違う／はまる／染まる×地＝誰も狙っていないのに記録者の目が留まる見た目"},
+{"id": "B8", "name": "よそから来た一言が形を決める", "relation": "差異＝言葉の出どころ（隣の口／連想／見立て／途中の語／聞き違い）×地＝手が塞がって耳が拾う"},
+{"id": "B9", "name": "欠けているほうがヒトになる", "relation": "差異＝呼び方（可愛い／傷病者／こいつ／ヒト／お手本）×地＝壊れて手をかけられた家具への口ぶり"},
+{"id": "B10", "name": "昨日の手が他人になって残る", "relation": "差異＝残り方（未完の札／ふり／居残り／揉め／他人化）×地＝前の手が物と紙の両方に残る"}
+];
+const CARDS=[
+{"id": "003", "w": "2026.08.15_文化創造館_003", "label": "強風に吹かれた果樹みたいな木", "text": "前方右側に、強風に吹かれた果樹みたいな木とロープの立体物があり、そのギリギリのバランスについて藤本さんが「これもメンテナンスがいる」といったことを言って、面白かった。"},
+{"id": "004", "w": "2026.08.15_文化創造館_004", "label": "ジグザグな縫い方", "text": "また、「メンテナンスクラブ」という刺繍がホワイトボードの縁に、横向きに掲げられている。近づいてみると、ジグザグな縫い方（名前を知らない）でミシンで布同士を塗っていて、そのジグザグが、木をくくりつけているロープと同じように見える。あとで見るけれど、一番最初のステップがインパクトドライバーであるように、くくりつけるとか、接着するとか、打ち付ける、といった動作が基本という感じがする。"},
+{"id": "011", "w": "2026.08.15_文化創造館_011", "label": "高校生の声が3Fから", "text": "白田さんが最初話している間、高校生の声が3Fからかなり大きくなってきた。何かしらのゲームをしている雰囲気で、中村さんのトークが始まってさらに大きくなる。"},
+{"id": "012", "w": "2026.08.15_文化創造館_012", "label": "腰のポーチが赤くて", "text": "白田さんの、館公式っぽいネームホルダーと腰のポーチが赤くて、文化創造館のカラーってそういうばわからないなと思う。ホームページは薄い緑で、雰囲気的には薄いオレンジのような暖かい感じもある。"},
+{"id": "013", "w": "2026.08.15_文化創造館_013", "label": "養生テープに名前を書いて", "text": "参加者は８名、養生テープに名前を書いて胸に貼っている。"},
+{"id": "015", "w": "2026.08.15_文化創造館_015", "label": "丁寧に話しかけている", "text": "トークの最中に、誰かネームカードを首にかけた女性の方が3Fの高校生たちに話しかけているのが見えた。丁寧に話しかけているのがよくわかる。後頭部がよく見えて、こういう表情と言葉遣いなのだろう、とまで思えた。"},
+{"id": "018", "w": "2026.08.15_文化創造館_018", "label": "緑のシートの上で", "text": "メンテナンスチームは、スタジオの真ん中に広げられた緑のシートの上で、いくつかの壊れた椅子や、さっきまで座っていた、ちょっとがたつく椅子を分解するところから始まる。前には、ホワイトボード、端材コーナー、オブジェがあり、後ろには基本的な工具（インパクトドライバーやビス、その他文房具なども）が棚を用意して置かれてある。"},
+{"id": "019", "w": "2026.08.15_文化創造館_019", "label": "みんな書くの速いな", "text": "みんなスケッチをしているが、みんな書くの速いなと驚く。さっきの打ち合わせ、そんなに時間が経ってないはずだけど。しかもけっこう面白くて、勢いで書くからパース？のようなものは定まってなくて、あと木の模様を書いている人もいる。ビスの数、どこにどう力がかかっているか、などをささっと把握できるようになるのは結構難しいんだろう。"},
+{"id": "020", "w": "2026.08.15_文化創造館_020", "label": "卸売市場の感じを思い出す", "text": "中村さんがインパクトの使い方を教えている。木のサイズにテープが貼ってあって、そこにサイズが書いてある。書いてないものもあるので、書いてあるものは一種の基準として物差し的に準備しているのかな。漁業とかの卸売市場の感じを思い出す。"},
+{"id": "021", "w": "2026.08.15_文化創造館_021", "label": "穴は開くけど、元に戻せる", "text": "確か中村さんが「いくらビスを打ってもいい。穴は開くけど、元に戻せる」と言ったことを話していて、それっていいなと思った。マグロとかの、カギ爪がついた道具でクイっと引っ掛けて動かすみたいなことをやった時につく傷。あの傷が実際値付けにどう影響するか、しないかはわからないけど、木が完全に可塑的なわけではなくて、後戻りできなさみたいなのを含んでいる。けど、その穴がとてもミニマルなので、機能的にも問題にならない。"},
+{"id": "022", "w": "2026.08.15_文化創造館_022", "label": "木が裂けるという現象", "text": "木が裂けるという現象。"},
+{"id": "023", "w": "2026.08.15_文化創造館_023", "label": "親子で同じ靴を履いている", "text": "親子参加の方が、親子で同じ靴を履いている。"},
+{"id": "024", "w": "2026.08.15_文化創造館_024", "label": "手袋をしている人としていない", "text": "手袋をしている人としていない人がいる。"},
+{"id": "025", "w": "2026.08.15_文化創造館_025", "label": "音でうまく行っているかどうか", "text": "会場にいろんな音がある。ビスの山を舐めて、ドゥルルルルという音が、あとで山岸さんがいうように身の毛がよだつような感覚って確かにあり、逆に音でうまく行っているかどうか、ってよくわかる。"},
+{"id": "026", "w": "2026.08.15_文化創造館_026", "label": "バッバッバーーーー", "text": "中村さんは、工事現場にいくと「バッバッバーーーー」っていう音聞こえてきませんか？と言っていて、みんなもそれにうなづいていたと思う。適切に素早く作業するための指標になっている。"},
+{"id": "027", "w": "2026.08.15_文化創造館_027", "label": "「野球やってたんで」", "text": "コウキさんの横でしばらく見ていた。コウキさんは、インパクトドライバーの作業のなかで、「野球やってたんで」と言い、それが面白かった。たとえば、筋力の話だったり、ボールに対して垂直に打つ？みたいなことだったり、野球と関連する体験があるのだろうか。"},
+{"id": "028", "w": "2026.08.15_文化創造館_028", "label": "ホームベースを思い出しますね", "text": "そのあとで、コウキさんは、天板が剥がれた椅子を見て、ホームベースを思い出しますね、と言って、自分がキャッチャーだったこと、４点がそれぞれ１塁からホームベースの配置に見えることなどを話してくれた。作業しながら、いろんなことを思い出す、というのはありそう。たとえば会話しながら編み物する、みたいに手先を動かしながらいろんなことを思い出したりするだろうか。"},
+{"id": "029", "w": "2026.08.15_文化創造館_029", "label": "早速「先生」と呼ぶ", "text": "小学生の親子の参加者、お父さんが、中村さんを早速「先生」と呼ぶ。"},
+{"id": "030", "w": "2026.08.15_文化創造館_030", "label": "大体みんな二人組で", "text": "作業は結構難しそうで、みんな苦戦して、ドゥルルルル音が聞こえてくる。特に椅子のようなサイズだと補助が必要で、大体みんな二人組で、一人が椅子を押さえて、ドライバーがビスに直角に当たるように保持したりする。"},
+{"id": "031", "w": "2026.08.15_文化創造館_031", "label": "自分の悦に入れるので", "text": "コウキさんが「外れちゃいました」「抜けちゃいました」と言ったふうな言い方をして白田さんがツッコむのが面白い。「そういう言い方をすれば自分の悦に入れるので」とコウキさんが説明して、確かに悦に入る要素がこういう作業にはあるようなあと、今振り返ってて思う。「あれ？またなんか僕やっちゃいました？」っていう異世界転生系の決まり文句を思い出す。"},
+{"id": "034", "w": "2026.08.15_文化創造館_034", "label": "空調のパワーがものすごい", "text": "ふと、空調のパワーがものすごいなと思った。天井が高くて明るく、高低差もあるから暑い空気が降りてこないのかな、と思ったり。さっきの邦生さんのトーク写真のように、軽くて、隙間が空いていて、ちょっと浮き上がって、風が吹いていくる感じ。"},
+{"id": "036", "w": "2026.08.15_文化創造館_036", "label": "ささっと靴紐を結ぶ", "text": "どなただったか参加者の作業を教えながら、中村さんがささっと靴紐を結ぶ。なんとなくそれが他の作業と似ている気もした。紐を結ぶっていう作業。きっちり２つを結び合わせてずれないようにする。"},
+{"id": "037", "w": "2026.08.15_文化創造館_037", "label": "メンテナンスの対象の基準", "text": "グラグラすることもそうだし、ささくれがあるってこともメンテナンスの対象になるそう。この、メンテナンスの対象の基準というか領域ってどこまでなんだろうなあ。たとえば、背もたれにカーブをつける、っていうのはメンテナンスとは言い難いから、元の状態を保持する、とか何か意識せずとも条件があるように思う。"},
+{"id": "039", "w": "2026.08.15_文化創造館_039", "label": "「愛らしい」と言った", "text": "中村さんは、車輪のシャフトみたいなパーツを足の補強に使っている家具を見て、「愛らしい」と言った。メンテナンスって愛らしさや可愛さが含まれている感じがする。"},
+{"id": "042", "w": "2026.08.15_文化創造館_042", "label": "重たくてミニマムな椅子", "text": "中村さんや経験者メンバーが、この椅子はすごいと言っていたエレベータ前の重たくてミニマムな椅子。あれはお手本のようなものだけれど、さっき言っていたような「愛らしさ」とは少しズレるように思う。"},
+{"id": "043", "w": "2026.08.15_文化創造館_043", "label": "重さがガタつきなどを解決する", "text": "1Fのフロアに行く。「重さがガタつきなどを解決する」"},
+{"id": "046", "w": "2026.08.15_文化創造館_046", "label": "そういう欲求が活性化される", "text": "次回以降の案内の話の中で、中村さん白田さんから、「こんなのあったらいいな、という気持ちを集めたい」と言ったような話があった。欲しい！と思うようになるってこと。メンテナンスだけど、そういう欲求が活性化される、っていいなと思う。食欲のように、料理できるようになって食べたいものが増える、とか。ストレッチしたら体調が良くなって食欲が増すとか。と書いて思ったけど、ストレッチしたら食欲がます、みたいに、一見関係ないことを行なってみて、別の欲求が湧く、みたいなことってありえるのだろうか？たとえば、館内を走ってみたら、メンテナンス欲求が生まれてくるかも、とか。"},
+{"id": "051", "w": "2026.08.16_文化創造館_051", "label": "掲示板のところに人が集まって", "text": "たしかまだ数人しか来ていなかった気がするけれど、椅子の方に座っていたら、ノートの掲示した方に皆立ち寄ってからこちらに来ているようで、掲示板のところに人が集まっているので、声をかけにいく。"},
+{"id": "054", "w": "2026.08.16_文化創造館_054", "label": "一人一人の名前が入っている", "text": "すぐに14時になって、白田さんから挨拶。昨日の振り返り。すぐに記録の掲示板の方にみんなで読みにいく。続々と質問が出てきて、面白かった。盛さんの「一人一人の名前が入っているのが印象的」という言葉。確かに不思議。全員の名前がギリギリ覚えられそうなこのサイズのコミュニティで、でも初対面でまだ覚えきらない中で、記録を書くときはある程度名前も丁寧に書こうとするからちゃんと残っている。"},
+{"id": "056", "w": "2026.08.16_文化創造館_056", "label": "誰かの記録に残る", "text": "あとは「自分の活動が誰かの記録に残るってことはこれまで全然なかったので嬉しいですね」。"},
+{"id": "060", "w": "2026.08.16_文化創造館_060", "label": "メンテナンスカートを配る", "text": "まず会場の什器にみんなでメンテナンスプランを作ろうということに。メンテナンスカートを配る。クラフトペーパーに赤いデザイン。"},
+{"id": "063", "w": "2026.08.16_文化創造館_063", "label": "単に「揺れ」でいい", "text": "昨日見たものを中心に回る。コウキさんと出身地の話をしたりしながら、コウキさんは1Fの人たちに話しかけに行って、いろいろ見つけていく。机の「横揺れ」という表現が気になる。横揺れは水平の揺れで、縦揺れは上下の高さの揺れだと思うけれど、上下に揺れることはないので、単に「揺れ」でいい。横揺れダンス・横揺れ界隈っていうミーム動画を思い出す。"},
+{"id": "064", "w": "2026.08.16_文化創造館_064", "label": "宝探しのような感覚", "text": "みんなどこにいるかわからないけれど、それが気にならない。まず自分の手元にある要メンテナンスシール２枚をどうにかしようという気持ちで、家具を探すようになる。なので、ちょっとした探検気分でもあり、宝探しのような感覚があり、他のメンバーがどこにいるか、はあんまり意識しない。"},
+{"id": "066", "w": "2026.08.16_文化創造館_066", "label": "キコキコ大きな音で台車", "text": "1Fのコミュニティフロアをキコキコ大きな音で台車が通り過ぎる。スタッフの方が屈んで台車で重たいものを移動していて、その音があんまり大きいので、メンテナンスのしがいがありそうと思い、コウキさんが早速声をかける。"},
+{"id": "067", "w": "2026.08.16_文化創造館_067", "label": "粗探しのようにじっくり見る", "text": "外に出たところで、白田さんがきて、14:45分くらいだったか、そろそろ戻らないとと思い出した。裏の階段を経由してもどると、2Fロビーのところに流行りのおもちゃの販売の方がいて、目線があう。どういう経緯でそこにあるかわからない顔ハメパネルに、何かしらあるだろと思って粗探しのようにじっくり見る。「何をしているんだこいつは？」と思われることが、今回に限らず文化創造館で何かをやっていたらありそうだな、と思う。「今何やってるんですか？」という知らない人からの声掛けは、以前の打ち合わせの時もあったけれど、そういう声かけが発生する空間っていいよなと思う。"},
+{"id": "068", "w": "2026.08.16_文化創造館_068", "label": "アスファルトの日々", "text": "道のアスファルトの日々が目に入って、それもメンテナンスの範囲かもと思う。"},
+{"id": "070", "w": "2026.08.16_文化創造館_070", "label": "スタイロと木材が引っ付かない", "text": "2Fに戻って再集合。 再び、どんなメンテナンスを見つけたかのツアーに行く。スタジオAを出て早速１歩目の木箱にシールがついていて、ことはさん小松さんが発表する。1Fへ。キッチンのIHのカバー。スタイロと木材が引っ付かない、みたいなのは僕もどこかで知ったけれど、美大関係者が多い文化創造館でそうであるのは、確かにすごいことだなと思う。"},
+{"id": "071", "w": "2026.08.16_文化創造館_071", "label": "第二の人生、余生", "text": "1Fのフライヤーペース（創造館のこのスペース、フライヤーを置く以外に、もっといい使い方があるのではと思う。）の什器に使われている荒巻鮭の木箱について。もう使われなくなったからもらってきた、という話から「第二の人生、余生をここで送ってるんですね」みたいな話。"},
+{"id": "072", "w": "2026.08.16_文化創造館_072", "label": "木って柔軟な人たちなんですね", "text": "（あと、「木って柔軟な人たちなんですね」という言葉もノートにメモしていたので、そういう擬人化が気になっている）"},
+{"id": "076", "w": "2026.08.16_文化創造館_076", "label": "補修やっちゃいました", "text": "スタジオに戻る。休憩は各自で取って作業を再開。「補修完了シール」ではなく「補修しましたシール」であることを白田さんが強調して説明する。完了って言ってしまうと終わっちゃうけど、とりあえずやっておきましたという形。「補修しておきました」「補修やっちゃいました」シールはどうか。"},
+{"id": "077", "w": "2026.08.16_文化創造館_077", "label": "私的な秘密を含んだもの", "text": "そして、気付かれないところにサインも入れてokという話。こうして履歴が残っていくこと、つまり、公的なものがちょっと私的な秘密を含んだものになるの、ってなんかいいなあ。"},
+{"id": "079", "w": "2026.08.16_文化創造館_079", "label": "「預かって」きて", "text": "戻りxxっていいな。メンテナンスを見ていて、館内の不調の什器を「預かって」きて、それを修理・治療して、また送り出す、というサイクルは、何か中心で披露する場所があって、それが自分たちの手元に戻って、という往復と、方向は逆に感じるけど少し重なる。"},
+{"id": "082", "w": "2026.08.16_文化創造館_082", "label": "手袋を二重にして", "text": "コウキさんが手袋を二重にして、インパクトドライバーを扱っている。一本のビスを打つのに、なるべく丁寧に準備をして向かう感じ。そして何事も野球と重ねて捉えているという話も面白かった。比喩ができるってことは、関係ないはずのものからいくつかの特徴を抜き出して、関連性を見つける、ってことだから、多分このワークと同じことが起こっている。それを、自分との結びつきで行うか、調べたこと同士の結びつきでおこなうか。"},
+{"id": "083", "w": "2026.08.16_文化創造館_083", "label": "味気なくバンバン打つ", "text": "津田さんもやりますか、といって手袋とインパクトを渡される。手袋は、巻き込まれると聞いたことがあったのでつけないでやろうかと思ったけど、コウキさんにつけた方がいいと言われて、つけてやってみる。慣れてはいるのと、こういう作業を僕はどんどん進めたくなってしまうタイプなので、味気なくバンバン打つ。確か４本。"},
+{"id": "084", "w": "2026.08.16_文化創造館_084", "label": "マスキングテープで仮止め", "text": "この後、終盤になってもコウキさんは特に急ぐわけではなくて、どのような椅子を作りたいか、の完成イメージを話してくれる。パーツについて「可愛い」という表現が繰り返し用いられて、実際ドーナツ型の背もたれはとても可愛い。ビスの時間はないので、マスキングテープで仮止めして、完成とする。"},
+{"id": "085", "w": "2026.08.16_文化創造館_085", "label": "自分のことが書かれているな", "text": "盛さんが難しそうな角度で木材を扱っている。話しかけると記録についていろいろとコメントをいただけた。「こういうものを作るのを書くにしても、僕には書けないけど、木の相（模様）とかビスとか、いろんなことが書くことができるって不思議ですよね」「僕なんかはこれまで記録される対象になったことがないので、こうやって、あ、自分のことが書かれているな、と思うのは印象深かった」といった話。"},
+{"id": "087", "w": "2026.08.16_文化創造館_087", "label": "「引っ張りあっている」", "text": "あとの話だけれど、打ち合わせだったか、藤本さんが「引っ張りあっている」、緊張感という話をしていて、作業場の領域とその外側で見ている記録チーム、そしてカメラマンの山岸さんがいて。でもそれぞれ分離しているわけでもない。中心から周辺へ、というよりも、手を入れたい椅子の周りに人が集まって、その間をいろんな役割を持った人が周遊している感じ。"},
+{"id": "088", "w": "2026.08.16_文化創造館_088", "label": "何度目かのトライで穴が開き", "text": "ことはさんとお母さんが、手すりの部分を叩き割ろうとして、中村さんはそれだとちょっと難しいかも、という表情だったけど、何度目かのトライで穴が開き、歓声が上がる。すごい！そんなふうにやろうとは思わなかった！といった感じで讃える。その後、お母さんがやすりをトンカチに巻きつけて擦って面取りしている。"},
+{"id": "089", "w": "2026.08.16_文化創造館_089", "label": "元からそうだったみたいな椅子", "text": "白田さんは、その椅子だったか、ソファだったか、「元からそうだったみたいな椅子ですね。」中村さんのメンテナンスが、トークの時に後付け、順番が逆、といった話があったけど、ところどころで、こうして時間が逆転する現象がある。新しいものが、もともとそうだったみたいに見える、とか。"},
+{"id": "092", "w": "2026.08.16_文化創造館_092", "label": "細い木材に腰掛けている", "text": "クニオさんが細い木材に腰掛けている。怖い！あとで自分も薄い板に座ってみる。"},
+{"id": "093", "w": "2026.08.16_文化創造館_093", "label": "まさかビスでやるとは", "text": "「ビスで穴を開けるのは、手順としてはあるけれど、まさかビスでやるとは。「あるものでやる」を体現している」"},
+{"id": "095", "w": "2026.08.16_文化創造館_095", "label": "ローラー作戦的に総当たり", "text": "新しくきた二人の直したソファについて。「感覚でここかも！っていう所をバンバンビスを打って行った。」これの正しさってすごいあるというか、ローラー作戦的に総当たりでやってみること。そうした感覚こそ上達の近道なのだろうと予想する。"},
+{"id": "096", "w": "2026.08.16_文化創造館_096", "label": "時間がドライブしていった", "text": "最後に締めの時間。 白田さんが「なんとなくわかっていたけど、下のフロアの椅子よりも、こっちの椅子をまずやりたい、ってことですね。」という話をしていて、確かに自分のものとしてやる、ということで、時間がドライブしていった感じがある。"},
+{"id": "097", "w": "2026.08.16_文化創造館_097", "label": "「寿命が短い」という話", "text": "クニオさんが、今回のような作業のデメリットとして、「寿命が短い」という話をする。再び擬人化っぽい話ではあるが、寿命・安全性や強度に問題があって、工夫の必要があるとのこと。"},
+{"id": "098", "w": "2026.08.16_文化創造館_098", "label": "とりあえず、でも最高です", "text": "「とりあえず、でも最高です。」という言葉で締め切られる。"},
+{"id": "099", "w": "2026.08.16_文化創造館_099", "label": "判断に迷う時間が減った", "text": "藤本さんからは、「判断に迷う時間が減った」とのこと。理想を描いてそこに向かう、というより、とりあえず目の前の状態を診断してあてがう、という作業だから、常にボールが投げられている状態、という感じだろうか。"},
+{"id": "104", "w": "2026.08.15_文化創造館_104", "label": "関係があって、でも関係がない", "text": "14:00イベントスタート。司会者の話が始まるが、3階の学生らしきグループがカードゲームかなにかしているのか盛り上がっていて、大きな声がこちらまで響いてくる。文化創造館はA1ホールでイベントをしていても3階に立ち入れたりするからなあ、2階と3階は声も姿も伝わるという意味で関係があって、でも関係がない、などと思う。"},
+{"id": "109", "w": "2026.08.15_文化創造館_109", "label": "みんなの視線が集まる瞬間", "text": "途中で中村さんが会場の真ん中に置いてある壊れたイスの話をして、みんな一斉にそちらを振り向く。振り返るとシートの真ん中に、片方の脚が折れて、こてんと倒れたベンチといってもいいようなサイズのイスがあった。広々としたシートの真ん中で、多分それまであまり注目されていなくてぽつんと転がっていたイスにみんなの視線が集まる瞬間。面白い。"},
+{"id": "110", "w": "2026.08.15_文化創造館_110", "label": "しかたない中でなんとかする", "text": "中村さんの話で特にそうだなあと思ったのは、しかたないけどそこにあるものを使うしかない、日々の連続、日常ってそういうこと。しかたない中でなんとかする。それによってできるようになることもあるのではないか、というあたりの話。"},
+{"id": "119", "w": "2026.08.15_文化創造館_119", "label": "世界を信頼すること", "text": "「一見地味に見える取るに足らないような出来事」 「これ以外に参照しなくていい全体を作る」 「この後ろ、背後に必ず何かある、という感覚」←これが11日に言っていた「世界を信頼すること」だそう。こういうものの見方をしたら、自分の特になんにもなかったような気がする毎日にも絶対なにかしら起きている感じがして、日々が面白くなりそうだなと思う。世界を信頼するってできてるようなできてないような、でもできたらいいことな感じがするので自分の日常でもやってみようかなと考える。"},
+{"id": "120", "w": "2026.08.15_文化創造館_120", "label": "座らされていたのか", "text": "メンテナンスクラブと記録のパーティでわかれる メンテナンスクラブのメンバーは我々が座っていたイスの中から中村さん曰く「明らかにボロい」ものをシートが敷かれているスペースに持って行った。私が最初に座ろうとしたイスも。私の右隣にあった、座面の板が浮き上がっていたイスも持っていかれる。我々は明らかにボロいイスに座らされていたのか。"},
+{"id": "123", "w": "2026.08.15_文化創造館_123", "label": "あんまりピンとこない", "text": "「自分の気になったところを熱く書いてもらって」と言われたが、熱く書くってあんまりピンとこない。"},
+{"id": "124", "w": "2026.08.15_文化創造館_124", "label": "微妙に元の文字が入っている", "text": "記録のパーティメンバーもメンテナンスクラブの方に移動する ホワイトボードの上にメンテナンスクラブと書かれた旗が設置されているが、それも何かのノボリをばらして作ったもののようで、微妙に元の文字が入っているところがある。"},
+{"id": "125", "w": "2026.08.15_文化創造館_125", "label": "なんだか神々しく見えて", "text": "会場には角材やら塩ビ管やらが大量に用意されていたが、それも照明の当たり方のためになんだか神々しく見えて不思議。"},
+{"id": "126", "w": "2026.08.15_文化創造館_126", "label": "手の影が二重に見える", "text": "少し暖色がかったライトが会場の2方向から照らされているので、メモ用のノートに映る自分の手の影が二重に見える。数日前にXで見かけた日食のときの影の写真を思い出した。光っていうものが見える瞬間が好きだ。"},
+{"id": "127", "w": "2026.08.15_文化創造館_127", "label": "まずは使ってみる", "text": "メンテナンスクラブの活動開始 まずはインパクトドライバーの使い方の説明が始まる。でも結局、まずは使ってみるという話になる。中村さんの言うことはぶれない。そしてこれから解体されるイスたちのことを「最終的にばらばらにした方がいいヒトたちなので」と「ヒト」と呼んでいたのが印象的だった。"},
+{"id": "130", "w": "2026.08.15_文化創造館_130", "label": "砂のような木くずのような", "text": "イスをひっくり返してビスを外しているところを見ていたら、振動と共に木材の上を砂のような木くずのようなほこりのような、細かいものがすべり落ちていく。このイスはどこに置かれていたのかと疑問に思う（のちに解決する）。"},
+{"id": "131", "w": "2026.08.15_文化創造館_131", "label": "木がメキメキ鳴る音がする", "text": "私が最初に座ろうとしてやめたイスは、ビスを抜くよりはいだ方がいいと、ベニヤ板の部分をバールではがされていた。木がメキメキ鳴る音がする。"},
+{"id": "133", "w": "2026.08.15_文化創造館_133", "label": "剣の形に切り抜かれて", "text": "会場に用意されていた大量の木材の前に、剣の形に切り抜かれて簡単にマジックか何かで絵を描かれた「剣」があって、なんだろうこれ…と思っていたのだが、それがメンテナンスクラブのメンバーの目に留まっておそらく娘さんのところに持っていくところを目撃する。やっぱり気になるよな。"},
+{"id": "135", "w": "2026.08.15_文化創造館_135", "label": "「まずいいや、まず！」", "text": "抜いたビスが思いがけず長かったらしいく「ながぁ…！」と声に出す人、「やっぱ角度が…」と呟きながら調整する人。中村さんは何かに対して「まずいいや、まず！」と言っている。秋田県人も「まず、まず」ってよく言う。"},
+{"id": "137", "w": "2026.08.15_文化創造館_137", "label": "くもの巣に枯れ葉まで", "text": "振動と共にほこりが落ちていたイスを別の角度から見たら、脚の間に古いくもの巣がかかっていて、そこに枯れ葉までくっついていた。屋外に置かれていたんだと、ここで判明する。しかし、くもの巣に枯れ葉までくっついたイスをそのまま屋内の会場に持ってきたんだ。私ならそれらは落としてから持ち込むなあと思う。文化創造館のイベントはこれだから面白い。"},
+{"id": "139", "w": "2026.08.15_文化創造館_139", "label": "完全に解体する前に直せないか", "text": "イスを解体しつつ、完全に解体する前に直せないかという試みが各所で始まる。"},
+{"id": "141", "w": "2026.08.15_文化創造館_141", "label": "引き継いで直すって難しい", "text": "中村さん「意外と前のを引き継いで直すって難しいんですよ」"},
+{"id": "142", "w": "2026.08.15_文化創造館_142", "label": "我々と同じ土俵で自己紹介", "text": "ゴーグル、耳栓、軍手などが置かれた棚を見る。受付で名札代わりに渡されたのと同じ養生テープにゴーグルとか耳栓とか軍手と書いて箱に貼ってある。我々と同じ土俵で自己紹介されているようで、なんだか面白い。"},
+{"id": "143", "w": "2026.08.15_文化創造館_143", "label": "「アル助」と商品名", "text": "棚の側面には巻き尺などをかけるために丸い木材やペットボトルのキャップがビスで打ち込まれていた。あと、1ｍのアルミ製の定規のカバーに「アル助」と商品名が書かれていた。これは擬人化なんだろうか。大工道具みたいなものには、名前を付けると愛着が湧いていいんだろうか。どういう意図があるのか、業界全体がそういう感じなのか、気になる。"},
+{"id": "144", "w": "2026.08.15_文化創造館_144", "label": "なんで白い紙じゃないんだろう", "text": "記録のパーティメンバーが津田さんの話を聞いている間にメンテナンスクラブもイスの「観察」をしていたらしく、床に置いてあるバインダーに茶色い紙が挟んであってイスの絵が描かれていたり、構造を文章で書いたりしているのを見つける。ホワイトボードにも貼ってあった。なんで白い紙じゃないんだろう。"},
+{"id": "148", "w": "2026.08.15_文化創造館_148", "label": "おさまりがよくてすごく自然", "text": "中村さんが津田さんと話していたのだけど、インパクトドライバーを股の間にすっぽりと挟んでいる。おさまりがよくてすごく自然に見えるけど何故。それが普通なのか。"},
+{"id": "149", "w": "2026.08.15_文化創造館_149", "label": "なんで存在してるかわかんない", "text": "津田さんが「全ネジを使いたいときってどんなとき？」と質問すると、中村さんは「僕も全ネジがなんで存在してるかわかんないんですけど…仮止めのときとかに使うんじゃないでしょうか」などとと答えている。インパクトドライバーはいつの間にか手の中に戻っている。"},
+{"id": "150", "w": "2026.08.15_文化創造館_150", "label": "何かを主張したかったら背中側", "text": "イスを解体するためにしゃがみこんでいる人の背中、Ｔシャツのプリントが目に入る。GREAT WAVESとか1782とかビーチの絵らしきものがプリントされているが、なんのことかはわからない。でも人のTシャツのプリントって背中だとよく見てしまう。何かを主張したかったら背中側でやるべきだなと思う。"},
+{"id": "151", "w": "2026.08.15_文化創造館_151", "label": "一緒にいるだけで1日過ごせる", "text": "若者たちが3階から降りてくる。帰るのかなと思ったら会場の外のロビーにあるカウンターに移動していた。一緒にいるだけで1日過ごせるのっていいねえと思う。私にとって文化創造館とはアートや学術っぽいイベント、個人が開催する「イベントの会場」として馴染みがあるので、特にああいう賑やかな若者のたむろする場所として選ばれているのがなんだか不思議な感じがする。でもひたすら勉強してる学生とかもいつもいる。不思議な場所。"},
+{"id": "153", "w": "2026.08.15_文化創造館_153", "label": "一体になって揺れている", "text": "15:50メンテナンスクラブの活動まとめ 参加者が何をしたかの説明を聞きながら、中村さんはまだぐらつくイスに座っている。中村さんがうなづいて揺れるとイスも揺れる。イスと中村さんが一体になって揺れている。"},
+{"id": "154", "w": "2026.08.15_文化創造館_154", "label": "でこぼこの鍵盤", "text": "私が結局座らなかったイスは背もたれがでこぼこの鍵盤のような見た目だったのだけど、中村さん曰く愛らしいイスらしい。物を見て愛らしいって思うことはあんまりないなと思う。"},
+{"id": "156", "w": "2026.08.15_文化創造館_156", "label": "発見にことかかない文化創造館", "text": "会場を出て一歩目でもうテーブルとイスはあるし（職人さんに作ってもらったイスとイケアのイスが一つのテーブルに混在している）、シンプルに見えてかなり作りがしっかりしたベンチはあるし、前館長が作って置いて行った積み木のようなものが大量に載ったテーブルがある。発見にことかかない文化創造館。"},
+{"id": "157", "w": "2026.08.15_文化創造館_157", "label": "背後に黒板は置かれたまま", "text": "会場の出入口にある大きな黒板には、当初イベントの案内が書かれていたが、汚れてきたのと「黒板じゃなくてもよくない？」ということでホワイトボードに取って代わられたそう。でも何故かホワイトボードの背後に黒板は置かれたままになっている。しかもサイドの絵がたまに変わっているらしい。 藤本さん「昨日花火だったから花火描いてるのかな」"},
+{"id": "159", "w": "2026.08.15_文化創造館_159", "label": "使ってるうちにガッタガタ", "text": "1階の一番広いホールに向かう途中で先行していた中村さんの「あー…、あー…、あー…」という声が聞こえて、相当ガタが来ているものを発見したのかと思ったら本当にガッタガタしているアンケートBOXがあった。でも蓋の向きを変えるとアンケートの投入口を開けておくか閉めておくか選べる２WAYのBOX。しかもちゃんとした人が作ったらしい。それでも使ってるうちにガッタガタになるものなんだなあ。"},
+{"id": "161", "w": "2026.08.15_文化創造館_161", "label": "墓場みたいなとこに寄せてます", "text": "屋外に出る テラスのイスも相当ぐらぐらしていた。藤本さんに「点検しないんですか」と聞くと「してはいるんですけど…ほんとにやばいのは墓場みたいなとこに寄せてます」。墓場。「でもまだ大丈夫なのはそのままになっちゃってます」とのこと。"},
+{"id": "162", "w": "2026.08.15_文化創造館_162", "label": "もっふもっふと軽い反発", "text": "芝生の上にもイスがあるのでそちらにも向かう。芝生の上を久しぶりに歩いた。もう少しふわふわ柔らかい感触を想像していたら草は案外しっかりしていて、踏むたび、もっふもっふと軽い反発が返ってくる。"},
+{"id": "163", "w": "2026.08.15_文化創造館_163", "label": "謎の共感を覚える", "text": "お堀の方の芝生に向かうと、なかいちの広場でやっているイベントの音がそこそこ大音量で聞こえてくる。ステージで誰かが郷ひろみを歌っている。メンテナンスクラブの参加者さんがそれに合わせてか、はたまたつられてか「エキゾチックジャパ～ン」と口ずさみながら私の前を通り過ぎていく。私も頭の中でちょっと口ずさんでいたので謎の共感を覚える。"},
+{"id": "165", "w": "2026.08.15_文化創造館_165", "label": "撤去せずにそのまま", "text": "「元」駐輪場であって今は駐輪場ではないとのことで、端っこに白いベニヤ板が立ててあり「駐輪場のご案内」という張り紙がある。その横にもでかい簀の子のような板が立っていて、他の参加者さんが「これはなんですか」と聞くと、これは元ベンチなのだが、掲示物を貼るように立てて置いていた、けれど視認性が悪いということで横に白いベニヤ板を設置した、でも撤去せずにそのままになっている、とのこと。屋内の黒板と同じく、用済みになったのに何故かそこにあることを許されている。文化創造館のゆるさを感じる。"},
+{"id": "168", "w": "2026.08.15_文化創造館_168", "label": "別の板を噛ませて補ったり", "text": "中村さんと津田さんが本日の簡単な感想と明日のスケジュールを説明して両メンバーはおつかれさまでした、と解散。でもメンテナンスクラブの女の子が一人、中村さんと一緒にイスを前にして作業を続けていた。作業中も補強する木材の長さが足りないのを、別の板を噛ませて補ったりと工夫していたらしい。熱心だ。楽しそうで良いな。"},
+{"id": "172", "w": "2026.08.16_文化創造館_172", "label": "「厚く」と書いてある", "text": "とりあえず自分が書いたものを読んでみると、津田さんの「熱く書く」という発言をメモした横に「厚く」と書いてある。なんとそちらの厚く、だった。文化人類学には「厚く書く（自分が気になったことについて、いろいろな層が重なるように詳しく記述するというような意味）」の言い回しがあるらしい。それまでの津田さんの冷静沈着な語り口の中で突然熱血っぽい言葉が出てきたので違和感があったが、なんと同音異義語だった。"},
+{"id": "174", "w": "2026.08.16_文化創造館_174", "label": "あえて身体を揺らす", "text": "14:00　イベントスタート 前日の活動で1個だけ誰も手を付けなかった「明らかにボロい」イスがスクリーン前に戻されていたので座ってみる。身体を左右に揺らすと確かにグラグラするが、座っていて不安になるほどではない。しかし、ボロいイスに座ってあえて身体を揺らすことは普段ならしないだろう。壊れてもいいものなら、普段やらないような扱い方をするのは楽しいものだなと思う。"},
+{"id": "177", "w": "2026.08.16_文化創造館_177", "label": "昨日から引き継がれているもの", "text": "スタッフの藤本さんの発言。屋外に什器を見に出た時に音楽が聞こえてきたが、なんの曲やったっけ？くらいの印象だった。でも記録を印刷するときに歌詞の記載があるのを読んで、朝からそのフレーズが頭の中でリフレインしているという。「昨日から引き継がれているもの」というような表現。自分の昨日の記録が他人の今日の脳内に引き継がれて、しかも朝からリフレインということは、なんだか強化されている感じがある。不思議な現象。"},
+{"id": "178", "w": "2026.08.16_文化創造館_178", "label": "ズボンに短くちぎられたマステ", "text": "14:21  メンテナンスクラブのメンバーは、まずは館内にある直せそうな什器を探しに行く。直すポイントを書くための小さい四角の紙を渡され会場を出て行った。紙は黄色いマステで貼ってくださいと藤本さんが言っていたが、そのあとしばらくしてから、藤本さんのズボンに短くちぎられたマステが5，6本貼られていることに気付く。ああいうのってイベント終わっても忘れてそのままにしちゃうことある。私も名札代わりの養生テープを何回胸元に貼り付けたまま帰ったかわからない。帰りにスタッフさんからはがしてくださいね～とか言われないと結構な頻度で気付かない。藤本さんがいつはがしたかは不明。"},
+{"id": "179", "w": "2026.08.16_文化創造館_179", "label": "すごくよく想像できる", "text": "前日、メンテナンスクラブの中村さんが立ち話中にインパクトドライバーを股の間に挟んでいた（しかもそれがむちゃくちゃ自然な姿だった）ことが改めて気になったのでご本人に聞いてみると、あんまり意識していなかったらしい。「物を持ってるとよく”フィットしてるね”とか、棒を持ってても”っぽいね”と言われる」とのこと。棒が”っぽい”ってどういうことかよくわからないし、中村さんには昨日初めてお会いしたばかりなのに、何故かその様がすごくよく想像できる。不思議。"},
+{"id": "180", "w": "2026.08.16_文化創造館_180", "label": "同じタイミングで座っていて", "text": "今日からメンテナンスクラブに参加する方が二人いて、新しく追加された二人掛けのデカいボロいベンチに一緒に取り掛かることになった。まずはベンチの構造をつかむためスケッチから開始するが、ひとりは立ったまま、ひとりは床にあぐらで座ってスケッチしていて高低差が出ている。しかし、ベンチのぐらつきを確かめるために座ってみようとなったときは二人一緒に全く同じタイミングで座っていて面白かった。しかも二人の服装は上が白、下が青いデニムで、後ろから見ているとなんだかお揃いに見えたので余計に面白い。"},
+{"id": "181", "w": "2026.08.16_文化創造館_181", "label": "ペンでザカザカ書くくらい", "text": "ベンチ組のうちのおひとりは美大生らしい。中村さんに、スケッチに何故えんぴつではなくマジックペンを使うのか？と質問している模様。「えんぴつだともっとおしゃれにできるかも、と思っちゃう」と納得している様子。中村さん曰く「ペンでザカザカ書くくらいが”それっぽく”なっていい。簡単にそれっぽくなるとモチベが下がらないのでいい」とのこと。私は絵が苦手で、美術の授業などで描いていて嫌になった記憶があるので、なるほどと思う。"},
+{"id": "182", "w": "2026.08.16_文化創造館_182", "label": "抜くときはむしろ押してやる", "text": "中村さんが今日からのメンバーにインパクトドライバーの使い方を説明している。「イメージと合わないかもしれないけど、抜くときはむしろ押してやるとうまくいく」。押してダメなら引いてみな、の逆バージョンみたいだ。"},
+{"id": "183", "w": "2026.08.16_文化創造館_183", "label": "みたいな濁音が多い", "text": "インパクトドライバーの回転はゆるく握るとゆっくりになり、思いっきり握ると「ビャーーー！！」ってなっちゃうと中村さんがデカめのジェスチャー付きで説明している。昨日からこういうちょっと不思議な擬音語で喋っていることが多いなと感じる。その後も「ビスはいきなり”ギャー！”って打たないようにしましょう」とか「ここはこのまま”バギャー”って」とか言っていた。ビ・ギ・ギャ・ビャ・ダ、みたいな濁音が多い。"},
+{"id": "184", "w": "2026.08.16_文化創造館_184", "label": "「ほんとだ、ホットだ」", "text": "ベンチ組が初めてのインパクトドライバーでビスを抜く。熱いから気を付けて、と中村さんが言うと「ほんとだ、ホットだ」とのコメント。これだけ聞くとコーヒーのことか？と思う。藤本さんがビスを見て「錆び錆びだね」と言うと「お菓子っぽくないですか？」と返していて、錆びたビスがなんのお菓子に見えたのか不思議に思う。言葉だけ聞いているとますます食べ物っぽさが増す。"},
+{"id": "186", "w": "2026.08.16_文化創造館_186", "label": "海っぽいものが珍しい", "text": "1階受付前のチラシを置いている什器について、市場から貰ってきた新巻鮭の箱が使われていることに着目した参加者さんがいて「横手出身だから海っぽいものが珍しい。これを更に活かしたプラスアルファのデザインをしてもいいのでは」とコメント。自分は県の沿岸出身だし、秋田はいわゆる海なし県ではないので、海っぽいものが珍しいという視点が同じ秋田県民から出ることを意外に感じる。"},
+{"id": "187", "w": "2026.08.16_文化創造館_187", "label": "「ギャップがいい」という声", "text": "藤本さん、キッチンスペースのIHコンロのカバー（木製）がボロボロで気になっているとのこと。四隅をホッチキスで留めてあるのが外れかけているし板が割れている、と思ったら持ち上げた瞬間そこそこ長めの破片が落ちた。藤本さん「破壊（笑）」「もうちょっと素敵なものでカバーしたいんですよね」。壊れそうなことより、最先端なIHコンロと木材のDIY感あふれるカバーとのギャップの方が気になっている様子。でも、参加者からは「ギャップがいい」という声も。"},
+{"id": "188", "w": "2026.08.16_文化創造館_188", "label": "頭の方が重いとバランスが悪い", "text": "ガタガタのアンケートBOXについて中村さん「頭の方が重いとバランスが悪い」と説明。頭でっかちみたいな感じ？人間にも組織にも同じことが言えるなと思う。"},
+{"id": "190", "w": "2026.08.16_文化創造館_190", "label": "お互いの様子を自然に覗き見", "text": "同じフロアで別々のイベントをやっていても衝立などできっちり区切っている訳でもないし、お互いの様子を自然に覗き見たりできるのが文化創造館のいいところだと思う。"},
+{"id": "191", "w": "2026.08.16_文化創造館_191", "label": "「ことは先生」", "text": "屋外に出る。「外でシール貼った人」という呼びかけに参加者さんが手を挙げると、誰かが「ことは先生」と言うのが聞こえた。昨日の誰より熱心な取り組み姿勢から、そのように呼ばれているのかな。紙が貼られたイスが指されるとスタッフの藤本さんと白田さんが同時に「だよね～」と呟く。言われると思ってました、とほほ的な言い方も見事にシンクロしていた。"},
+{"id": "192", "w": "2026.08.16_文化創造館_192", "label": "元の身体どれだ…！？", "text": "中村さんがイスの様子を見ながら「作ったときはいいんですけど、使っているうちに緩んでいく、そういう”ヒトたち”なので」と表現する。前日も同じように話していたので普段からそうなんだなと思う。修理に関して、木材を外して新しいものに入れ替えることを話しているときも「元の身体どれだ…！？みたいな」という表現をしている。"},
+{"id": "193", "w": "2026.08.16_文化創造館_193", "label": "たくさん使っているからこそ", "text": "屋外のDJイベントの準備で使用中の台車や、数学イベントで今使われているテーブルもガタガタしていたそうだが、使用中なので、ということで様子を見守りながら通り過ぎる。みんながたくさん使っているからこそ、緩んでくる。"},
+{"id": "196", "w": "2026.08.16_文化創造館_196", "label": "細かく打っては抜いて", "text": "新しく取り付けた手すりにドリンクホルダー用の穴を開けようと試みる方がいて、会場には穴を開ける用の道具がないので、インパクトドライバーで円の形にビスを細かく打っては抜いて、それでくり抜こうとしているらしい。中村さん「これで開けられたらすごい！この手法で穴を開けた人は見たことない」"},
+{"id": "197", "w": "2026.08.16_文化創造館_197", "label": "ちょこん、とコンパクト", "text": "会場内に文化創造館の常連さんが現れて、スタッフさんに声を掛けたりしながら様子を見学している。と思ったら、いつの間にかラグをしいているところに津田さんと並んで腰かけて話をしている。津田さんの座り方はちょこん、とコンパクトで、両手でペットボトルをそっと持っている。常連さんはのびのび自由な感じで座って、身振りも交えながらお話していて、その姿がなんだか対照的。"},
+{"id": "201", "w": "2026.08.16_文化創造館_201", "label": "案外ここぞというタイミング", "text": "カメラマンさんがシャッターを切る瞬間を撮ろうとするが、案外ここぞというタイミングが少ない。構えたと思ったらカメラをすぐおろしたり(撮ったのか撮ってないのか)、周囲を歩き回っている時間や、それまでの写真を見返しているらしい時間が結構ある。"},
+{"id": "202", "w": "2026.08.16_文化創造館_202", "label": "造りが同じだ", "text": "イベントの参加者ではない人がまた会場に入ってくる。見学かと思ったら、スタッフの白田さんに「ここに昔、大きい絵があったよね」「子どものころ来た。造りが同じだ」と話しかけている。白田さんが頷いて、県立美術館から文化創造館への変遷の説明をしている。文化創造館が出来てからそれなりに経つけれど、まだ初めて来たという人はいるんだなと思う。"},
+{"id": "204", "w": "2026.08.16_文化創造館_204", "label": "ちょうどいい静けさ", "text": "ロビーに出ると、Ａ1ホールに響くインパクトドライバーの音や参加者さんたちの話し声、笑い声が遠くなって、外の蝉の鳴き声と混じって聞こえる。「コンフリクション、コンフリクト、動詞だと矛盾するね」。テーブルで英語の勉強をしている学生さんたちもいる。ちょうどいい静けさ。"},
+{"id": "205", "w": "2026.08.16_文化創造館_205", "label": "会場の扉は閉められていない", "text": "でも、外から会場内を見るとみんな楽しそうに何か作業していて、なんだろう？とちょっと様子を見たくなる感じもする。そういえば会場の扉は閉められていない。文化創造館はこういう絶妙なつながりのある、ちょうどいい距離感がつくられている独特な場所だと思う。"},
+{"id": "206", "w": "2026.08.16_文化創造館_206", "label": "手すりにビス打ちで穴を開ける", "text": "作業していたみなさんが一か所に集まっているのが見えたので何だろうと戻ってみると、手すりにビス打ちで穴を開けるという果敢なチャレンジがなんと成功する瞬間だった。中村さんも「ビスでここまでやるのは初めて見た！」と絶賛している。しかし穴が開いただけでは完成ではなく、ここからブサブサにささくれ立った穴のふちにヤスリをかけるらしい。"},
+{"id": "207", "w": "2026.08.16_文化創造館_207", "label": "持ち手にヤスリを巻きつけて", "text": "最初はヤスリを手に巻きつけて作業していたのが、いつの間にか短い角材に巻きつけられ、最終的にはトンカチの持ち手にヤスリを巻きつけてそれでゴシゴシと磨いている。"},
+{"id": "210", "w": "2026.08.16_文化創造館_210", "label": "びっくりするほどキラキラ", "text": "その様子を少し離れたところから見ていて、やけにキラキラしたものが視界に入るなと思ったら、正面に見えるイスの背もたれに新しく打たれた二本のビスが、びっくりするほどキラキラ光を反射していた。会場は照明でバッチリ照らされていて、かなり明るいからか。でも、このイスがこんな照明の真ん中に置かれるのはこれが最後かな、いや、もし外に置かれたら太陽光をめちゃくちゃ反射するかも、そもそもこれらのイスは今後どこに置かれるのか、置かれる場所が変わっても私はこれらのイスを見つけられるだろうか、ということが頭を過ぎる。"},
+{"id": "212", "w": "2026.08.16_文化創造館_212", "label": "あるものでやる", "text": "ビスでドリンクホルダーの穴を開けたことについては「あるものでやる、とりあえずやるをあまりにも体現している」と言っていた。そういうやり方について「なんとなく体感として楽しいなーと感じてもらえたら十分。あまり言うことはない。とりあえず、でも、サイコーです」というのがまとめ。"},
+{"id": "213", "w": "2026.08.16_文化創造館_213", "label": "木材に腰かけていた", "text": "ところで、コメントしている中村さんの足元に新しい木材が見えたので既製品のイスに座ってるのかと思ったらなんとイスくらいの高さ（長さ）の木材に腰かけていた。その辺に置かれていたんだろうけれど、同じくらいの距離に普通にイスもあるのに何故。しかもそれが正に”フィットしている”ために違和感がない。"},
+{"id": "214", "w": "2026.08.16_文化創造館_214", "label": "”っぽい”の真髄", "text": "中村さんのあとに津田さんがコメントを求められる。「津田さんすごいとこ座ってますね」という声。津田さんは横長のすごく大きいけれど比較的薄い板（木材置き場の棚に立てかけられている）の上に座っている。 「中村さんが木材に座ってたので…」真似したということか。というか、中村さんには誰もつっこまなかったので、中村さんが木材に座っていたことはあまり注目されていなかったということか？　”っぽい”の真髄を見たかもしれない。"},
+{"id": "215", "w": "2026.08.16_文化創造館_215", "label": "モノとヒトとの境界が薄い", "text": "クローズのあと 中村さんがイスを「ヒトたち」と表現していたことが気になったので聞いてみる。 以下回答。 無意識かもしれない／擬人化しようとすら思ってない／愛らしいもそういうとこだと思う (愛らしいからヒトっぽいのか、ヒトっぽいから愛らしいのか？と聞いてみるとしばらく考えて) このボロボロのヒトたちをメンテナンスする、しょーがないなーってやってあげる感じ。でもやりだすと楽しくなっちゃう／おせっかいを焼きたくなる状態。だからヒトっぽいと感じるのかな？／遠くにポツンとイスが”いたら”なんか淋しそうって思う／モノとヒトとの境界が薄い"},
+{"id": "216", "w": "2026.08.16_文化創造館_216", "label": "木材の部分は骨", "text": "(会場に置いてある木材とロープを組んだ大きなオブジェについても、ヒトと感じるのか追加で質問) 木材の部分は骨。ロープは少し有機的な、解剖図でみるような神経みたいなもの、肉がつく前のイメージ／どうあれ生き物。”こいつ”とか言う。”これ”とは言わない"},
+{"id": "221", "w": "2026.08.16_文化創造館_221", "label": "まず、住んでみる", "text": "ところで、秋田に移住してきた人に話を聞くと「ここが好きで！」みたいな話は思ったより聞かないなと思う。割となんとなく決めたとか、単に仕事で、夫が転勤するから仕方なく、などの話も多い気がする。だからといって悪い気がする訳ではない。これは中村さんの制作と通じるものがあるのかもしれないと考える。「とりあえず行ってみる。しょーがないからまず、住んでみる」のような。そこから愛しさが生まれることもありそう。"},
+{"id": "224", "w": "2026.08.16_文化創造館_224", "label": "見たら気付けそう", "text": "カフェスペースに、前日の館内ツアー中に注目されていたシンプルなコの字型だけれど裏に支える木材が打ってあるから強度がしっかりしている、と言われていたのと同じ形のベンチが置かれていることに気付く。この様子なら、今日メンテナンスされたイスが館内に散らばっていても見たら気付けそうだなと思う。"},
+{"id": "226", "w": "2026.08.15_文化創造館_226", "label": "お互いの言葉は筒抜け", "text": "邦生さんの自己紹介。３階にウェーイ学生がいる。邦生さんも気にしている様子。空間は吹き抜け、お互いの言葉は筒抜け。"},
+{"id": "229", "w": "2026.08.15_文化創造館_229", "label": "「連続で状態を作っていく」", "text": "「連続で状態を作っていく」っていい言葉。"},
+{"id": "230", "w": "2026.08.15_文化創造館_230", "label": "増築MIX系と質量パワー系", "text": "津田さんの自己紹介の最初に、橋の写真が映される。橋の袂のどでかいコンクリブロックの写真と、さっき邦生さんが見せていた謎の円柱の写真。関連がある気がする。二人とも構造物の写真撮ってんなー。増築MIX系と質量パワー系。"},
+{"id": "232", "w": "2026.08.15_文化創造館_232", "label": "「身に現れる」", "text": "「書く」の説明の時に「身に現れる」という言葉があった。「身に現れる」っていい言葉やと思う。訪れる、みたいな、向こうからやってくる感じがある。ホーリー。「〜な気になってくる」とか「浮かび上がってくる」も、Become（〜な状態になる）な感じが目指されてて、非常に健やか。"},
+{"id": "235", "w": "2026.08.15_文化創造館_235", "label": "骨折した椅子が一脚", "text": "緑のブルーシートの上に、骨折した椅子が一脚。その上に他の什器と人が乗っかる。"},
+{"id": "236", "w": "2026.08.15_文化創造館_236", "label": "ごろんごろんと転がして", "text": "小松さんが椅子を解体しようとしている。ビス穴にインパクトドライバを垂直に当てるために、椅子の方をごろんごろんと転がして向きを変えながら、ビス穴-インパクト-腕ができるだけ真っ直ぐに力が伝わる姿勢を探す。"},
+{"id": "239", "w": "2026.08.15_文化創造館_239", "label": "料理番組みたいだな", "text": "邦生さんのワンポイントアドバイス。インパクトを垂直に当てることや、トリガースイッチの握り方でドリルの回転数が変わること、半ネジと全ネジの使い所を教えてくれる。ワンポイントを聞く前と聞いた後で、ビスの抜き方・打ち込み方が格段に向上する。料理番組みたいだなと思う。"},
+{"id": "241", "w": "2026.08.15_文化創造館_241", "label": "「ユーモア入れていい？」", "text": "ことはちゃんが、家具の補修に「ユーモア入れていい？」と聞いてくれる。「もちろん！」と答える。補修作業にユーモアの発揮のしどころを見出せるなんてさすがっすね！と興奮する。"},
+{"id": "242", "w": "2026.08.15_文化創造館_242", "label": "観察して、考えて、やってみる", "text": "各自の作業進捗を聞く。ササクレを外す。グラグラするところに、「シンデレラフィット」する板材を見つけてあてがってみた。ハズれかけの板を打ち付ける。観察して、考えて、やってみるの工程をふむふむと聞く。"},
+{"id": "243", "w": "2026.08.15_文化創造館_243", "label": "それぞれの人に似合う椅子", "text": "コウキさんが、椅子の強度を上げる。背もたれをつくるプランを話す。邦生さんが椅子に腰掛けて、佐藤さんの話を聞いている様子を見て、収まりが良い。それぞれの人に似合う椅子があるなーと思う。"},
+{"id": "244", "w": "2026.08.15_文化創造館_244", "label": "探検隊みたいでワクワクする", "text": "みんなで館内の什器を見にいく。探検隊みたいでワクワクする。A1を出て2歩で、グラグラの馬と天板のテーブルがある。揺らしてみたり、座ってみたりしている。「既製品のテーブルの安定感」"},
+{"id": "246", "w": "2026.08.15_文化創造館_246", "label": "背景と化している無用の産物", "text": "2Fのホワイトボード裏の黒板。背景と化している無用の産物。花火の絵があったのは、昨日が花火だったから？2Fホールだけでも「見所」ある什器がたくさんある。そういう意味でポテンシャルに溢れた空間。"},
+{"id": "248", "w": "2026.08.15_文化創造館_248", "label": "壊れているものを探す目線", "text": "コミュニティスペースのキッチンのコンロを隠す木のカバーの側面のタッカーが外れている。直したい。なんなら新しいものに変えたい。目が館内の壊れているものを探す目線に変わってきている。"},
+{"id": "249", "w": "2026.08.15_文化創造館_249", "label": "どういう材を入れたら良いか", "text": "アンケートBOXの足もぐらついている。どこにどういう材を入れたら良いか意見交換が沸く。"},
+{"id": "251", "w": "2026.08.15_文化創造館_251", "label": "什器の墓場があります", "text": "デッキに出る。パレットを天板にしたテーブルを囲む。「パレットって？」という質問に邦生さんが動作を持って説明する。フォークリフトの先をこの穴に入れて、運ぶんですよ。スガヤさんが「壊れている什器は直さないんですか？」と聞いてくれる。スタッフとしての管理の不行き届きを省みてひやっとする。「階段の向こう側に什器の墓場があります」と答える。"},
+{"id": "252", "w": "2026.08.15_文化創造館_252", "label": "グラグラするのも許容できる", "text": "芝生の方にでる。置かれている椅子に腰掛けて「下が芝だと、グラグラするのも許容できる」と話す。不安定な場所だと、什器としての成立条件も不安定で良いのか。"},
+{"id": "253", "w": "2026.08.15_文化創造館_253", "label": "椅子には思えない形状", "text": "木枠に天板をくっつけて椅子にしているものがある。ひっくり返した時に椅子には思えない形状に見えて、椅子だよってわかる形で置いておいてもらえないと、それと思えないものだと思う。元駐輪場下にあるベンチを看板に見立てているものも、もともとベンチだったものと言われないとベンチだとは思えないと思う。"},
+{"id": "254", "w": "2026.08.15_文化創造館_254", "label": "シナプスが繋がった", "text": "AUの方から浮かれた音楽が聞こえる。お堀の方の芝生のベンチでビスが外れている部分がある。先ほどレクチャーのあった「半ビスが活かされる補修の場面」そのままで、シナプスが繋がった。さっきの練習の実践ができそう。"},
+{"id": "255", "w": "2026.08.15_文化創造館_255", "label": "「バス停みたい」", "text": "ホリエさんが元駐輪場を見て「バス停みたい」という。見慣れていてそんな風に考えてこともなかったけれど、屋根の下に椅子があって座っている人たちを見るとバス停に見えてくる。屋根の高さや大きさがちょうどそう見える。誰かが発見した「〜に見立てる」のアイデアは面白い。"},
+{"id": "256", "w": "2026.08.16_文化創造館_256", "label": "カメをいじめる子供たちの図", "text": "2日目、1日目の振り返りから。白田さんが昨日の写真を投影しながら、起きた出来事を話す。什器を真ん中に、人が集っている様子の不思議な写真。囲まれる什器。浦島太郎の冒頭で、カメをいじめる子供たちの図。"},
+{"id": "257", "w": "2026.08.16_文化創造館_257", "label": "気になる部分が違っていて", "text": "みんなで昨日のフィールドノートをみる。靴についての描写があること、邦生さんの「愛らしい」の言葉遣い、みんな記録を読んでも気になる部分が違っていて、面白い。この時も頭の中で「エキゾチックジャパ～ン」がリフレインしている。"},
+{"id": "258", "w": "2026.08.16_文化創造館_258", "label": "見つけるのが早い", "text": "メンテナンスポイントを探しについての説明。メンテナンスポイントを書き込む台紙を配って出発。ことはちゃんがA1を出てすぐの箱馬を見つけて書き込んでいる。小松さんも出て左手の黒板に書き込んでいる。見つけるのが早い。世界にメンテナンスポイントが溢れすぎている。"},
+{"id": "259", "w": "2026.08.16_文化創造館_259", "label": "「ここも剥がれていますね」", "text": "1Fに降りてみると、ことはちゃんがそうぞうの木にも書き込んでいる。ことはちゃんのお母さんが記入台の縁をさして、「ここも剥がれていますね」という。全く気づいていなかったけど縁を囲うように貼られているテープがビリビリに破れている。ギクッと思う。"},
+{"id": "260", "w": "2026.08.16_文化創造館_260", "label": "什器をユサユサしながら", "text": "今日はコミュニティスペースで複数の催しがあって、心なしか子どもの姿が多い気がする。メンテナンスクラブのメンバーが、什器をユサユサしながら館内を歩いている。探し物をしているような目つきで、覗き込んだり、立ち止まったり、うろうろしている。他の人からはどう見えているんだろう。"},
+{"id": "261", "w": "2026.08.16_文化創造館_261", "label": "お菓子みたいという", "text": "A1に戻るとナツキさんとコハルさんが邦生さんに教わりながらベンチのビスを抜いている。錆びついた茶色ビスをみてナツキさんがお菓子みたいという。ちょっとびっくりする。衛生的とは思えないものを食べ物みたいって発想できる脳の回路が柔らかくて良いなと思う。"},
+{"id": "262", "w": "2026.08.16_文化創造館_262", "label": "やりたいからやる", "text": "ことはちゃんも小松さんもメンテナンスポイントを探す時間を残して、早々にA1に帰ってきて、昨日まで作業していた椅子の補修に取り掛かる。何を指示されるでもなく、やりたいからやる。手が動いている。"},
+{"id": "263", "w": "2026.08.16_文化創造館_263", "label": "内陸の方だと縁遠いものなのか", "text": "みんなでみんなが貼ったメンテナンスポイントをみに行く。ことはちゃんの箱馬と小松さんの黒板。1階の総合案内前のチラシ置き場で、市場の箱のスタンプが良いから注目したいと小松さんが貼ってくれている。「横手の出身だから、海のものが感じられるのが珍しい」という視点が面白い。そうか秋田って見全体で捉えると海ある感じがするけど、内陸の方だと縁遠いものなのか。広いもんね。"},
+{"id": "264", "w": "2026.08.16_文化創造館_264", "label": "あえて質感が違うのも良い", "text": "コミュニティスペースに移動し、ずっと気になっているキッチンのコンロの蓋について紹介する。私がキッチンに置くものだから質感を統一してもいい、というと盛さんが「あえて質感が違うのも良い」と言ってくれる。創造館の什器の質感の統一性のなさを「味」と感じてくれる人がいてくれて嬉しい。"},
+{"id": "265", "w": "2026.08.16_文化創造館_265", "label": "癖ついて、内に入ってくる", "text": "コミュニティスペースの入り口看板の前。ソウゾウの木とアンケート台についてもシートが貼られている。アンケート台の足がなぜ内側に入っていってしまうのか、邦生さんが教えてくれる。「癖ついて、内に入ってくる」。盛さんが「例えば、この位置にこの向きで渡したら良いってことですか？」と具体的な提案をする。見えていて、すごい。ことはちゃんのお母さんのTシャツがモナリザだと気づく。"},
+{"id": "267", "w": "2026.08.16_文化創造館_267", "label": "外れているピースを留め直す", "text": "ことはちゃんのお母さんが、傘立てが部分的に外れていることを発見。邦生さんがロックが外れている部分を見つけて、ロックし直し、「補修完了」という。構造を確認して、外れているピースを留め直すのもメンテナンス。"},
+{"id": "268", "w": "2026.08.16_文化創造館_268", "label": "地震の用語ですよね", "text": "館内に戻ってきて、机が「横揺れ」することについて話す。よく使う机だから、直したいよねと話す。津田さんが「横揺れ縦揺れって地震の用語ですよね」という。確かに。自然に使ってしまっていたけど。"},
+{"id": "271", "w": "2026.08.16_文化創造館_271", "label": "手が、身体が先に動いている", "text": "みんな行為に悩む時間が短い。手が、身体が先に動いている感じがする。"},
+{"id": "272", "w": "2026.08.16_文化創造館_272", "label": "「バババッ」って鳴ると嬉しい", "text": "コハルさんとナツキさんのチームからインパクトドライバーの音。から回っているドゥルルじゃなくて、ちゃんと締まっている「バババッ」の音がする。「バババッ」って鳴ると嬉しい。多分締めてる本人も、インパクトドライバーを使うことに慣れて身体化している人たちも、「この音は正常、ちゃんと締まってる」って思えて嬉しい。"},
+{"id": "274", "w": "2026.08.16_文化創造館_274", "label": "抜けた時に拍手が起こる", "text": "ことはさんがいよいよトンカチでホルダーの穴をぶち抜こうとしている。みんなに見守られながら、腕を振り下ろす。高い天井の広い空間に、「バン、バン、バン」と音が響く。3Fの学生たちは動じない。抜けた時に拍手が起こる。欲望の達成。"},
+{"id": "275", "w": "2026.08.16_文化創造館_275", "label": "道具の形状が進化していく", "text": "やすりがけを試みる。紙やすりを筒状にして、穴にフィットするようにあてがってこする。「佐輔くん、やすりの番号小さいのある？」「下にあったかな、取ってきます」ことはちゃんが木の棒にやすりを巻きつけて、やする。状況に最適化するように道具の形状が進化していく。"},
+{"id": "276", "w": "2026.08.16_文化創造館_276", "label": "「適合の余地」", "text": "ナツキさんコハルさんチームが背もたれを補修する。角度を変えると背中に刺さるので、ちょっと不安定なグラグラするくらいがちょうど良いという結論に至っている。「不安定」は個別への「適合の余地」と解釈が変換されて今許された。"},
+{"id": "278", "w": "2026.08.16_文化創造館_278", "label": "それも味としよう", "text": "小松さんは足の部分に板を取り付ける。クランプでずれないように抑えながら、ビスで一つずつ止める。足の長さが左右で違って座面が傾くけど、それも味としよう！ということで、片面の足を完成させる。ちょっとグラグラするけど、今日はここまでと決める。"},
+{"id": "279", "w": "2026.08.16_文化創造館_279", "label": "みんな恐る恐る座る", "text": "小松さんが去ったあと、山岸さんや白田さんが恐る恐る座る。みんな恐る恐る座る。そ〜っと座るの面白い。壊さないように。誰かのメンテナンスや作業を信じて身を預けること。既製品の椅子は信じられるけど、手作りのものの前では立ち止まる。"},
+{"id": "281", "w": "2026.08.16_文化創造館_281", "label": "魔法陣みたいな位置取り", "text": "メンテナンス作業をしている場の向こう側に記録しているスガヤさんが見える。魔法陣みたいな位置取り。テンションっていうか、引力？張力が生まれている感じ。引っ張り合ってる。真ん中に什器、その周りにメンテナンスクラブ、の周りに記録のパーティ、の外側に撮影の山岸さん。"},
+{"id": "282", "w": "2026.08.16_文化創造館_282", "label": "お札みたいな、なんか宿る", "text": "ナツキさんコハルさんチーム、ことはさんチームの椅子の補修が完了する。「ここまでできた」のゴールが達成されて晴れやかな様子。「補修しました」のシールを貼ると「認定」な感じが沸く。お札みたいな、なんか宿る。"},
+{"id": "284", "w": "2026.08.16_文化創造館_284", "label": "とりあえずは短い", "text": "振り返りで邦生さんが「とりあえず」は「寿命が短い」という。準備して取り組んだものは長く、とりあえずは短い。報いというか、行為には然るべき結果・報復が伴う。他の人が使う時には安全性や強度を考えないといけない。10回座っても大丈夫かとか、確認が必要。自分の行いが自分のいないどこかや誰かに影響することに想像力を持ちながら、備えて取り組むことが強度と信頼と安全性につながる。"},
+{"id": "294", "w": "2026.08.15_文化創造館_294", "label": "薄い深緑色のビニールシート", "text": "14時53分～ 会場の中央に薄い深緑色のビニールシートが敷かれている。"},
+{"id": "296", "w": "2026.08.15_文化創造館_296", "label": "「釘を抜く」という作業", "text": "どうやらまずは、みんなそこに置かれた椅子やベンチの「釘を抜く」という作業を各々やっているということにそこで気がついた。"},
+{"id": "297", "w": "2026.08.15_文化創造館_297", "label": "男性はお父さん？", "text": "15時06分頃　作業をしている4人のうち、会場入り口側からみて手前で釘を抜いていた女性を見ていた。その様子を写真に撮っている男性はお父さん？"},
+{"id": "298", "w": "2026.08.15_文化創造館_298", "label": "「これはバールで…」", "text": "だんだんコツをつかんできた様子のところ、苦戦している箇所が。様子を見にきた中村さんが「これはバールで…」とバールをもってきて使う。"},
+{"id": "299", "w": "2026.08.15_文化創造館_299", "label": "タッタッタータァァァー", "text": "その直後、思い出したように中村さんが「ちょっと追加で説明しまーす」とドライバーを垂直に使う、まっすぐにあてる、というアドバイスを全員に伝える。続けて、ドライバーの握り方について、やさしくにぎるとゆっくり回転するので、最初ゆっくり、徐々に強く握ると早くなる、という仕組みを説明。例えとして「よく、工事現場から聞こえる音で」と「タッタッタータァァァー」と実演。すかさず「わかる！　聞いたことある！」とフジモトさんがみんなの心の声を代弁。"},
+{"id": "300", "w": "2026.08.15_文化創造館_300", "label": "「上手」と小声で声掛け", "text": "15時13分頃　各々作業に取り組んでいる。15時15分頃、気がつくと、手前で作業中の娘さん（かな？）の写真を撮っていたお父さん（かな？）がどこかに行ったようだ。一人でがんばっているところを白田さんが見守っている。中村さんも黙々を作業しているところを見回り「上手」と小声で声掛け。"},
+{"id": "301", "w": "2026.08.15_文化創造館_301", "label": "完全にバラす前になおして", "text": "15時19分頃　「じゃあ、また追加で情報というか」と中村さんがみんなへ呼びかける。 「思いついてみてほしいというか、めっちゃビス打つとかやってみて、（ここのイスは）1本しか打ってないので、1本より2本のほうが強くなるかもなので、完全にバラす前になおしてみてほしい」。"},
+{"id": "302", "w": "2026.08.15_文化創造館_302", "label": "背幅をメジャーで測ってから", "text": "その呼びかけのすぐ後に手前の女性（娘さん？）が作業中のイスの背幅をメジャーで測ってから材料を選びにいった。そこに白田さんが付き添う。"},
+{"id": "303", "w": "2026.08.15_文化創造館_303", "label": "横に揺れるので", "text": "15時27分頃　手前の女性がイスの背にさきほど選んでもってきた棒状の板を取り付けようと、ななめにビスをドライバーで打ち込んでいる。ななめに入れるのはむずかしそうだ。「（イスが）横に揺れるので（板を）追加しようと…」と様子を見に来た中村さんに白田さんが説明。"},
+{"id": "304", "w": "2026.08.15_文化創造館_304", "label": "けっこう難易度高いぞー", "text": "「けっこう難易度高いぞー」と中村さんもアドバイスをしながら見守りながら手伝う。"},
+{"id": "305", "w": "2026.08.15_文化創造館_305", "label": "「ガタッガタッガタ」", "text": "ドライバーで穴をあけてから、ネジを「最初するするする～っと」といいながらドライバーでゆっくり締めていき、「ガタッガタッガタ」と最後に締まった音がした。"},
+{"id": "306", "w": "2026.08.15_文化創造館_306", "label": "「まがってる～」と女性の声", "text": "「いいねいいね～」「ちょっと強くなったかも」。その直後「まがってる～」と女性の声。"},
+{"id": "308", "w": "2026.08.15_文化創造館_308", "label": "イスがなくなっている", "text": "15時33分頃　中村さんが「え～っと」と周りを見回して説明をしようとしているのを見たところ、手前の女性の奥に見えていた男性が作業していたイスがなくなっているのに気がついた。"},
+{"id": "309", "w": "2026.08.15_文化創造館_309", "label": "「ウンチクタ～イム！」", "text": "「ウンチクタ～イム！」という中村さんの呼びかけで「半ネジ」と「全ネジ」の説明。"},
+{"id": "310", "w": "2026.08.15_文化創造館_310", "label": "記録チームも休み休み", "text": "15時40分頃　いつの間にか作業が終わってイスが片付けられていた男性が帰っていった。 と同時にお父さんが復活！ と同時に津田さんが近づいてこられ「記録チームも休み休みいきましょう」といわれる。 時計を見るが15時40分、同じ時間にいろいろ起こっている！　と書きながら思った。"},
+{"id": "313", "w": "2026.08.15_文化創造館_313", "label": "「楽しいよ～」と娘さん", "text": "「楽しい？」とお父さん（？）、「楽しいよ～」と娘さん（たぶん）。"},
+{"id": "314", "w": "2026.08.15_文化創造館_314", "label": "「ゆっくり→はやく」", "text": "まだまだやりたいことがあるようだ。ネジも「これじゃない」「たぶんこっち」と選んでいる。ネジの取付も「ゆっくり→はやく」が板についてきている。"},
+{"id": "315", "w": "2026.08.15_文化創造館_315", "label": "だれがつくったのかわらない", "text": "15時47分頃　もう一人の女性が戻ってきた。白田さんが声をかけて状況を聞いている。 「これって（ここで）やってるんですか」と女性。「前の館長が『つくりましょう』、ていう方で…」と白田さんが説明。「だれがつくったのかわらない、みたいな」。"},
+{"id": "316", "w": "2026.08.15_文化創造館_316", "label": "これぞ『メンテナンス』！", "text": "15時50分頃　「ここが長さが足りないのでこれをかませて…」と中村さんがイスを見ながら「これぞ『メンテナンス』！」と評価。"},
+{"id": "321", "w": "2026.08.16_文化創造館_321", "label": "足元に注目しているんだな", "text": "記録を読んで気になることがあるか、とみんなで掲示された昨日の記録の前で意見交換。「ハイ！　コウキです」と手を挙げたコウキさんが「くつが『ニューバランス』とか、って書いている人は、くつ（の記述）がまたでてくるのは、足元に注目しているんだな」と思う、という感想。みんな、たしかに～とうなづく。"},
+{"id": "326", "w": "2026.08.16_文化創造館_326", "label": "同じ中央のイスをスケッチ", "text": "途中、一人は立って、もう一人は座って同じ中央のイスをスケッチしている。"},
+{"id": "327", "w": "2026.08.16_文化創造館_327", "label": "ペンで描くので", "text": "今回のスケッチはペンで描くので、通常の鉛筆のときと違って、という話を3人でしている。"},
+{"id": "329", "w": "2026.08.16_文化創造館_329", "label": "座ったまま各々つづきを描く", "text": "「ぜひ一旦座って～」と中村さんが呼びかけると2人でならんでイスに座ってみる。座ったまま各々つづきを描く。かなり真剣に描いているようす。"},
+{"id": "333", "w": "2026.08.16_文化創造館_333", "label": "反射的に背を向けてしまった", "text": "そのテーブルの隣のブースには囲いがあり、その囲いに『HOME TOWN TRAVELER』と書かれた小ぶりのポスターが何枚も貼られている。その一角でゲームをしている人たちがいた。覗き込んでいたら中にいる人の視線を感じたので、「あっ、違います」という感じで反射的に背を向けてしまった。一言なんか言えばよかったかな、とすこし反省。"},
+{"id": "335", "w": "2026.08.16_文化創造館_335", "label": "一体そこで何を？", "text": "2階の入口右側のカウンターにいる人、一体そこで何を？"},
+{"id": "339", "w": "2026.08.16_文化創造館_339", "label": "普通に胸元に貼り直す", "text": "早めに文化創造館に到着／開始時間の5分前に会場へ。受付で保険のお金を払い、テープに名前を書いて服にはる。名札をつけるとき、みんな胸の左か右に貼るような〜といつも思う。ちょっと冒険しようと、真ん中に貼ってみる。シャツの柄が派手で、名札が目立たず、名前を覚えてもらえないかもと思ったので、普通に胸元に貼り直す。"},
+{"id": "341", "w": "2026.08.16_文化創造館_341", "label": "どうやって！？という疑問", "text": "荷物をテーブルに置いて、屏風の方に向かうと、昨日のフィールドノートが飾っていた。昨日記録したのに、どうやって！？という疑問。"},
+{"id": "343", "w": "2026.08.16_文化創造館_343", "label": "読んでもわからない", "text": "飾っているフィールドノートを読んでみる。やはり昨日いなかったこともあり、あまり読んでもわからないことが多く、仕方ないとは思いつつも、ちょっと悲しい。"},
+{"id": "345", "w": "2026.08.16_文化創造館_345", "label": "板のような座るやつが人気", "text": "白田さんの呼びかけで、みんなが集まる。最初の説明を聞くために椅子に座る。クッションがいくつか乗っている板のような座るやつが人気な感じがする。"},
+{"id": "347", "w": "2026.08.16_文化創造館_347", "label": "「グラグラする」", "text": "みんなメンテナンスのことだと「揺れてる」とか「グラグラする」ことに関する発言が多い。"},
+{"id": "350", "w": "2026.08.16_文化創造館_350", "label": "直さないこともメンテナンス", "text": "メンテナンスってなんだろうな。直すことなのかな？でもなんでも直すのは違うよな？直さないこともメンテナンスなのかな？ベンチが揺れてたらダメなんだっけ？"},
+{"id": "351", "w": "2026.08.16_文化創造館_351", "label": "一発勝負のぺん", "text": "まずはメンテナンスするベンチを観察することに。茶色い紙に黒ペンが支給される。ペンを使うのは、「鉛筆だと書き直せるから何度も何度も線を書き直したり、重ねたりしてしまうけど、一発勝負のぺんにあえてすることで、その一本の描写に力が入り、かえって、鉛筆よりも特徴を捉えた線になるから」というようなことを中村さんがおっしゃっていた。／聞いていてすごく腑に落ちた。私も鉛筆だと「もっとうまくかけるかも」と思ってたくさん線を描いて、最終的にできた線が目の前の観察対象を捉えた線というより、私の頭のなかの観察対象の記憶とか今まで見てきた観察対象の平均値の線になる感じがする。"},
+{"id": "355", "w": "2026.08.16_文化創造館_355", "label": "どんどん打ち込んでいく作戦", "text": "いろんな箇所にビス？を打ち込んでみると、木材同士がもっとくっついて揺れがなくなるかもだから、「ここかも？」と思ったところにどんどん打ち込んでいく作戦。"},
+{"id": "357", "w": "2026.08.16_文化創造館_357", "label": "ほんとに打ち込みすぎ", "text": "揺れが治ってきたので、今度は背もたれの板を一度外すことに。しかしなかなか外れない。昔のビスが打ち込みすぎて埋もれてるので、外すのが難しい。なんでこれを作った人はこんなに打ち込んだのか気になる。ほんとに打ち込みすぎ。"},
+{"id": "358", "w": "2026.08.16_文化創造館_358", "label": "横揺れが再発", "text": "なんとか板のビスを緩めていく。そしたらベンチの横揺れが再発。緩めちゃいけない部分だったみたい。"},
+{"id": "359", "w": "2026.08.16_文化創造館_359", "label": "「おして引いて」みたいな作業", "text": "緩めてみては（外してみては）締め直してを繰り返して具合を探る。この「おして引いて」みたいな作業が直感的にいいな〜と思った。メンテナンスってこういうことなのかなみたいな。メンテナンスする物と対話するというか。対話っていうと大袈裟だし、「対話する」ってよく使われるから、この体験に当てはめる言葉としてちょっとしっくりこないけど。"},
+{"id": "362", "w": "2026.08.16_文化創造館_362", "label": "緑が剥がれても普通に書ける", "text": "黒板の表面が、みんなに使われすぎて緑の塗料が剥がれて黒くなっていた。黒板の緑って表面に塗っているものなのか！？という衝撃の事実。そして緑が剥がれても普通に書けるこの黒板のタフさ。見習いたい。"},
+{"id": "363", "w": "2026.08.16_文化創造館_363", "label": "物のもつ魅力を生かそう", "text": "階段を降りる。チラシがたくさん置いてある箱に注目した女性。箱には「べに」「さけ」「特」「カナダ」「８尾」「特撰」「船凍」などと書いてある。（文字はスタンプでおしているらしい）／この箱の模様をもっと魅せるようにできないか？という意見だった。素敵な視点。壊れている部分、足りない部分を直すだけでなく、物のもつ魅力を生かそうというタイプのメンテナンスもあるんだな。"},
+{"id": "365", "w": "2026.08.16_文化創造館_365", "label": "家具の『足』って言う", "text": "みんな家具の『足』って言う。正式な呼び方なのかもしれないけど、擬人化が起きてるし、「命があるもの」感が増す。"},
+{"id": "366", "w": "2026.08.16_文化創造館_366", "label": "4本の足に箱がのってる", "text": "中村さんの家具の解説「4本の足に箱がのってる」 ➡︎「のってる」もこれは擬人化ではないんだけど、なんか箱が生きてる感じがする。"},
+{"id": "367", "w": "2026.08.16_文化創造館_367", "label": "『わたし』があれば揺れに強い", "text": "中村さん「『わたし』があれば揺れに強い」➡︎足と足の間に「わたし」があれば、その方向の揺れに強くなるらしい。"},
+{"id": "368", "w": "2026.08.16_文化創造館_368", "label": "ミラクルが起きた気がする", "text": "中村さんが右眉毛の上をポリポリかいた。そのあと白田さんも右眉毛の上をかいた。ちょっとミラクルが起きた気がする。でも私はあまり眉毛の上をかくことがないのでなんで眉毛の上をかくのか不思議。でもその仕草に既視感があるので、多分一定数眉毛をかく人はいる。"},
+{"id": "370", "w": "2026.08.16_文化創造館_370", "label": "『頭』のほうがでかい", "text": "中村さん？が家具を解説「『頭』のほうがでかい」➡︎擬人化"},
+{"id": "371", "w": "2026.08.16_文化創造館_371", "label": "「気にかけてるよ〜」", "text": "以前一度メンテナンスした家具が、今回のツアーでメンテナンスの余地あり判定をされた。そのときの中村さん、藤本さん、白田さんが家具に「みんな見てるよ〜」「気にかけてるよ〜」と言っていて、その物の機能だけを必要としているのではないような、なんか愛を感じる。"},
+{"id": "372", "w": "2026.08.16_文化創造館_372", "label": "きいきい『鳴っている』", "text": "藤本さん「キャスターがきいきい『鳴っている』」➡︎擬人化？声みたいに捉えている感じ"},
+{"id": "373", "w": "2026.08.16_文化創造館_373", "label": "木は（環境に？）柔軟な人たち", "text": "中村さん「木は（環境に？）柔軟な人たち」"},
+{"id": "374", "w": "2026.08.16_文化創造館_374", "label": "愛されているのかもしれない", "text": "一階の外に置いてある家具について カズさん「けっこう長い付き合いだからね」 藤本さん「開館当初から」 （この家具は藤先生が作ったんだよという話） 白田さん「愛されているのかもしれない」"},
+{"id": "376", "w": "2026.08.16_文化創造館_376", "label": "さらさらとツルツルのシール", "text": "「補修しました」と書かれたシールを、メンテナンスした物に貼る。／丸くて半透明で、触りごごちの良いさらさらとツルツルのシール。ほしい。"},
+{"id": "377", "w": "2026.08.16_文化創造館_377", "label": "木の棒に座っている", "text": "中村さんが木の棒に座っている。すごいバランス力。木の棒に座ろうと思ったことがなかったし、多分ちょっとコツがいる。"},
+{"id": "379", "w": "2026.08.16_文化創造館_379", "label": "寿命が短いらしい", "text": "中村さん曰く「とりあえずメンテナンス」のデメリットは「クオリティが落ちてしまうこと」。メンテナンスするにも、とりあえずだと、一時的になおすことになるので、寿命が短いらしい。／（「寿命」は命のこと。よく物に対して「寿命」と言ったりするけど、やっぱりみんなどこかで物に対して命っぽいものを感じている。これは日本語だけど、他の言語圏にもそういう言葉とか言葉の使い方はあるのかな？）"},
+{"id": "380", "w": "2026.08.16_文化創造館_380", "label": "これからも更新していける", "text": "白田さん曰く、シールを「補修完了」ではなく「補修しました」にしたのは、これで完成にするのではなく、創造館の状況に合わせてこれからも更新していけるようにと考えているからなのだそう。／物も変化できるのって素晴らしいな。その時代その時代で流行ったり、求められるものがあって、それで作られた物が誰からも必要とされなくなったり、捨てられるみたいな場面は少なくないけど、"},
+{"id": "381", "w": "2026.08.15_文化創造館_381", "label": "父が娘にドライバーを渡す", "text": "14:55 ワークショップ開始 親子（父、娘）の娘さんが一生懸命メモしている。父が娘にドライバーを渡す。"},
+{"id": "383", "w": "2026.08.15_文化創造館_383", "label": "男子高校生がおしゃべり", "text": "上では男子高校生がおしゃべり。前よりは静か。"},
+{"id": "385", "w": "2026.08.15_文化創造館_385", "label": "まずは触ってみましょう", "text": "「まずは触ってみましょう」と始まる。すでに中途半端な状態だから、色々何やっても大丈夫といっている。"},
+{"id": "389", "w": "2026.08.15_文化創造館_389", "label": "設計メモみたいなの", "text": "黄色いメジャーが置かれていて、設計メモみたいなのがある。"},
+{"id": "390", "w": "2026.08.15_文化創造館_390", "label": "音が各所でひびく", "text": "ドライバーを使う音が各所でひびく。"},
+{"id": "391", "w": "2026.08.15_文化創造館_391", "label": "小言多くてごめんなさい", "text": "「小言多くてごめんなさい」とドライバーの熱を心配する講師。"},
+{"id": "394", "w": "2026.08.15_文化創造館_394", "label": "取りたいクギを自分で探す", "text": "親子、先生を呼ぶ。背もたれ部分をドライバーで解体。とれたクギをケースに入れる娘。その後、1人でいすを観察し、取りたいクギを自分で探す。"},
+{"id": "397", "w": "2026.08.15_文化創造館_397", "label": "みんな共感できてうなずく", "text": "講師の例えに、みんな共感できてうなずく。"},
+{"id": "398", "w": "2026.08.15_文化創造館_398", "label": "急に上手になり藤本さん拍手", "text": "コマツさん急に上手になり藤本さん拍手"},
+{"id": "399", "w": "2026.08.15_文化創造館_399", "label": "そっとドライバーを回し始める", "text": "こうきさん「外れちゃいました」というけど、スタッフがそれでいいとほめる。こうきさん、再びそっとドライバーを回し始める。"},
+{"id": "403", "w": "2026.08.15_文化創造館_403", "label": "娘は黙々とドライバーを使う", "text": "親子の父、いったん用事があるのか退出。／娘は黙々とドライバーを使う。"},
+{"id": "404", "w": "2026.08.15_文化創造館_404", "label": "お揃いのTシャツは3人", "text": "見上げると男子高校生は4人。お揃いのTシャツは3人"},
+{"id": "408", "w": "2026.08.15_文化創造館_408", "label": "廃材を使ったオブジェ", "text": "横には廃材の木がたくさん。／廃材を使ったオブジェがあって、影もきれい。オレンジのロープでつなげている。／仕切りのようなものが3つ。"},
+{"id": "409", "w": "2026.08.15_文化創造館_409", "label": "メジャーと、横の木廃材", "text": "女の子がメジャーと、横の木廃材を持ってスタッフと直す方法を考える。背もたれに廃材を追加しようとしている。"},
+{"id": "410", "w": "2026.08.15_文化創造館_410", "label": "「長めのがイイ」", "text": "棚には様々な用具がある。女の子が「長めのがイイ」と言いながら、一番長いビスを手にする。"},
+{"id": "412", "w": "2026.08.15_文化創造館_412", "label": "ビスを斜めに入れる", "text": "女の子、講師の助言でビスを斜めに入れる。"},
+{"id": "415", "w": "2026.08.15_文化創造館_415", "label": "白から少しオレンジに", "text": "少し室内の明るさが抑えられてきた印象。白から少しオレンジに部屋が色付く"},
+{"id": "417", "w": "2026.08.15_文化創造館_417", "label": "男子高校生、ついに帰る", "text": "男子高校生、ついに帰る。"},
+{"id": "422", "w": "2026.08.15_文化創造館_422", "label": "両手を使って例える", "text": "講師よりビスの説明。スタッフがホワイトボードに設計図を貼る。／ビスの接続の説明を両手を使って例える。女の子のいすで実演。フジモトさん「すげえ！」と一言。"},
+{"id": "423", "w": "2026.08.15_文化創造館_423", "label": "移動しただけで", "text": "男子高校生、帰っておらず、移動しただけで、外から楽しそうな声が聞こえる。"},
+{"id": "426", "w": "2026.08.15_文化創造館_426", "label": "微妙にデザインが違う", "text": "戻ると女の子がイスに座って、ネジを外している。親子、靴がニューバランス（赤）でも、微妙にデザインが違う。"},
+{"id": "428", "w": "2026.08.15_文化創造館_428", "label": "1人だけやめない", "text": "休憩中も女の子は1人だけやめない、ネジもこれではと自ら選ぶ"},
+{"id": "430", "w": "2026.08.15_文化創造館_430", "label": "津田先生に何やら相談中", "text": "こうきさんは津田先生に何やら相談中。"},
+{"id": "431", "w": "2026.08.15_文化創造館_431", "label": "スマホで撮る父", "text": "頑張る娘の姿をスマホで撮る父。"},
+{"id": "432", "w": "2026.08.15_文化創造館_432", "label": "江戸川乱歩の人間椅子", "text": "こうきさん 江戸川乱歩の人間椅子の話を講師に話す。"},
+{"id": "436", "w": "2026.08.15_文化創造館_436", "label": "靴はニューバランス", "text": "コマツさん、補強の話。藤本さん横で聞いている。靴はニューバランス。"},
+{"id": "437", "w": "2026.08.15_文化創造館_437", "label": "STOP and GO", "text": "１５：５７頃　移動 カメラマンのTシャツ「STOP and GO」と書いてる。"},
+{"id": "438", "w": "2026.08.15_文化創造館_438", "label": "ビスが真ん中にある話", "text": "最初は会議室のホワイトボードに注目。その後、木のおもちゃ、講師エリアトイレ前のベンチが良い話。ビスが真ん中にある話。面取りしている。秋田美大の方の制作らしい。"},
+{"id": "439", "w": "2026.08.15_文化創造館_439", "label": "お父さんは天井に注目", "text": "こうきさんはいすに注目、お父さんは天井に注目。「ミルハスっぽい」と言う。"},
+{"id": "440", "w": "2026.08.15_文化創造館_440", "label": "黒板の前にホワイトボード", "text": "黒板の話。最近は黒板の前にホワイトボードがあるとのこと。"},
+{"id": "441", "w": "2026.08.15_文化創造館_441", "label": "重さは正義ですねー", "text": "1階にきて、チラシ置き場の補強を観察。「重さは正義ですねー」と講師。重くなるかららしい。"},
+{"id": "442", "w": "2026.08.15_文化創造館_442", "label": "ピンクの花が咲いている", "text": "藤本さんが棚の説明。ガタガタには隙間を埋める作業をしてほしい講師。室内の制作物をみんなで触る。外の木、ピンクの花が咲いている。"},
+{"id": "443", "w": "2026.08.15_文化創造館_443", "label": "コジコジは宇宙の子", "text": "本棚に「コジコジ」あり、コジコジは宇宙の子という話が「宇野千代」と「荒井注」の子という勘違いで終わるオチ。"},
+{"id": "444", "w": "2026.08.15_文化創造館_444", "label": "セミの音が終始聞こえる", "text": "外に出る。少し風が暑い、セミの音が終始聞こえる。"},
+{"id": "445", "w": "2026.08.15_文化創造館_445", "label": "グラついてないいすを発見", "text": "女の子がグラついてないいすを発見。"},
+{"id": "446", "w": "2026.08.15_文化創造館_446", "label": "テーブルが三角", "text": "テーブルが三角。"},
+{"id": "447", "w": "2026.08.15_文化創造館_447", "label": "こんなんでも椅子が成立する", "text": "グラついているベンチにみんな注目。逆にこんなんでも椅子が成立するということと講師。"},
+{"id": "448", "w": "2026.08.15_文化創造館_448", "label": "なぞの紙ひろみの歌声", "text": "なかいちでビールフェス、なぞの紙ひろみの歌声聞こえる。日ざしが弱くなっている。"},
+{"id": "449", "w": "2026.08.15_文化創造館_449", "label": "横になって看板になった", "text": "ベンチが横になって看板になったらしい。"},
+{"id": "453", "w": "2026.08.15_文化創造館_453", "label": "武器を手に入れた", "text": "１５：００ビズ？ビス?とにかく武器を手に入れた。おれは無敵モードに恐る恐る入っていく。小学校のときの図工を楽しみにしていた感覚とは似て非なるもの。変態チックな性癖みたいな、そんな感覚。"},
+{"id": "455", "w": "2026.08.15_文化創造館_455", "label": "作戦会議のような会話", "text": "１５：１５津田さんと何やら作戦会議のような会話。"},
+{"id": "456", "w": "2026.08.15_文化創造館_456", "label": "『人間椅子」の話をしちゃった", "text": "１５：３３中村さんの小話😊✨️半ねじと全ネジの話、インパクトビスの使いかた🤣！なぜか、江戸川乱歩の『人間椅子」の話をしちゃった、ために若干気まずい雰囲気になる。撤退。作業に戻る。愛煙家（電子）と文学、そして何より野球がすき。"},
+{"id": "458", "w": "2026.08.15_文化創造館_458", "label": "ニトリ見学会", "text": "１６：００ニトリ見学会ｗｗｗイケア見学会ｗｗｗ"},
+{"id": "459", "w": "2026.08.15_文化創造館_459", "label": "出身地名を知ると仲良し", "text": "１６：１５津田さんの出身地を聞いた。（館内巡りに飽きた訳でもない。出身地名を知ると仲良しになれる気がして。。。）中村さんは北海道のどちらの出身なのか、広すぎて想像できない。だから明日は必ずや聴こう！"},
+{"id": "460", "w": "2026.08.15_文化創造館_460", "label": "不真面目な椅子は場所を選ぶ", "text": "１６：２０中村さん。不真面目な椅子は場所を選ぶ🪑"},
+{"id": "466", "w": "2026.08.15_文化創造館_466", "label": "図工みたいなことをする", "text": "１３：３５刻が来た。いざ、これから向かうイベントについてヘルパーさんに話した。 「へ〜〜〜すごい。楽しそう！チラシが上手！図工みたいなことをするってことで合ってますか？」 「ほかにも文化創造館ではイベントあるのかしら？」 もはや快感。僕はできるだけ短く簡潔に説明して（つもり） １３：４５無事に自宅を出発できた。"},
+{"id": "472", "w": "2026.09.13_文化創造館_472", "label": "愛というキーワード", "text": "前回同様、これまでの記録の掲示を振り返りに行く。そのままカードの配置の話。冒頭で山岸さんが愛というキーワードと共に登場したり、魚・マグロみたいなキーワードで繋がる話だったり。邦生さんが「やばいことしている。瞬間移動みたいな」とおっしゃっていて、面白かった。"},
+{"id": "473", "w": "2026.09.13_文化創造館_473", "label": "作って欲しい系が多い", "text": "続いて、みんなでこれまでに集まった要望を確認しに行く。くにおさんが作った掲示板が丸くて可愛い。まず「卓球を作ってほしい」が５、６枚集まっていることに盛り上がる。「ゲーム性があるものを作ってほしい」という要望の中に、具体例で卓球もある。卓球部のやつがいたのかな？と想像する。多分小学校低学年の子が書いた、小さな椅子が欲しい、という要望も。作って欲しい系が多い。"},
+{"id": "475", "w": "2026.09.13_文化創造館_475", "label": "みんな全然言い出さない", "text": "一通り紹介して、やりたいのを立候補制で集めていく。なので先着順でもあるが、みんな全然言い出さないのが面白い。とりあえずなんでもいいけれど、という感じなのだろうか、それとも、これがいいんだけどな、、という気持ちがあるんだろうか。そもそも今日はメンテナンスクラブ要員はそんなに多いわけではなく、割と自由に自分のものが選べた。とりあえず与えられたものでやる、みたいな空気があるのだろうか、それとも、とりあえず譲り合っているか。"},
+{"id": "478", "w": "2026.09.13_文化創造館_478", "label": "迷いなく、すっと", "text": "まず小松さんがビスを抜き始めたと思う。14:56ごろ。迷いなく、すっと自分の作業を淡々やります、みたいな空気感。"},
+{"id": "479", "w": "2026.09.13_文化創造館_479", "label": "「真グレー」の椅子", "text": "ことはさん親子は外に出ていったので、ついていく。目当ての椅子があったらしく、それを探すけれど、見当たらない。蓮池の方を見に行ったりして、階段のところに戻ってくると、文化創造館に遊びに来ていた女の子が、メンテナンスクラブの看板のところで、トンボを手にのせて、飛び立つところ。お父さんがそれに、お？捕まえたの？と声をかける。再びトンボが看板の上で休んで、女の子がそれを両手で囲うように捕まえようとして、触ったけど逃げた。おおお、と思って横目に見ていたら、後ろから邦生さんが、あったー！と言って、「真グレー」の椅子を持ってくる。迷子の感じ。こちらに近づいて、邦生さんはその椅子を掲げながら、バタバタと逃げ出すようなパントマイムをした。生き物が飛んできたり逃げ出したりして、それを捕まえるイメージ。"},
+{"id": "481", "w": "2026.09.13_文化創造館_481", "label": "「自主練しましたね？」", "text": "戻ってくると、小松さんがビスを抜く作業を続行していて、その手つきに上達が見られて、山岸さん含む周りの人から驚きの声が上がる。この上達ってなんなんだろうと思う。特に自宅でビス抜き特訓をした、とかではないはずで、だけど１度やったら体が覚えている、みたいな自転車的な学習か、それとも月日が経つと生活の中に経験値が上がる機会があってある程度は自然と上達する、みたいな国語の成績みたいなのものか。「自主練しましたね？」"},
+{"id": "482", "w": "2026.09.13_文化創造館_482", "label": "「先生！」と言われる", "text": "硬いビスがあったかなにかで、中村さんがビスを抜いて見せる場面があった。その手際が、おおお！という感じで、「先生！」と言われる。そういえば中村さんはこの日、12-13時をダンスの先生の仕事があったそうで、そんな風に「先生」を続けている。ちなみに山岸さんは、先日は朝夜私の家のエアコン工事をしてくれたり、今日は現場での展示設営に、翌日からインドネシアに滞在、と、現場仕事の忙しい日々を過ごしている。"},
+{"id": "484", "w": "2026.09.13_文化創造館_484", "label": "大きな音を出していい空間", "text": "今日から参加の五社さんは、迷いがなくて、トンカチで釘を埋め込んでいる。大きな音が出たのはこれが今日初だった気もする。記録側だから、大きな音に敏感なのだろうか？五社さんは全然気にせず、作業に集中している。そういえば、小松さんのビス抜きの作業も、インパクトの大きな音が出るけれど、そうやって大きな音を出していい空間って、いいよなと思う。"},
+{"id": "485", "w": "2026.09.13_文化創造館_485", "label": "いつもと違うルールで動く空間", "text": "この空間の、ブルーシートの存在は、なんか際立たせるものがある。作業してもいい空間、一時的に立ち上げられた空間、ステージではないけれど、確実に、いつもと違うルールで動く空間。"},
+{"id": "486", "w": "2026.09.13_文化創造館_486", "label": "それぞれの美意識が感じられる", "text": "それぞれの美意識が感じられる。仕上がりの基準のような。この前のことはさんのお母さんのヤスリがけもそうだし、小松さんがこういうタイプの椅子に取り組み、色々と足を足したりしたくなる感じだったり、菜月さんがかなりミニマムに、什器のシンプルさを汲んで、最低限のメンテナンスをする感じ。それぞれに、明確な基準があって、そこに向けて研ぎ澄ませていく、とかではなくて、都度都度自分と家具の癖というかこだわりを引き延ばして、探索していくような感じ？　みんなあまり周りを見ない。没頭するというか、個人の空間にいる、という感じがする。"},
+{"id": "488", "w": "2026.09.13_文化創造館_488", "label": "やり方に制限をかける", "text": "this is maintenanceというワードが出てくる。すでにあるもののルールで、やり方に制限をかける。この辺りの話、なかなか発言内容が思い出せない。"},
+{"id": "490", "w": "2026.09.13_文化創造館_490", "label": "ピクニックする気分", "text": "さて、15:30。外でニス塗りに向かう。全員でピクニックする気分がちょっとあり、大きな青いビニールシートが嬉しい。屋外プールみたい。"},
+{"id": "491", "w": "2026.09.13_文化創造館_491", "label": "なめらか前になるように", "text": "邦生さんが作業の説明に、「なめらか前になるように」と表現する。"},
+{"id": "492", "w": "2026.09.13_文化創造館_492", "label": "参加者の多くが女性", "text": "そして、ソファサイズの椅子を磨く作業になると、実は今回の参加者の多くが女性だったことに気づく。前回は、男性メンバーも数名いたけれど今回は来ていない。六人くらいがソファを紙やすりで磨いていく。"},
+{"id": "494", "w": "2026.09.13_文化創造館_494", "label": "何重にも、椅子を撫でる作業", "text": "やする作業は結構大変。続いて、ブロワーで吹き、雑巾で拭いて、ニスを塗っていく。何重にも、椅子を撫でる作業。これはこれまでのビスを打ったり抜いたりする作業と違う。ツボ押し痛マッサージとオイルマッサージの違い、みたいなものだろうか？　作業をしながら、「喜んでそう」「病院」「アカスリ」みたいなワードも出てくる。椅子の色がどんどん変わって、白くなる。全体的に均質で落ち着いた色味になる。"},
+{"id": "495", "w": "2026.09.13_文化創造館_495", "label": "帽子、マスク、エプロン完備", "text": "ことはさんが、マスク持ってくるべきだったー！と言っている。小松さんは、帽子、マスク、エプロン完備で取り組んでいることに気づいた。準備がめちゃくちゃいい。"},
+{"id": "496", "w": "2026.09.13_文化創造館_496", "label": "耳が情報を求める", "text": "僕も作業に加わる。やする最中に五社さんが始めたプーさんの話を、よく覚えている。やする作業はあまりに個人作業、さっきの編み物のような感覚があり、手を動かしながら、どんどん耳が情報を求める感じがある。"},
+{"id": "497", "w": "2026.09.13_文化創造館_497", "label": "終わりがわからない", "text": "やする作業は終わりがわからない。几帳面な人はずっとやるだろうし、ささっと終わらせる人もいそう。対して、ビスを打つ作業は、終わりがわかりやすい。"},
+{"id": "498", "w": "2026.09.13_文化創造館_498", "label": "ニスって、余らせないのが大事", "text": "ニス塗りが終わって、元の作業に戻っていい、ということになる。僕は、その場にあった小さな椅子の塗装をやってみたくなり、メンテナンスメンバーになった気分で取り組んでみる。細い木材が使われていて、やすりをかけるのが手間がかかる。気持ち早めに終わらせて、ざっくりやる。ニスの塗装も同様。ニスの箱が開かず、その場にあったセメントの足の金属を噛ませて開ける。ニスって、余らせないのが大事だよなきっと。最後、ちびちび使ったり、たっぷり使ったりを駆使して、みんなのニスのトレイを綺麗にしていく。"},
+{"id": "500", "w": "2026.09.13_文化創造館_500", "label": "木の色が変わるのいいですね", "text": "さて、完成したので、みんなで？スタジオに戻る。 小坂さんが、ことはさんの椅子を見て、古い家具の部分と、新しい家具の部分で、木の色が変わるのいいですね、という。"},
+{"id": "501", "w": "2026.09.13_文化創造館_501", "label": "「ニス塗りたて注意」", "text": "15:56。さっき藤本さんが「ニス塗りたて注意」と書かないとですね、と言って、今スタジオで紙に書いてそれを貼りに行こうとしている。小松さんは、荷物をまとめて外に出られた（と思ったら後で戻ってこられた。）シートの上では、みんな自分の家具に向き合っている。それぞれやることが分かれて、自分のペースでやることをこなしていっている。"},
+{"id": "502", "w": "2026.09.13_文化創造館_502", "label": "元の家具が規定する条件", "text": "16:18。奈月さんと五社さんが、何やら難しそうな話を相談している。顔はめパネルが、絵が書いてある方からはビスが打てないし、木を出せないので、裏側から支えるしかない。そのためにトラス構造のようなワードを検索して、うまく支える方法を調べている。元の家具が規定する条件に合わせて、できることが限定されていく。そして、二人は構造のことについて詳しく、（もしかして奈月さんは建築系だったか・・？）トラス構造のようなワードをスマホで調べつつ、画像の検索をかけている。"},
+{"id": "503", "w": "2026.09.13_文化創造館_503", "label": "端材置き場から剣があった", "text": "顔はめパネルはほぼ完成。ボードの絵の青い背景が少しひび割れているので、それをビニールテープで補修するとのこと。どうしても色はぴったり合わないので、ちょっと目立ちそう。最後、思い出して、端材置き場から剣があったのを取り出して、五社さんに渡してみる。五社さんは気に入って、それをパネルのキャラクターの右手？で掴めるようにアイデアを考えている。"},
+{"id": "504", "w": "2026.09.13_文化創造館_504", "label": "全体を俯瞰するための位置", "text": "観察疲れというべきか、多分作業やりたい、という気持ちからくる動きたさも相まって、ちょっと休憩がてら壁際のベンチに座ってみたりする。このベンチ、藤本さんはなぜここに置いたのだろうか、と今になって思う。座ったまま記録を見れるわけではなく、全体を俯瞰するための位置にあるさりげない椅子。"},
+{"id": "507", "w": "2026.09.13_文化創造館_507", "label": "日々の中に持ち帰っていくこと", "text": "小松さんは、家の中で億劫でやっていないことにこれを機に取り組んでみたい、とおっしゃる。確かにDIYや家のことって、後回しにしがち。日々の中に持ち帰っていくこと。"},
+{"id": "510", "w": "2026.09.13_文化創造館_510", "label": "自分一人で参加者気分で", "text": "僕は今日のニスの時間が面白かった。ニス作業の中で、自分一人で参加者気分でやってみたのだった。その結果、観察側の目線だと「我々は大所帯だな」などグループ意識を強く思っていたけれど、参加者（メンテナンスする側）からみると、一人で作業に没頭し向き合う時間なのだと感じた。"},
+{"id": "513", "w": "2026.09.13_文化創造館_513", "label": "並び替えワークの紙片", "text": "そうこうしているうちに津田さんがやってくる。ビニール袋を持っていて、お昼かなと思う。張り出したフィールドノートを確認してもらい、テーブルを出してきて、津田さんが持ってきた並び替えワークの紙片を並べる。今読み返すと「ああ、そんな繋げ方してたな」と思い出す。ワーク中はちょっと違う脳の使い方をしていたから、その体感が呼び起こされる感覚。"},
+{"id": "515", "w": "2026.09.13_文化創造館_515", "label": "オーシャンズ11のポスター", "text": "昼食休憩の時に、屋外の塗装エリアの様子を見にいくと、外階段からカメラマンの山岸さん、中村さん、白田さん、津田さんが降りてくる。オーシャンズ11のポスターみたいな「意気込んだ感じ」が漂っている。墓場の大きいベンチを運ぶそう。5人でベンチを持ち上げ、外階段を使って運搬する。先頭をいく山岸さんが、「倒します、〇〇注意です」と指示出しをしてくれる。カメラマンでお願いしているのに本当に多岐にわたる場面で活躍されるなと思う。"},
+{"id": "517", "w": "2026.09.13_文化創造館_517", "label": "中心ではないモノゴト", "text": "皆で張り出したフィールドノートを眺める。津田さんが解説をする。テーブルの方に並べた並び替えワークの方をみて、「山岸さん」から繋がりは始まっていることに気づく。メンテナンスクラブの中心ではないモノゴトで繋がっていくのも軽やか。ナツキさんと楽しかったよねと交わし合い、中村さんは「ずっとみちゃう」と言う。"},
+{"id": "518", "w": "2026.09.13_文化創造館_518", "label": "さながら救急治療室", "text": "メンテナンスリクエストボードへ移動する。今日もグリーンシートの上には破損した傷病者たちが並んでいて、さながら救急治療室だなと思う。ごしゃさんがブンカソウゾウくんの前に座っている。それぞれのグリーンシートの領域内にそれぞれの位置取りで立ったり座ったりしている様子が面白い。前回も思ったけれど、引力というか張力が働いている感じがする。中央にメンテナンスクラブの人たち、それを記録する記録のパーティ、その外側にカメラマンの山岸さんとレビュアーの小坂さん。身体や意識の「向き」「距離」がフィールド上で観測できる気がする。"},
+{"id": "523", "w": "2026.09.13_文化創造館_523", "label": "椅子を取り押さえている", "text": "こと葉ちゃんとお母さんが帰ってくる。ベンチが見つからなかったとのこと。白田さんがビスを片付けながら「あるはず」という。中村さん、私も加わってもう一回探しに行く。外階段から芝生に降りると芝生広場に人が数人いて、往来する人、岩に登ろうとする子どもたちが見える。デッキの上、お堀川の芝生を探す。中村さんが「（椅子が）自分で歩いて行ったのかな。ここじゃ直してもらえないと思って」という。塗装準備をしたエリア、墓場をみるが確かにない。中村さんがミルハス側から「あったよ」と椅子を抱えて外階段の方に歩いてくる。歩いてくる途中で、暴れている椅子を取り押さえているような動きをしながら「捕まえた」という。"},
+{"id": "525", "w": "2026.09.13_文化創造館_525", "label": "背負子みたいという", "text": "それぞれが作業を進める。小松さんがベンチの座面をある程度外したところで、5分の1くらいの部分が取り外される。中村さんと白田さんが背負子みたいという。"},
+{"id": "527", "w": "2026.09.13_文化創造館_527", "label": "人の線を切るのは緊張する", "text": "ことはさんが、角材を切ってもらうために、ペンで切断位置の指示を書いている。中村さんがスタイロフォームを被せた作業台に電動ノコギリを持ってきて、ことはさんから角材を受けとる。切って欲しい位置にの線の横に⚪︎、間違えた線の横に×が書いてあり、それを中村さんが褒める。実際、知り合いの大工さんも切断位置の指示を示す時にその方法をとっていたと思います。あて木を求めていたナツキさんも立ち会い、角材が切られる。ホームセンターの百円カットみたいだと誰かが言う。中村さんは「人の線を切るのは緊張する」と言う。先端をさいとうさんが抑える。ブーン。"},
+{"id": "532", "w": "2026.09.13_文化創造館_532", "label": "介護みたいな", "text": "紙やすりが配られ、一斉にやすり出しが始まる。介護みたいな、みんなで誰かの身体をふいているかのような。不思議な風景。ざらざらざらざらと音が響く。みんなの手が素早く動く。田中功起さんの映像作品みたいな、複数人で一つの作業に取り組む映像や舞台を鑑賞しているような。写真を撮りながら、目の前で立ち上がっている行為を傍観者として見ている感覚になる。文化創造館の屋外の特に階段下の芝生の上ではそんなことが何度かあった。野菜栽培の土づくりの時、芋掘りの時、Aokidさんの自己紹介パフォーマンスの時。"},
+{"id": "533", "w": "2026.09.13_文化創造館_533", "label": "「椅子が気持ちよさそう」", "text": "椅子をひっくり返しやすりやすりがけが終わったら、ブロアーで細かい木屑をとばし、雑巾で拭き取りをする。赤い塗料が雑巾に付着する。身体を拭いてあげている。手をかけてあげている。白田さんが「椅子が気持ちよさそう」と言う。おやさい隊の奥山さんが軒下の土を見にやってくる。こちら側が何をしているのかチラチラと様子を見ながら、春に肥料を加えて眠らせている土のグリーンシートを剥がしている。その様子を白田さんが何をしているんだろうと言う様子でみる。お互い様やでと思う。"},
+{"id": "534", "w": "2026.09.13_文化創造館_534", "label": "裏面から塗る", "text": "塗料をバケツにわけて、椅子をぬる。表面から塗ると裏面を塗る時に、せっかく塗った部分がブルーシートについてしまうので、裏面から塗る、と言う説明がされる。確かに合理的。塗料を塗るのが久しぶりで、ハケで椅子の隅々まで液を付着させていく感覚が楽しい。すいー、すいすいー。夢中になりながら、隣の人がどこをぬって、自分がどこを塗るかを感覚的に分け合うような共同作業。"},
+{"id": "535", "w": "2026.09.13_文化創造館_535", "label": "一人につき一体の獲物", "text": "塗り終わって、それぞれの作業に戻る。ことはさんは急いで階段を登っていく。小松さんは前回自分が補修した椅子の塗装をする。中村さんが赤いベンチの2度塗りをして、津田さんは四角い小さい椅子のやすりがけを始める。先ほどは共同作業だったけど、今は一人につき一体の獲物。一対一で身体が向き合っている。"},
+{"id": "537", "w": "2026.09.13_文化創造館_537", "label": "するどさがきわだって", "text": "『記録のパーティ』のメンバーが書いた記録の用紙が木でできた屏風コーナーに掲示してあり、そこへみんなで移動。それぞれの記載分に津田さんのコメントが書かれたカードがつけてあった。 津田さんが改めて感想を。前回の2日間でだんだん「するどさがきわだっていっているなと感じました」などと話した。"},
+{"id": "539", "w": "2026.09.13_文化創造館_539", "label": "期待が大きい", "text": "会場中央のメンテナンスコーナーにみんなで移動。 『文化創造館の家具に対するリクエスト』なるアンケートに寄せられたアンケート用紙そのものをホワイトボードが貼ってある。白田さんがそれぞれを説明。 具体的なものから抽象的なものまでいろいろなリクエストが寄せられていたが、文化創造館に対する期待が大きい…と感じた。期待されるのはいいことだ。"},
+{"id": "540", "w": "2026.09.13_文化創造館_540", "label": "なかなか手が挙がらない", "text": "次に今回もまたメンテナンスにとりかかる。こちらは引き続きそれを記録する。 メンテナンスコーナーに集められたそれぞれの家具のうち、どれをやるか、「手を挙げてください～」という呼びかけがあるが、なかなか手が挙がらない。お互い遠慮しているのか迷っているのか…と気が付くとそれぞれがちゃんとひとつずつメンテナンスする家具の前にいた。"},
+{"id": "541", "w": "2026.09.13_文化創造館_541", "label": "ここの備品はナチュラル系だ", "text": "手順は今回も同じで、まずはメンテナンスする前の家具を『Before』としてペンでスケッチする。できたらそれをホワイトボードの『Before』コーナーに貼ってからメンテナンスにとりかかる。 クラフトのバインダーにクラフト紙をはさむ。ここの備品はナチュラル系だ。"},
+{"id": "543", "w": "2026.09.13_文化創造館_543", "label": "「スケッチ楽しいんだよね～」", "text": "ふとこの会場に流れている音楽は一体なんだろう…と思っていたら「スケッチ楽しいんだよね～」という中村さんの声が聞こえた。"},
+{"id": "544", "w": "2026.09.13_文化創造館_544", "label": "制作の現場をずっと見続けて", "text": "スケッチをしている人たちを見ていると、昨夜アルヴェシアターでレイトショーを観た（実写版映画『ルックバック』）ので、なんか制作の現場をずっと見続けているような感じがした。"},
+{"id": "545", "w": "2026.09.13_文化創造館_545", "label": "パネルの色あいが似てる", "text": "『顔はめパネル』を担当している人（位置関係から『③の人』と定義）を見ていると、洋服（エリがピンク）とパネルの色あいが似てる？　と思った。"},
+{"id": "546", "w": "2026.09.13_文化創造館_546", "label": "早くもビスを抜きはじめた", "text": "14時37分頃　中央に位置するステージのようなひな壇のようなベンチを担当する④の人は、早くもビスを抜きはじめた。近くで記録していた男性が見守る。白田さんも近づいて見守る。撮影のヤマギシさんも見守る。"},
+{"id": "548", "w": "2026.09.13_文化創造館_548", "label": "うまなってる！", "text": "④の人がビスを抜いている。「自主練習しました？」「うまなってる！」と声がかかる。"},
+{"id": "549", "w": "2026.09.13_文化創造館_549", "label": "③の人をマークしている", "text": "15時08分頃　木の屏風を担当している①の人は完成？ でもなぜかずっと自分は③の人をマークしている。平たい板に線を何本かひいている。下部分の木の幅をはかって…アイデアがきまったようだ。"},
+{"id": "552", "w": "2026.09.13_文化創造館_552", "label": "おっと、とたおれそうになる", "text": "③の人が戻ってきた。三角の棒2本を上と中くらいのところにわたしてみる。パネルを立てている。おっと、とたおれそうになる。押さえたほうがよい？ 脚を調整しているようす。たおれないかな？　フジモトさんも心配そうにながめている。"},
+{"id": "553", "w": "2026.09.13_文化創造館_553", "label": "「脚を抜いて～」", "text": "「進捗報告」ということで各々報告。 ④     のコマツさんは「脚を抜いて～」。一同拍手。①のナツキさんは「脚を補強～」。"},
+{"id": "554", "w": "2026.09.13_文化創造館_554", "label": "ディス・イズ・メンテナンス", "text": "すると「メンテ完了！」と中村さんの声。③の人（この方ばかり見ていたのに名札がちょうど見えない位置にあり）は見ると脚ができていた！　「意外とむずかしい」「メンテあるある」「ディス・イズ・メンテナンス！！」という中村さんの声のあと、パチパチパチと拍手！！　⑤の2人（今日もまた母娘）も進捗を報告。どうも昨日の映画から若い人に期待してしまう我がおばさん心。"},
+{"id": "555", "w": "2026.09.13_文化創造館_555", "label": "カチ、カチ！！いい音", "text": "さっきの説明で③の人のプランがわかった。あとはドライバーでビスを打っていく。カチ、カチ！！いい音。"},
+{"id": "556", "w": "2026.09.13_文化創造館_556", "label": "と思ったらいなくなっていた", "text": "①の人は完成したので、記録のコーナー（木の屏風）で掲示された用紙をながめている、と思ったらいなくなっていた。"},
+{"id": "561", "w": "2026.09.13_文化創造館_561", "label": "真ん中に貼ることに決めた", "text": "開始時間2分前になり、五社さんと会場のスタジオAにいく。藤本さんが受付で立っている。テープに緑色のマジックで名前を書いて、服に貼る。五社さんがテープをどこに貼るか迷っていたが、真ん中に貼ることに決めたらしい。"},
+{"id": "565", "w": "2026.09.13_文化創造館_565", "label": "個々の意思を持った生物", "text": "そのあと、フィールドノートを展示している方へみんなで移動する。津田さんが「メンテナンスクラブというプロジェクトで、みんなで同じことをしているけど、同じことをしていてもその人にしか気づかないこと、みんななんとなく気づいていたり、目にはうつっていてもフィールドノートに記録しないことを記録する人がいる」というようなことをおっしゃっていて、人によって見えるものや見え方の違いが生まれることに、当然なんだけど「個々の意思を持った生物」って感じがする。"},
+{"id": "566", "w": "2026.09.13_文化創造館_566", "label": "瞬間移動してるみたい", "text": "前回8/16はフィールドノートをみるだけだったけど、今回はWSで並べたカードたちも置いてあって、その周りでみんなで少し話す。中村さんが、別の全く関係ない話題や場面をつなげるのが「瞬間移動してるみたい」って表現していて、面白い見え方だなと思った。そういうふうに感じるのかとびっくりもした。"},
+{"id": "568", "w": "2026.09.13_文化創造館_568", "label": "なんでそれを着ているんだろう", "text": "女の子と親子で参加されているお母さんが着ているシャツに、アインシュタインの顔が結構大きめにプリントされていて、着ている人にとってはあまり強い意味はないかもしれないけど、「なんでそれを着ているんだろう？」と思ってしまった。普通に服のデザインとして気に入っているのかもしれないけど、もしかしたらアインシュタインが好きなのかもと思ったり。"},
+{"id": "569", "w": "2026.09.13_文化創造館_569", "label": "「卓球をつくってください」", "text": "会場の中央の作業スペースに、メンテナンス候補たちが集まっている。さらに、メンテナンスしてほしいものを書いて貼る掲示板には、「卓球をつくってください」という意見がたくさんあった。それをみて誰かが、「卓球台を作ってほしいとかではなくて、卓球という概念を作ってほしいって言ってるみたい」とか「こんなに書いてるってことは卓球部でもきたんじゃない？」と言っていて、みんなの頭の中には多分、中学生とか小学生が数人で来て書いた様子とか、卓球部か卓球クラブの子供がみんなで書いている様子が浮かんだんじゃないかなと思う。"},
+{"id": "570", "w": "2026.09.13_文化創造館_570", "label": "折れた足に添木して", "text": "メンテナンスするものを選ぶ。選んだら茶色い紙にマジックペンでスケッチをする。私は足のところが折れちゃった屏風っぽい看板をメンテナンスすることにした。この屏風看板は、津田さんのプロジェクトで書いたフィールドノートを貼るのに使われているものと同じ。なので、あまり形をかえると、他の屏風看板たちとは違う形になって、複数同時に看板を使うときに統一感なくなったらちょっと嫌な気もすると思ってしまい、折れた足に添木してくっつけ直すだけにしてみた。"},
+{"id": "572", "w": "2026.09.13_文化創造館_572", "label": "「ぶんかそうぞう」くん", "text": "五社さんがメンテナンスしている顔はめパネルをみにいく。パネルには文化創造館の特徴的な屋根の形が頭の形になっている、灰色の毛の生き物が、飛び出し坊やみたいなポージングで描かれている。しかも、小学校のときに使うような名札をつけていて「ぶんか　そうぞう」と書いていて、この子の名前は「ぶんかそうぞう」くんなんだ！と初めて知る。このパネルは文化創造館の2階のホールに置いてあるのをみたことがあるけど、このキャラクターに名前があることは知らなかった。しかもよく見たら、看板に絵が書いてあるんじゃなくて、スチレンボード（もしくはハレパネ）を切って色を塗ったものを木の板に貼っていて、そのやり方いいな〜と思った。"},
+{"id": "574", "w": "2026.09.13_文化創造館_574", "label": "「作ってる！」感がすごかった", "text": "今回は時間があまりないので、ニスを全て剥がすことはできなかったけど、みんなでベンチを紙やすりでやすって、ベンチをひっくり返してまたやすってを数回繰り返して、なんか一体感というか、「作ってる！」感がすごかった。それは多分、やすっているときに話したこととか、話が弾んだことが少なくとも影響しているとも思う。みんなで一つのものをやすっていること、物理的に距離が近いこと、手を動かしながら話したことが話を弾ませたのかな。メンテナンスクラブは自分がメンテナンスしたいものをメンテナンスするっていうスタイルだから、参加者みんなでこれをやるのは意外にも少ないのかな。"},
+{"id": "575", "w": "2026.09.13_文化創造館_575", "label": "はちみつに見えて", "text": "みんなでやすりをしながらプーさんの話をした。話の始まりはあまり覚えてないけど、ニスが（はちみつに見えて）美味しそうみたいな発言から始まったのかなと思う。五社さんがプーさんを好きという話になり、プーさんははちみつが大好きで、はちみつ食べたさに友達の家のはちみつを勝手に食べてしまうみたいな、ちょっとプーさんってかわっているよねという話になった。"},
+{"id": "576", "w": "2026.09.13_文化創造館_576", "label": "ベンチがちょこっと心配", "text": "今日は晴れていて、気温もちょうどいいから、外で作業するには最高の天気だった。でも、仕上げタイムが終わって、各自やりたい作業をやっていたら、雨が振ってき始めたらしく、ベンチがちょこっと心配。"}
+];
+const SEQS=[
+{"name": "粗探しの目でしか壊れが見えない", "alts": ["自分の貼ったテープは見えない", "メンテの領域は目が決める"], "relation": "気づかない側か見つける側か×直す対象は目が決める", "bi": 0, "cards": ["178", "259", "067", "150", "037", "486", "186"], "html": ["14:21  メンテナンスクラブのメンバーは、まずは館内にある直せそうな什器を探しに行く。直すポイントを書くための小さい四角の紙を渡され会場を出て行った。紙は黄色いマステで貼ってくださいと藤本さんが言っていたが、そのあとしばらくしてから、藤本さんのズボンに短くちぎられたマステが5，6本貼られていることに気付く。ああいうのってイベント終わっても忘れてそのままにしちゃうことある。私も名札代わりの養生テープを何回胸元に<mark class=\"hg\">貼り付けたまま帰ったかわからない</mark>。帰りにスタッフさんからはがしてくださいね～とか言われないと結構な頻度で気付かない。藤本さんがいつはがしたかは不明。", "1Fに降りてみると、ことはちゃんがそうぞうの木にも書き込んでいる。ことはちゃんのお母さんが記入台の縁をさして、<mark class=\"hg\">「ここも剥がれていますね」</mark>という。全く気づいていなかったけど縁を囲うように貼られているテープがビリビリに破れている。ギクッと思う。", "外に出たところで、白田さんがきて、14:45分くらいだったか、そろそろ戻らないとと思い出した。裏の階段を経由してもどると、2Fロビーのところに流行りのおもちゃの販売の方がいて、目線があう。どういう経緯でそこにあるかわからない顔ハメパネルに、何かしらあるだろと思って<mark class=\"hg\">粗探しのようにじっくり見る</mark>。「何をしているんだこいつは？」と思われることが、今回に限らず文化創造館で何かをやっていたらありそうだな、と思う。「今何やってるんですか？」という知らない人からの声掛けは、以前の打ち合わせの時もあったけれど、そういう声かけが発生する空間っていいよなと思う。", "イスを解体するためにしゃがみこんでいる人の背中、Ｔシャツのプリントが目に入る。GREAT WAVESとか1782とかビーチの絵らしきものがプリントされているが、なんのことかはわからない。でも人のTシャツのプリントって<mark class=\"hg\">背中だとよく見てしまう</mark>。何かを主張したかったら背中側でやるべきだなと思う。", "グラグラすることもそうだし、ささくれがあるってこともメンテナンスの対象になるそう。この、<mark class=\"hg\">メンテナンスの対象の基準というか領域</mark>ってどこまでなんだろうなあ。たとえば、背もたれにカーブをつける、っていうのはメンテナンスとは言い難いから、元の状態を保持する、とか何か意識せずとも条件があるように思う。", "それぞれの美意識が感じられる。<mark class=\"hg\">仕上がりの基準のような</mark>。この前のことはさんのお母さんのヤスリがけもそうだし、小松さんがこういうタイプの椅子に取り組み、色々と足を足したりしたくなる感じだったり、菜月さんがかなりミニマムに、什器のシンプルさを汲んで、最低限のメンテナンスをする感じ。それぞれに、明確な基準があって、そこに向けて研ぎ澄ませていく、とかではなくて、都度都度自分と家具の癖というかこだわりを引き延ばして、探索していくような感じ？　みんなあまり周りを見ない。没頭するというか、個人の空間にいる、という感じがする。", "1階受付前のチラシを置いている什器について、市場から貰ってきた新巻鮭の箱が使われていることに着目した参加者さんがいて「横手出身だから海っぽいものが珍しい。これを更に活かしたプラスアルファのデザインをしてもいいのでは」とコメント。自分は県の沿岸出身だし、秋田はいわゆる海なし県ではないので、<mark class=\"hg\">海っぽいものが珍しいという視点</mark>が同じ秋田県民から出ることを意外に感じる。"]},
+{"name": "探す目になると全部が候補", "alts": ["壊れを探す目が人にも向く", "見つけても直さない"], "relation": "差異＝見つけて何をするか（広げる／通過／寄せる／嫌がる／問う）×地＝直す目", "bi": 0, "cards": ["248", "068", "193", "161", "137", "187", "350", "335"], "html": ["コミュニティスペースのキッチンのコンロを隠す木のカバーの側面のタッカーが外れている。直したい。なんなら新しいものに変えたい。<mark class=\"hg\">目が館内の壊れているものを探す目線に変わってきている</mark>。", "道のアスファルトの日々が目に入って、<mark class=\"hg\">それもメンテナンスの範囲かもと思う</mark>。", "屋外のDJイベントの準備で使用中の台車や、数学イベントで今使われているテーブルもガタガタしていたそうだが、<mark class=\"hg\">使用中なので、ということで様子を見守りながら通り過ぎる</mark>。みんながたくさん使っているからこそ、緩んでくる。", "屋外に出る テラスのイスも相当ぐらぐらしていた。藤本さんに「点検しないんですか」と聞くと「してはいるんですけど…ほんとにやばいのは墓場みたいなとこに寄せてます」。墓場。「<mark class=\"hg\">でもまだ大丈夫なのはそのままになっちゃってます</mark>」とのこと。", "振動と共にほこりが落ちていたイスを別の角度から見たら、脚の間に古いくもの巣がかかっていて、そこに枯れ葉までくっついていた。屋外に置かれていたんだと、ここで判明する。しかし、くもの巣に枯れ葉までくっついたイスをそのまま屋内の会場に持ってきたんだ。<mark class=\"hg\">私ならそれらは落としてから持ち込むなあと思う</mark>。文化創造館のイベントはこれだから面白い。", "藤本さん、キッチンスペースのIHコンロのカバー（木製）がボロボロで気になっているとのこと。四隅をホッチキスで留めてあるのが外れかけているし板が割れている、と思ったら持ち上げた瞬間そこそこ長めの破片が落ちた。藤本さん「破壊（笑）」「もうちょっと素敵なものでカバーしたいんですよね」。壊れそうなことより、最先端なIHコンロと木材のDIY感あふれるカバーとの<mark class=\"hg\">ギャップの方が気になっている様子</mark>。でも、参加者からは「ギャップがいい」という声も。", "メンテナンスってなんだろうな。直すことなのかな？<mark class=\"hg\">でもなんでも直すのは違うよな？</mark>直さないこともメンテナンスなのかな？ベンチが揺れてたらダメなんだっけ？", "2階の入口右側のカウンターにいる人、<mark class=\"hg\">一体そこで何を？</mark>"]},
+{"name": "捕まえないと直せない", "alts": ["椅子は歩いて逃げる", "宝探しが狩りになる"], "relation": "差異＝探す側の気分（宝探し→狩り→見失う不安）×地＝家具に定位置がない", "bi": 0, "cards": ["064", "445", "161", "523", "479", "210"], "html": ["みんなどこにいるかわからないけれど、それが気にならない。まず自分の手元にある要メンテナンスシール２枚をどうにかしようという気持ちで、<mark class=\"hg\">家具を探すようになる</mark>。なので、ちょっとした探検気分でもあり、宝探しのような感覚があり、他のメンバーがどこにいるか、はあんまり意識しない。", "女の子が<mark class=\"hg\">グラついてないいすを発見</mark>。", "屋外に出る テラスのイスも相当ぐらぐらしていた。藤本さんに「点検しないんですか」と聞くと「してはいるんですけど…ほんとにやばいのは<mark class=\"hg\">墓場みたいなとこに寄せてます</mark>」。墓場。「でもまだ大丈夫なのはそのままになっちゃってます」とのこと。", "こと葉ちゃんとお母さんが帰ってくる。ベンチが見つからなかったとのこと。白田さんがビスを片付けながら「あるはず」という。中村さん、私も加わってもう一回探しに行く。外階段から芝生に降りると芝生広場に人が数人いて、往来する人、岩に登ろうとする子どもたちが見える。デッキの上、お堀川の芝生を探す。中村さんが「（椅子が）<mark class=\"hg\">自分で歩いて行ったのかな</mark>。ここじゃ直してもらえないと思って」という。塗装準備をしたエリア、墓場をみるが確かにない。中村さんがミルハス側から「あったよ」と椅子を抱えて外階段の方に歩いてくる。歩いてくる途中で、暴れている椅子を取り押さえているような動きをしながら「捕まえた」という。", "ことはさん親子は外に出ていったので、ついていく。目当ての椅子があったらしく、それを探すけれど、見当たらない。蓮池の方を見に行ったりして、階段のところに戻ってくると、文化創造館に遊びに来ていた女の子が、メンテナンスクラブの看板のところで、トンボを手にのせて、飛び立つところ。お父さんがそれに、お？捕まえたの？と声をかける。再びトンボが看板の上で休んで、女の子がそれを両手で囲うように捕まえようとして、触ったけど逃げた。おおお、と思って横目に見ていたら、後ろから邦生さんが、あったー！と言って、「真グレー」の椅子を持ってくる。迷子の感じ。こちらに近づいて、邦生さんはその椅子を掲げながら、バタバタと<mark class=\"hg\">逃げ出すようなパントマイム</mark>をした。生き物が飛んできたり逃げ出したりして、それを捕まえるイメージ。", "その様子を少し離れたところから見ていて、やけにキラキラしたものが視界に入るなと思ったら、正面に見えるイスの背もたれに新しく打たれた二本のビスが、びっくりするほどキラキラ光を反射していた。会場は照明でバッチリ照らされていて、かなり明るいからか。でも、このイスがこんな照明の真ん中に置かれるのはこれが最後かな、いや、もし外に置かれたら太陽光をめちゃくちゃ反射するかも、そもそもこれらのイスは今後どこに置かれるのか、置かれる場所が変わっても<mark class=\"hg\">私はこれらのイスを見つけられるだろうか</mark>、ということが頭を過ぎる。"]},
+{"name": "探しに出ると場所の方が見つかる", "alts": ["什器の来歴が落ちてくる", "もっふもっふと反発が返ってくる"], "relation": "足元か什器か×歩くと物の来歴が返ってくる", "bi": 0, "cards": ["162", "442", "438", "156", "263", "130", "020"], "html": ["芝生の上にもイスがあるのでそちらにも向かう。芝生の上を久しぶりに歩いた。もう少しふわふわ柔らかい感触を想像していたら草は案外しっかりしていて、<mark class=\"hg\">踏むたび、もっふもっふと軽い反発が返ってくる</mark>。", "藤本さんが棚の説明。ガタガタには隙間を埋める作業をしてほしい講師。室内の制作物をみんなで触る。<mark class=\"hg\">外の木、ピンクの花が咲いている</mark>。", "最初は会議室のホワイトボードに注目。その後、木のおもちゃ、講師エリアトイレ前のベンチが良い話。ビスが真ん中にある話。面取りしている。<mark class=\"hg\">秋田美大の方の制作らしい</mark>。", "会場を出て一歩目でもうテーブルとイスはあるし（職人さんに作ってもらったイスとイケアのイスが一つのテーブルに混在している）、シンプルに見えてかなり作りがしっかりしたベンチはあるし、前館長が作って置いて行った積み木のようなものが大量に載ったテーブルがある。<mark class=\"hg\">発見にことかかない文化創造館</mark>。", "みんなでみんなが貼ったメンテナンスポイントをみに行く。ことはちゃんの箱馬と小松さんの黒板。1階の総合案内前のチラシ置き場で、<mark class=\"hg\">市場の箱のスタンプが良いから注目したい</mark>と小松さんが貼ってくれている。「横手の出身だから、海のものが感じられるのが珍しい」という視点が面白い。そうか秋田って見全体で捉えると海ある感じがするけど、内陸の方だと縁遠いものなのか。広いもんね。", "イスをひっくり返してビスを外しているところを見ていたら、振動と共に木材の上を砂のような木くずのようなほこりのような、細かいものがすべり落ちていく。<mark class=\"hg\">このイスはどこに置かれていたのかと疑問に思う</mark>（のちに解決する）。", "中村さんがインパクトの使い方を教えている。木のサイズにテープが貼ってあって、そこにサイズが書いてある。書いてないものもあるので、書いてあるものは一種の基準として物差し的に準備しているのかな。<mark class=\"hg\">漁業とかの卸売市場の感じを思い出す</mark>。"]},
+{"name": "捨てないから、見どころになる", "alts": ["用済みでも置いておくと目が育つ", "墓場と味のあいだ"], "relation": "差異＝用済みの物の扱い（放置・墓場・オブジェ・味）×地＝館に残る用のない物", "bi": 0, "cards": ["246", "165", "251", "408", "003", "258", "264"], "html": ["2Fのホワイトボード裏の黒板。<mark class=\"hg\">背景と化している無用の産物</mark>。花火の絵があったのは、昨日が花火だったから？2Fホールだけでも「見所」ある什器がたくさんある。そういう意味でポテンシャルに溢れた空間。", "「元」駐輪場であって今は駐輪場ではないとのことで、端っこに白いベニヤ板が立ててあり「駐輪場のご案内」という張り紙がある。その横にもでかい簀の子のような板が立っていて、他の参加者さんが「これはなんですか」と聞くと、これは元ベンチなのだが、掲示物を貼るように立てて置いていた、けれど視認性が悪いということで横に白いベニヤ板を設置した、でも撤去せずにそのままになっている、とのこと。屋内の黒板と同じく、<mark class=\"hg\">用済みになったのに何故かそこにあることを許されている</mark>。文化創造館のゆるさを感じる。", "デッキに出る。パレットを天板にしたテーブルを囲む。「パレットって？」という質問に邦生さんが動作を持って説明する。フォークリフトの先をこの穴に入れて、運ぶんですよ。スガヤさんが「壊れている什器は直さないんですか？」と聞いてくれる。スタッフとしての管理の不行き届きを省みてひやっとする。<mark class=\"hg\">「階段の向こう側に什器の墓場があります」</mark>と答える。", "横には廃材の木がたくさん。／<mark class=\"hg\">廃材を使ったオブジェがあって、影もきれい</mark>。オレンジのロープでつなげている。／仕切りのようなものが3つ。", "前方右側に、強風に吹かれた果樹みたいな木とロープの立体物があり、そのギリギリのバランスについて藤本さんが<mark class=\"hg\">「これもメンテナンスがいる」といったことを言って</mark>、面白かった。", "メンテナンスポイントを探しについての説明。メンテナンスポイントを書き込む台紙を配って出発。ことはちゃんがA1を出てすぐの箱馬を見つけて書き込んでいる。小松さんも出て左手の黒板に書き込んでいる。見つけるのが早い。<mark class=\"hg\">世界にメンテナンスポイントが溢れすぎている</mark>。", "コミュニティスペースに移動し、ずっと気になっているキッチンのコンロの蓋について紹介する。私がキッチンに置くものだから質感を統一してもいい、というと盛さんが「あえて質感が違うのも良い」と言ってくれる。創造館の什器の<mark class=\"hg\">質感の統一性のなさを「味」と感じてくれる</mark>人がいてくれて嬉しい。"]},
+{"name": "直していると、欲しくなる", "alts": ["メンテナンスは食欲に似る", "見つける目が欲しがる目になる"], "relation": "差異＝何を欲しがるか（家具・ポイント・シール・新品）×地＝館の什器を見て回る目", "bi": 0, "cards": ["046", "539", "060", "258", "376", "458"], "html": ["次回以降の案内の話の中で、中村さん白田さんから、「こんなのあったらいいな、という気持ちを集めたい」と言ったような話があった。欲しい！と思うようになるってこと。<mark class=\"hg\">メンテナンスだけど、そういう欲求が活性化される</mark>、っていいなと思う。食欲のように、料理できるようになって食べたいものが増える、とか。ストレッチしたら体調が良くなって食欲が増すとか。と書いて思ったけど、ストレッチしたら食欲がます、みたいに、一見関係ないことを行なってみて、別の欲求が湧く、みたいなことってありえるのだろうか？たとえば、館内を走ってみたら、メンテナンス欲求が生まれてくるかも、とか。", "会場中央のメンテナンスコーナーにみんなで移動。 『文化創造館の家具に対するリクエスト』なるアンケートに寄せられたアンケート用紙そのものをホワイトボードが貼ってある。白田さんがそれぞれを説明。 具体的なものから抽象的なものまでいろいろなリクエストが寄せられていたが、<mark class=\"hg\">文化創造館に対する期待が大きい…と感じた</mark>。期待されるのはいいことだ。", "まず会場の什器にみんなでメンテナンスプランを作ろうということに。<mark class=\"hg\">メンテナンスカートを配る。クラフトペーパーに赤いデザイン</mark>。", "メンテナンスポイントを探しについての説明。メンテナンスポイントを書き込む台紙を配って出発。ことはちゃんがA1を出てすぐの箱馬を見つけて書き込んでいる。小松さんも出て左手の黒板に書き込んでいる。<mark class=\"hg\">見つけるのが早い。世界にメンテナンスポイントが溢れすぎている</mark>。", "「補修しました」と書かれたシールを、メンテナンスした物に貼る。／丸くて半透明で、触りごごちの良い<mark class=\"hg\">さらさらとツルツルのシール。ほしい</mark>。", "１６：００<mark class=\"hg\">ニトリ見学会ｗｗｗイケア見学会ｗｗｗ</mark>"]},
+{"name": "図工が日常に染み出す", "alts": ["帰り道まで直す目", "とりあえずが生き方に見える"], "relation": "差異＝染み出す先（家族／館内／道路／移住／日常）×地＝会場の外へ持ち出す目", "bi": 0, "cards": ["466", "248", "068", "221", "119"], "html": ["１３：３５刻が来た。いざ、これから向かうイベントについてヘルパーさんに話した。 「へ〜〜〜すごい。楽しそう！チラシが上手！<mark class=\"hg\">図工みたいなことをするってことで合ってますか？</mark>」 「ほかにも文化創造館ではイベントあるのかしら？」 もはや快感。僕はできるだけ短く簡潔に説明して（つもり） １３：４５無事に自宅を出発できた。", "コミュニティスペースのキッチンのコンロを隠す木のカバーの側面のタッカーが外れている。<mark class=\"hg\">直したい。なんなら新しいものに変えたい</mark>。目が館内の壊れているものを探す目線に変わってきている。", "<mark class=\"hg\">道のアスファルトの日々が目に入って</mark>、それもメンテナンスの範囲かもと思う。", "ところで、秋田に移住してきた人に話を聞くと「ここが好きで！」みたいな話は思ったより聞かないなと思う。割となんとなく決めたとか、単に仕事で、夫が転勤するから仕方なく、などの話も多い気がする。だからといって悪い気がする訳ではない。これは中村さんの制作と通じるものがあるのかもしれないと考える。<mark class=\"hg\">「とりあえず行ってみる。しょーがないからまず、住んでみる」</mark>のような。そこから愛しさが生まれることもありそう。", "「一見地味に見える取るに足らないような出来事」 「これ以外に参照しなくていい全体を作る」 「この後ろ、背後に必ず何かある、という感覚」←これが11日に言っていた「世界を信頼すること」だそう。こういうものの見方をしたら、自分の特になんにもなかったような気がする毎日にも絶対なにかしら起きている感じがして、日々が面白くなりそうだなと思う。世界を信頼するってできてるようなできてないような、でもできたらいいことな感じがするので<mark class=\"hg\">自分の日常でもやってみようかなと考える</mark>。"]},
+{"name": "描いているうちにもう直しはじめている", "alts": ["紙の上で先に触る", "Beforeを描くと手が決まる"], "relation": "紙に描くか体で座るか×スケッチが手つきの入口になる", "bi": 1, "cards": ["541", "144", "327", "180", "329", "544", "549"], "html": ["手順は今回も同じで、まずはメンテナンスする前の家具を<mark class=\"hg\">『Before』としてペンでスケッチする</mark>。できたらそれをホワイトボードの『Before』コーナーに貼ってからメンテナンスにとりかかる。 クラフトのバインダーにクラフト紙をはさむ。ここの備品はナチュラル系だ。", "記録のパーティメンバーが津田さんの話を聞いている間にメンテナンスクラブもイスの「観察」をしていたらしく、床に置いてあるバインダーに茶色い紙が挟んであってイスの絵が描かれていたり、構造を文章で書いたりしているのを見つける。ホワイトボードにも貼ってあった。<mark class=\"hg\">なんで白い紙じゃないんだろう</mark>。", "今回のスケッチは<mark class=\"hg\">ペンで描くので、通常の鉛筆のときと違って</mark>、という話を3人でしている。", "今日からメンテナンスクラブに参加する方が二人いて、新しく追加された二人掛けのデカいボロいベンチに一緒に取り掛かることになった。まずはベンチの構造をつかむためスケッチから開始するが、<mark class=\"hg\">ひとりは立ったまま、ひとりは床にあぐらで座ってスケッチ</mark>していて高低差が出ている。しかし、ベンチのぐらつきを確かめるために座ってみようとなったときは二人一緒に全く同じタイミングで座っていて面白かった。しかも二人の服装は上が白、下が青いデニムで、後ろから見ているとなんだかお揃いに見えたので余計に面白い。", "「ぜひ一旦座って～」と中村さんが呼びかけると2人でならんでイスに座ってみる。<mark class=\"hg\">座ったまま各々つづきを描く</mark>。かなり真剣に描いているようす。", "スケッチをしている人たちを見ていると、昨夜アルヴェシアターでレイトショーを観た（実写版映画『ルックバック』）ので、なんか<mark class=\"hg\">制作の現場をずっと見続けているような感じ</mark>がした。", "15時08分頃　木の屏風を担当している①の人は完成？ でもなぜかずっと自分は③の人をマークしている。平たい板に線を何本かひいている。下部分の木の幅をはかって…<mark class=\"hg\">アイデアがきまったようだ</mark>。"]},
+{"name": "図面はないがメジャーはある", "alts": ["メジャーが先、絵は後", "勢いで書いて測ってから選ぶ"], "relation": "差異＝道具の使い方（勢い／測る／合わせる／曲げる／巻く）×地＝設計図なしの手", "bi": 1, "cards": ["019", "389", "302", "409", "412", "275"], "html": ["みんなスケッチをしているが、みんな書くの速いなと驚く。さっきの打ち合わせ、そんなに時間が経ってないはずだけど。しかもけっこう面白くて、勢いで書くから<mark class=\"hg\">パース？のようなものは定まってなくて</mark>、あと木の模様を書いている人もいる。ビスの数、どこにどう力がかかっているか、などをささっと把握できるようになるのは結構難しいんだろう。", "<mark class=\"hg\">黄色いメジャーが置かれていて</mark>、設計メモみたいなのがある。", "その呼びかけのすぐ後に手前の女性（娘さん？）が作業中のイスの<mark class=\"hg\">背幅をメジャーで測ってから材料を選びにいった</mark>。そこに白田さんが付き添う。", "女の子が<mark class=\"hg\">メジャーと、横の木廃材を持って</mark>スタッフと直す方法を考える。背もたれに廃材を追加しようとしている。", "女の子、講師の助言で<mark class=\"hg\">ビスを斜めに入れる</mark>。", "やすりがけを試みる。紙やすりを筒状にして、穴にフィットするようにあてがってこする。「佐輔くん、やすりの番号小さいのある？」「下にあったかな、取ってきます」ことはちゃんが<mark class=\"hg\">木の棒にやすりを巻きつけて、やする</mark>。状況に最適化するように道具の形状が進化していく。"]},
+{"name": "手が先、寿命は後", "alts": ["仮止めで完成にする", "短命でも愛しさは出る"], "relation": "差異＝とりあえずの帰結（速さ／短命／愛しさ）×地＝先に手を出すこと", "bi": 1, "cards": ["271", "099", "135", "212", "084", "379", "221"], "html": ["みんな行為に悩む時間が短い。<mark class=\"hg\">手が、身体が先に動いている</mark>感じがする。", "藤本さんからは、「<mark class=\"hg\">判断に迷う時間が減った</mark>」とのこと。理想を描いてそこに向かう、というより、とりあえず目の前の状態を診断してあてがう、という作業だから、常にボールが投げられている状態、という感じだろうか。", "抜いたビスが思いがけず長かったらしいく「ながぁ…！」と声に出す人、「やっぱ角度が…」と呟きながら調整する人。中村さんは何かに対して<mark class=\"hg\">「まずいいや、まず！」</mark>と言っている。秋田県人も「まず、まず」ってよく言う。", "ビスでドリンクホルダーの穴を開けたことについては「<mark class=\"hg\">あるものでやる、とりあえずやる</mark>をあまりにも体現している」と言っていた。そういうやり方について「なんとなく体感として楽しいなーと感じてもらえたら十分。あまり言うことはない。とりあえず、でも、サイコーです」というのがまとめ。", "この後、終盤になってもコウキさんは特に急ぐわけではなくて、どのような椅子を作りたいか、の完成イメージを話してくれる。パーツについて「可愛い」という表現が繰り返し用いられて、実際ドーナツ型の背もたれはとても可愛い。ビスの時間はないので、<mark class=\"hg\">マスキングテープで仮止めして、完成とする</mark>。", "中村さん曰く「とりあえずメンテナンス」のデメリットは「クオリティが落ちてしまうこと」。メンテナンスするにも、とりあえずだと、<mark class=\"hg\">一時的になおすことになるので、寿命が短い</mark>らしい。／（「寿命」は命のこと。よく物に対して「寿命」と言ったりするけど、やっぱりみんなどこかで物に対して命っぽいものを感じている。これは日本語だけど、他の言語圏にもそういう言葉とか言葉の使い方はあるのかな？）", "ところで、秋田に移住してきた人に話を聞くと「ここが好きで！」みたいな話は思ったより聞かないなと思う。割となんとなく決めたとか、単に仕事で、夫が転勤するから仕方なく、などの話も多い気がする。だからといって悪い気がする訳ではない。これは中村さんの制作と通じるものがあるのかもしれないと考える。「とりあえず行ってみる。しょーがないからまず、住んでみる」のような。<mark class=\"hg\">そこから愛しさが生まれることもありそう</mark>。"]},
+{"name": "手元のものが持ち場を替えていく", "alts": ["あるものでやると褒められる", "用途を知らないまま選ぶ"], "relation": "差異＝代用の理由（工夫・しかたなさ・不明・好み）×地＝ヤスリ・板・ビスの持ち替え", "bi": 1, "cards": ["207", "088", "110", "168", "149", "410"], "html": ["最初はヤスリを手に巻きつけて作業していたのが、いつの間にか短い角材に巻きつけられ、<mark class=\"hg\">最終的にはトンカチの持ち手にヤスリを巻きつけて</mark>それでゴシゴシと磨いている。", "ことはさんとお母さんが、手すりの部分を叩き割ろうとして、中村さんはそれだとちょっと難しいかも、という表情だったけど、何度目かのトライで穴が開き、歓声が上がる。すごい！そんなふうにやろうとは思わなかった！といった感じで讃える。その後、お母さんが<mark class=\"hg\">やすりをトンカチに巻きつけて擦って面取りしている</mark>。", "中村さんの話で特にそうだなあと思ったのは、<mark class=\"hg\">しかたないけどそこにあるものを使うしかない</mark>、日々の連続、日常ってそういうこと。しかたない中でなんとかする。それによってできるようになることもあるのではないか、というあたりの話。", "中村さんと津田さんが本日の簡単な感想と明日のスケジュールを説明して両メンバーはおつかれさまでした、と解散。でもメンテナンスクラブの女の子が一人、中村さんと一緒にイスを前にして作業を続けていた。作業中も補強する木材の長さが足りないのを、<mark class=\"hg\">別の板を噛ませて補ったりと工夫していたらしい</mark>。熱心だ。楽しそうで良いな。", "津田さんが「全ネジを使いたいときってどんなとき？」と質問すると、中村さんは「<mark class=\"hg\">僕も全ネジがなんで存在してるかわかんないんですけど</mark>…仮止めのときとかに使うんじゃないでしょうか」などとと答えている。インパクトドライバーはいつの間にか手の中に戻っている。", "棚には様々な用具がある。女の子が<mark class=\"hg\">「長めのがイイ」と言いながら、一番長いビスを手にする</mark>。"]},
+{"name": "元の形が許す分だけ足す", "alts": ["かませるのがメンテナンス", "裏からしか支えられない"], "relation": "足すか保つか×元の家具の条件が工夫を限る", "bi": 1, "cards": ["316", "502", "242", "503", "037", "097", "359"], "html": ["15時50分頃　<mark class=\"hg\">「ここが長さが足りないのでこれをかませて…」</mark>と中村さんがイスを見ながら「これぞ『メンテナンス』！」と評価。", "16:18。奈月さんと五社さんが、何やら難しそうな話を相談している。顔はめパネルが、絵が書いてある方からはビスが打てないし、木を出せないので、裏側から支えるしかない。そのためにトラス構造のようなワードを検索して、うまく支える方法を調べている。<mark class=\"hg\">元の家具が規定する条件に合わせて、できることが限定されていく</mark>。そして、二人は構造のことについて詳しく、（もしかして奈月さんは建築系だったか・・？）トラス構造のようなワードをスマホで調べつつ、画像の検索をかけている。", "各自の作業進捗を聞く。ササクレを外す。グラグラするところに、「シンデレラフィット」する板材を見つけてあてがってみた。<mark class=\"hg\">ハズれかけの板を打ち付ける</mark>。観察して、考えて、やってみるの工程をふむふむと聞く。", "顔はめパネルはほぼ完成。ボードの絵の青い背景が少しひび割れているので、それをビニールテープで補修するとのこと。<mark class=\"hg\">どうしても色はぴったり合わないので</mark>、ちょっと目立ちそう。最後、思い出して、端材置き場から剣があったのを取り出して、五社さんに渡してみる。五社さんは気に入って、それをパネルのキャラクターの右手？で掴めるようにアイデアを考えている。", "グラグラすることもそうだし、ささくれがあるってこともメンテナンスの対象になるそう。この、メンテナンスの対象の基準というか領域ってどこまでなんだろうなあ。たとえば、背もたれにカーブをつける、っていうのはメンテナンスとは言い難いから、<mark class=\"hg\">元の状態を保持する、とか何か意識せずとも条件がある</mark>ように思う。", "クニオさんが、今回のような作業のデメリットとして、「寿命が短い」という話をする。再び擬人化っぽい話ではあるが、寿命・安全性や強度に問題があって、<mark class=\"hg\">工夫の必要があるとのこと</mark>。", "<mark class=\"hg\">緩めてみては（外してみては）締め直してを繰り返して</mark>具合を探る。この「おして引いて」みたいな作業が直感的にいいな〜と思った。メンテナンスってこういうことなのかなみたいな。メンテナンスする物と対話するというか。対話っていうと大袈裟だし、「対話する」ってよく使われるから、この体験に当てはめる言葉としてちょっとしっくりこないけど。"]},
+{"name": "直すから足すへ", "alts": ["直さないのも直すのうち", "ユーモアも補修"], "relation": "差異＝手の入れ方（留め直す／添木／残す／ユーモア／穴）×地＝直すの範囲", "bi": 1, "cards": ["267", "570", "276", "241", "212"], "html": ["ことはちゃんのお母さんが、傘立てが部分的に外れていることを発見。邦生さんがロックが外れている部分を見つけて、ロックし直し、「補修完了」という。構造を確認して、<mark class=\"hg\">外れているピースを留め直すのもメンテナンス</mark>。", "メンテナンスするものを選ぶ。選んだら茶色い紙にマジックペンでスケッチをする。私は足のところが折れちゃった屏風っぽい看板をメンテナンスすることにした。この屏風看板は、津田さんのプロジェクトで書いたフィールドノートを貼るのに使われているものと同じ。なので、あまり形をかえると、他の屏風看板たちとは違う形になって、複数同時に看板を使うときに統一感なくなったらちょっと嫌な気もすると思ってしまい、<mark class=\"hg\">折れた足に添木してくっつけ直すだけにしてみた</mark>。", "ナツキさんコハルさんチームが背もたれを補修する。角度を変えると背中に刺さるので、<mark class=\"hg\">ちょっと不安定なグラグラするくらいがちょうど良い</mark>という結論に至っている。「不安定」は個別への「適合の余地」と解釈が変換されて今許された。", "ことはちゃんが、家具の補修に「ユーモア入れていい？」と聞いてくれる。「もちろん！」と答える。<mark class=\"hg\">補修作業にユーモアの発揮のしどころを見出せる</mark>なんてさすがっすね！と興奮する。", "<mark class=\"hg\">ビスでドリンクホルダーの穴を開けた</mark>ことについては「あるものでやる、とりあえずやるをあまりにも体現している」と言っていた。そういうやり方について「なんとなく体感として楽しいなーと感じてもらえたら十分。あまり言うことはない。とりあえず、でも、サイコーです」というのがまとめ。"]},
+{"name": "とりあえずを叱って、とりあえずで締める", "alts": ["制限がやり方を生む", "しかたなさと最高が同居する"], "relation": "差異＝「とりあえず」の評価（短命・味・最高）×地＝あるものの制限下で直すこと", "bi": 1, "cards": ["488", "110", "004", "278", "284", "098"], "html": ["this is maintenanceというワードが出てくる。<mark class=\"hg\">すでにあるもののルールで、やり方に制限をかける</mark>。この辺りの話、なかなか発言内容が思い出せない。", "中村さんの話で特にそうだなあと思ったのは、しかたないけどそこにあるものを使うしかない、日々の連続、日常ってそういうこと。<mark class=\"hg\">しかたない中でなんとかする</mark>。それによってできるようになることもあるのではないか、というあたりの話。", "また、「メンテナンスクラブ」という刺繍がホワイトボードの縁に、横向きに掲げられている。近づいてみると、ジグザグな縫い方（名前を知らない）でミシンで布同士を塗っていて、そのジグザグが、木をくくりつけているロープと同じように見える。あとで見るけれど、一番最初のステップがインパクトドライバーであるように、<mark class=\"hg\">くくりつけるとか、接着するとか、打ち付ける</mark>、といった動作が基本という感じがする。", "小松さんは足の部分に板を取り付ける。クランプでずれないように抑えながら、ビスで一つずつ止める。足の長さが左右で違って座面が傾くけど、それも味としよう！ということで、片面の足を完成させる。<mark class=\"hg\">ちょっとグラグラするけど、今日はここまでと決める</mark>。", "振り返りで邦生さんが「とりあえず」は「寿命が短い」という。<mark class=\"hg\">準備して取り組んだものは長く、とりあえずは短い</mark>。報いというか、行為には然るべき結果・報復が伴う。他の人が使う時には安全性や強度を考えないといけない。10回座っても大丈夫かとか、確認が必要。自分の行いが自分のいないどこかや誰かに影響することに想像力を持ちながら、備えて取り組むことが強度と信頼と安全性につながる。", "<mark class=\"hg\">「とりあえず、でも最高です。」という言葉で締め切られる</mark>。"]},
+{"name": "初めて握ると比喩が出る", "alts": ["武器と呼んでから慣れる", "押して抜く"], "relation": "差異＝比喩の出処（ゲーム／逆説／食べ物／野球）×地＝初めて持つインパクト", "bi": 2, "cards": ["024", "453", "182", "184", "082", "275"], "html": ["<mark class=\"hg\">手袋をしている人としていない人がいる</mark>。", "１５：００ビズ？ビス?<mark class=\"hg\">とにかく武器を手に入れた</mark>。おれは無敵モードに恐る恐る入っていく。小学校のときの図工を楽しみにしていた感覚とは似て非なるもの。変態チックな性癖みたいな、そんな感覚。", "中村さんが今日からのメンバーにインパクトドライバーの使い方を説明している。「イメージと合わないかもしれないけど、<mark class=\"hg\">抜くときはむしろ押してやるとうまくいく</mark>」。押してダメなら引いてみな、の逆バージョンみたいだ。", "ベンチ組が初めてのインパクトドライバーでビスを抜く。熱いから気を付けて、と中村さんが言うと「ほんとだ、ホットだ」とのコメント。これだけ聞くとコーヒーのことか？と思う。藤本さんがビスを見て「錆び錆びだね」と言うと「お菓子っぽくないですか？」と返していて、錆びたビスがなんのお菓子に見えたのか不思議に思う。<mark class=\"hg\">言葉だけ聞いているとますます食べ物っぽさが増す</mark>。", "コウキさんが手袋を二重にして、インパクトドライバーを扱っている。一本のビスを打つのに、なるべく丁寧に準備をして向かう感じ。そして<mark class=\"hg\">何事も野球と重ねて捉えている</mark>という話も面白かった。比喩ができるってことは、関係ないはずのものからいくつかの特徴を抜き出して、関連性を見つける、ってことだから、多分このワークと同じことが起こっている。それを、自分との結びつきで行うか、調べたこと同士の結びつきでおこなうか。", "やすりがけを試みる。紙やすりを筒状にして、穴にフィットするようにあてがってこする。「佐輔くん、やすりの番号小さいのある？」「下にあったかな、取ってきます」ことはちゃんが木の棒にやすりを巻きつけて、やする。<mark class=\"hg\">状況に最適化するように道具の形状が進化していく</mark>。"]},
+{"name": "穴が安いと、手が荒くなる", "alts": ["元に戻せると言われて打ちまくる", "ぶち抜く快と報い"], "relation": "差異＝穴の開け方（ビス・叩き割る・報い）×地＝木は穴を許すという前提", "bi": 2, "cards": ["021", "355", "083", "093", "088", "274", "284"], "html": ["確か中村さんが「いくらビスを打ってもいい。<mark class=\"hg\">穴は開くけど、元に戻せる</mark>」と言ったことを話していて、それっていいなと思った。マグロとかの、カギ爪がついた道具でクイっと引っ掛けて動かすみたいなことをやった時につく傷。あの傷が実際値付けにどう影響するか、しないかはわからないけど、木が完全に可塑的なわけではなくて、後戻りできなさみたいなのを含んでいる。けど、その穴がとてもミニマルなので、機能的にも問題にならない。", "いろんな箇所にビス？を打ち込んでみると、木材同士がもっとくっついて揺れがなくなるかもだから、<mark class=\"hg\">「ここかも？」と思ったところにどんどん打ち込んでいく</mark>作戦。", "津田さんもやりますか、といって手袋とインパクトを渡される。手袋は、巻き込まれると聞いたことがあったのでつけないでやろうかと思ったけど、コウキさんにつけた方がいいと言われて、つけてやってみる。慣れてはいるのと、こういう作業を僕はどんどん進めたくなってしまうタイプなので、<mark class=\"hg\">味気なくバンバン打つ。確か４本</mark>。", "「ビスで穴を開けるのは、手順としてはあるけれど、<mark class=\"hg\">まさかビスでやるとは。「あるものでやる」を体現している</mark>」", "ことはさんとお母さんが、手すりの部分を叩き割ろうとして、中村さんはそれだとちょっと難しいかも、という表情だったけど、<mark class=\"hg\">何度目かのトライで穴が開き、歓声が上がる</mark>。すごい！そんなふうにやろうとは思わなかった！といった感じで讃える。その後、お母さんがやすりをトンカチに巻きつけて擦って面取りしている。", "ことはさんがいよいよトンカチでホルダーの穴をぶち抜こうとしている。みんなに見守られながら、腕を振り下ろす。高い天井の広い空間に、「バン、バン、バン」と音が響く。3Fの学生たちは動じない。<mark class=\"hg\">抜けた時に拍手が起こる。欲望の達成</mark>。", "振り返りで邦生さんが<mark class=\"hg\">「とりあえず」は「寿命が短い」という</mark>。準備して取り組んだものは長く、とりあえずは短い。報いというか、行為には然るべき結果・報復が伴う。他の人が使う時には安全性や強度を考えないといけない。10回座っても大丈夫かとか、確認が必要。自分の行いが自分のいないどこかや誰かに影響することに想像力を持ちながら、備えて取り組むことが強度と信頼と安全性につながる。"]},
+{"name": "当てずっぽうで打つのが正解になる", "alts": ["壊れかけだから何でもやれる", "総当たりが上達に化ける"], "relation": "抜くか打つか×バラす前の中途半端さが手数を許す", "bi": 2, "cards": ["385", "296", "139", "301", "095", "196", "206", "481"], "html": ["「まずは触ってみましょう」と始まる。すでに中途半端な状態だから、<mark class=\"hg\">色々何やっても大丈夫</mark>といっている。", "どうやらまずは、みんなそこに置かれた椅子やベンチの<mark class=\"hg\">「釘を抜く」という作業を各々やっている</mark>ということにそこで気がついた。", "イスを解体しつつ、<mark class=\"hg\">完全に解体する前に直せないかという試み</mark>が各所で始まる。", "15時19分頃　「じゃあ、また追加で情報というか」と中村さんがみんなへ呼びかける。 「思いついてみてほしいというか、めっちゃビス打つとかやってみて、（ここのイスは）1本しか打ってないので、<mark class=\"hg\">1本より2本のほうが強くなるかもなので</mark>、完全にバラす前になおしてみてほしい」。", "新しくきた二人の直したソファについて。「感覚でここかも！っていう所をバンバンビスを打って行った。」これの正しさってすごいあるというか、<mark class=\"hg\">ローラー作戦的に総当たりでやってみること</mark>。そうした感覚こそ上達の近道なのだろうと予想する。", "新しく取り付けた手すりにドリンクホルダー用の穴を開けようと試みる方がいて、会場には穴を開ける用の道具がないので、インパクトドライバーで円の形に<mark class=\"hg\">ビスを細かく打っては抜いて</mark>、それでくり抜こうとしているらしい。中村さん「これで開けられたらすごい！この手法で穴を開けた人は見たことない」", "作業していたみなさんが一か所に集まっているのが見えたので何だろうと戻ってみると、手すりにビス打ちで穴を開けるという<mark class=\"hg\">果敢なチャレンジがなんと成功する瞬間</mark>だった。中村さんも「ビスでここまでやるのは初めて見た！」と絶賛している。しかし穴が開いただけでは完成ではなく、ここからブサブサにささくれ立った穴のふちにヤスリをかけるらしい。", "戻ってくると、小松さんがビスを抜く作業を続行していて、その手つきに上達が見られて、山岸さん含む周りの人から驚きの声が上がる。<mark class=\"hg\">この上達ってなんなんだろうと思う</mark>。特に自宅でビス抜き特訓をした、とかではないはずで、だけど１度やったら体が覚えている、みたいな自転車的な学習か、それとも月日が経つと生活の中に経験値が上がる機会があってある程度は自然と上達する、みたいな国語の成績みたいなのものか。「自主練しましたね？」"]},
+{"name": "一発で決めるほうが、続く", "alts": ["終わりの見える作業に手が乗る", "線を引く人と切る人が分かれる"], "relation": "差異＝やり直しが効くか（鉛筆・ペン・切断・やすり）×地＝一本の線・一本のビス", "bi": 2, "cards": ["351", "181", "326", "527", "497", "478"], "html": ["まずはメンテナンスするベンチを観察することに。茶色い紙に黒ペンが支給される。ペンを使うのは、「鉛筆だと書き直せるから何度も何度も線を書き直したり、重ねたりしてしまうけど、<mark class=\"hg\">一発勝負のぺんにあえてすることで</mark>、その一本の描写に力が入り、かえって、鉛筆よりも特徴を捉えた線になるから」というようなことを中村さんがおっしゃっていた。／聞いていてすごく腑に落ちた。私も鉛筆だと「もっとうまくかけるかも」と思ってたくさん線を描いて、最終的にできた線が目の前の観察対象を捉えた線というより、私の頭のなかの観察対象の記憶とか今まで見てきた観察対象の平均値の線になる感じがする。", "ベンチ組のうちのおひとりは美大生らしい。中村さんに、スケッチに何故えんぴつではなくマジックペンを使うのか？と質問している模様。「えんぴつだともっとおしゃれにできるかも、と思っちゃう」と納得している様子。中村さん曰く「ペンでザカザカ書くくらいが”それっぽく”なっていい。<mark class=\"hg\">簡単にそれっぽくなるとモチベが下がらないのでいい</mark>」とのこと。私は絵が苦手で、美術の授業などで描いていて嫌になった記憶があるので、なるほどと思う。", "途中、一人は立って、<mark class=\"hg\">もう一人は座って同じ中央のイスをスケッチしている</mark>。", "ことはさんが、角材を切ってもらうために、ペンで切断位置の指示を書いている。中村さんがスタイロフォームを被せた作業台に電動ノコギリを持ってきて、ことはさんから角材を受けとる。切って欲しい位置にの線の横に⚪︎、間違えた線の横に×が書いてあり、それを中村さんが褒める。実際、知り合いの大工さんも切断位置の指示を示す時にその方法をとっていたと思います。あて木を求めていたナツキさんも立ち会い、角材が切られる。ホームセンターの百円カットみたいだと誰かが言う。中村さんは<mark class=\"hg\">「人の線を切るのは緊張する」と言う</mark>。先端をさいとうさんが抑える。ブーン。", "やする作業は終わりがわからない。几帳面な人はずっとやるだろうし、ささっと終わらせる人もいそう。対して、<mark class=\"hg\">ビスを打つ作業は、終わりがわかりやすい</mark>。", "まず小松さんがビスを抜き始めたと思う。14:56ごろ。<mark class=\"hg\">迷いなく、すっと自分の作業を淡々やります、みたいな空気感</mark>。"]},
+{"name": "コツは先に姿勢に出る", "alts": ["ゆっくり→はやくが板につく", "野球の体で打つ"], "relation": "そっとか速くか転がすか×上達が体の向きに現れる", "bi": 2, "cards": ["381", "399", "314", "428", "236", "027", "481", "298"], "html": ["14:55 ワークショップ開始 親子（父、娘）の娘さんが一生懸命メモしている。<mark class=\"hg\">父が娘にドライバーを渡す</mark>。", "こうきさん「外れちゃいました」というけど、スタッフがそれでいいとほめる。こうきさん、<mark class=\"hg\">再びそっとドライバーを回し始める</mark>。", "まだまだやりたいことがあるようだ。ネジも「これじゃない」「たぶんこっち」と選んでいる。ネジの取付も<mark class=\"hg\">「ゆっくり→はやく」が板についてきている</mark>。", "休憩中も女の子は1人だけやめない、<mark class=\"hg\">ネジもこれではと自ら選ぶ</mark>", "小松さんが椅子を解体しようとしている。ビス穴にインパクトドライバを垂直に当てるために、椅子の方をごろんごろんと転がして向きを変えながら、ビス穴-インパクト-腕が<mark class=\"hg\">できるだけ真っ直ぐに力が伝わる姿勢を探す</mark>。", "コウキさんの横でしばらく見ていた。コウキさんは、インパクトドライバーの作業のなかで、<mark class=\"hg\">「野球やってたんで」</mark>と言い、それが面白かった。たとえば、筋力の話だったり、ボールに対して垂直に打つ？みたいなことだったり、野球と関連する体験があるのだろうか。", "戻ってくると、小松さんがビスを抜く作業を続行していて、その手つきに上達が見られて、山岸さん含む周りの人から驚きの声が上がる。この上達ってなんなんだろうと思う。特に自宅でビス抜き特訓をした、とかではないはずで、だけど１度やったら体が覚えている、みたいな自転車的な学習か、それとも月日が経つと生活の中に経験値が上がる機会があってある程度は自然と上達する、みたいな国語の成績みたいなのものか。<mark class=\"hg\">「自主練しましたね？」</mark>", "だんだんコツをつかんできた様子のところ、苦戦している箇所が。様子を見にきた中村さんが<mark class=\"hg\">「これはバールで…」</mark>とバールをもってきて使う。"]},
+{"name": "上手くなると拍手、慣れると味気ない", "alts": ["悦に入る言い方", "料理番組みたいに上達する"], "relation": "差異＝上達の見せ方（拍手・小言・自己演出・無言）×地＝ビスの抜き打ちの手つき", "bi": 2, "cards": ["239", "398", "548", "391", "031", "083"], "html": ["邦生さんのワンポイントアドバイス。インパクトを垂直に当てることや、トリガースイッチの握り方でドリルの回転数が変わること、半ネジと全ネジの使い所を教えてくれる。ワンポイントを聞く前と聞いた後で、ビスの抜き方・打ち込み方が<mark class=\"hg\">格段に向上する。料理番組みたいだなと思う</mark>。", "<mark class=\"hg\">コマツさん急に上手になり藤本さん拍手</mark>", "④の人がビスを抜いている。<mark class=\"hg\">「自主練習しました？」「うまなってる！」と声がかかる</mark>。", "<mark class=\"hg\">「小言多くてごめんなさい」とドライバーの熱を心配する講師</mark>。", "コウキさんが「外れちゃいました」「抜けちゃいました」と言ったふうな言い方をして白田さんがツッコむのが面白い。<mark class=\"hg\">「そういう言い方をすれば自分の悦に入れるので」</mark>とコウキさんが説明して、確かに悦に入る要素がこういう作業にはあるようなあと、今振り返ってて思う。「あれ？またなんか僕やっちゃいました？」っていう異世界転生系の決まり文句を思い出す。", "津田さんもやりますか、といって手袋とインパクトを渡される。手袋は、巻き込まれると聞いたことがあったのでつけないでやろうかと思ったけど、コウキさんにつけた方がいいと言われて、つけてやってみる。<mark class=\"hg\">慣れてはいるのと、こういう作業を僕はどんどん進めたくなって</mark>しまうタイプなので、味気なくバンバン打つ。確か４本。"]},
+{"name": "敷いた途端、椅子が動きはじめる", "alts": ["シートの内と外で椅子が別物になる", "座っていた椅子が持っていかれる"], "relation": "差異＝椅子がどちら側か（座席・シート上・外・消えた）×地＝会場中央の一枚のシート", "bi": 3, "cards": ["294", "018", "485", "120", "308", "576"], "html": ["14時53分～ <mark class=\"hg\">会場の中央に薄い深緑色のビニールシートが敷かれている</mark>。", "メンテナンスチームは、スタジオの真ん中に広げられた緑のシートの上で、いくつかの壊れた椅子や、<mark class=\"hg\">さっきまで座っていた、ちょっとがたつく椅子を分解する</mark>ところから始まる。前には、ホワイトボード、端材コーナー、オブジェがあり、後ろには基本的な工具（インパクトドライバーやビス、その他文房具なども）が棚を用意して置かれてある。", "この空間の、ブルーシートの存在は、なんか際立たせるものがある。作業してもいい空間、一時的に立ち上げられた空間、ステージではないけれど、<mark class=\"hg\">確実に、いつもと違うルールで動く空間</mark>。", "メンテナンスクラブと記録のパーティでわかれる メンテナンスクラブのメンバーは我々が座っていたイスの中から中村さん曰く「明らかにボロい」ものをシートが敷かれているスペースに持って行った。私が最初に座ろうとしたイスも。私の右隣にあった、座面の板が浮き上がっていたイスも持っていかれる。<mark class=\"hg\">我々は明らかにボロいイスに座らされていたのか</mark>。", "15時33分頃　中村さんが「え～っと」と周りを見回して説明をしようとしているのを見たところ、手前の女性の奥に見えていた男性が作業していた<mark class=\"hg\">イスがなくなっているのに気がついた</mark>。", "今日は晴れていて、気温もちょうどいいから、外で作業するには最高の天気だった。でも、仕上げタイムが終わって、各自やりたい作業をやっていたら、<mark class=\"hg\">雨が振ってき始めたらしく、ベンチがちょこっと心配</mark>。"]},
+{"name": "耳が先に『締まった』と言う", "alts": ["音でうまく行っているかわかる", "目より先に耳が合否を知る"], "relation": "道具が鳴らす音か人の声か×作業の合否が先に耳で決まる", "bi": 3, "cards": ["025", "272", "305", "555", "131", "306", "163"], "html": ["会場にいろんな音がある。ビスの山を舐めて、ドゥルルルルという音が、あとで山岸さんがいうように身の毛がよだつような感覚って確かにあり、逆に<mark class=\"hg\">音でうまく行っているかどうか、ってよくわかる</mark>。", "コハルさんとナツキさんのチームからインパクトドライバーの音。から回っているドゥルルじゃなくて、ちゃんと締まっている「バババッ」の音がする。「バババッ」って鳴ると嬉しい。多分締めてる本人も、インパクトドライバーを使うことに慣れて身体化している人たちも、<mark class=\"hg\">「この音は正常、ちゃんと締まってる」</mark>って思えて嬉しい。", "ドライバーで穴をあけてから、ネジを「最初するするする～っと」といいながらドライバーでゆっくり締めていき、<mark class=\"hg\">「ガタッガタッガタ」と最後に締まった音</mark>がした。", "さっきの説明で③の人のプランがわかった。あとはドライバーでビスを打っていく。<mark class=\"hg\">カチ、カチ！！いい音</mark>。", "私が最初に座ろうとしてやめたイスは、ビスを抜くよりはいだ方がいいと、ベニヤ板の部分をバールではがされていた。<mark class=\"hg\">木がメキメキ鳴る音がする</mark>。", "「いいねいいね～」「ちょっと強くなったかも」。<mark class=\"hg\">その直後「まがってる～」と女性の声</mark>。", "お堀の方の芝生に向かうと、なかいちの広場でやっているイベントの音がそこそこ大音量で聞こえてくる。ステージで誰かが郷ひろみを歌っている。メンテナンスクラブの参加者さんがそれに合わせてか、はたまたつられてか<mark class=\"hg\">「エキゾチックジャパ～ン」と口ずさみながら</mark>私の前を通り過ぎていく。私も頭の中でちょっと口ずさんでいたので謎の共感を覚える。"]},
+{"name": "鳴ると寄っていく", "alts": ["音で見つける", "うるさいほどいい"], "relation": "差異＝誰の音か（台車／中村／家具／トンカチ／高校生）×地＝音が異常の合図", "bi": 3, "cards": ["066", "159", "372", "484", "383"], "html": ["1Fのコミュニティフロアをキコキコ大きな音で台車が通り過ぎる。スタッフの方が屈んで台車で重たいものを移動していて、<mark class=\"hg\">その音があんまり大きいので</mark>、メンテナンスのしがいがありそうと思い、コウキさんが早速声をかける。", "1階の一番広いホールに向かう途中で先行していた中村さんの<mark class=\"hg\">「あー…、あー…、あー…」という声が聞こえて</mark>、相当ガタが来ているものを発見したのかと思ったら本当にガッタガタしているアンケートBOXがあった。でも蓋の向きを変えるとアンケートの投入口を開けておくか閉めておくか選べる２WAYのBOX。しかもちゃんとした人が作ったらしい。それでも使ってるうちにガッタガタになるものなんだなあ。", "藤本さん「キャスターがきいきい『鳴っている』」➡︎擬人化？<mark class=\"hg\">声みたいに捉えている感じ</mark>", "今日から参加の五社さんは、迷いがなくて、トンカチで釘を埋め込んでいる。大きな音が出たのはこれが今日初だった気もする。記録側だから、大きな音に敏感なのだろうか？五社さんは全然気にせず、作業に集中している。そういえば、小松さんのビス抜きの作業も、インパクトの大きな音が出るけれど、そうやって<mark class=\"hg\">大きな音を出していい空間って、いいよな</mark>と思う。", "上では男子高校生が<mark class=\"hg\">おしゃべり。前よりは静か</mark>。"]},
+{"name": "近くで先生、遠くで蝉になる音", "alts": ["口真似できる手加減", "濁音が上手さを漏らす"], "relation": "差異＝聞く距離（手元・ホール・3F・ロビー）×地＝インパクトドライバーの音", "bi": 3, "cards": ["026", "299", "183", "030", "274", "204"], "html": ["中村さんは、工事現場にいくと「バッバッバーーーー」っていう音聞こえてきませんか？と言っていて、みんなもそれにうなづいていたと思う。<mark class=\"hg\">適切に素早く作業するための指標になっている</mark>。", "その直後、思い出したように中村さんが「ちょっと追加で説明しまーす」とドライバーを垂直に使う、まっすぐにあてる、というアドバイスを全員に伝える。続けて、ドライバーの握り方について、やさしくにぎるとゆっくり回転するので、最初ゆっくり、徐々に強く握ると早くなる、という仕組みを説明。例えとして「よく、工事現場から聞こえる音で」と<mark class=\"hg\">「タッタッタータァァァー」と実演</mark>。すかさず「わかる！　聞いたことある！」とフジモトさんがみんなの心の声を代弁。", "インパクトドライバーの回転はゆるく握るとゆっくりになり、思いっきり握ると「ビャーーー！！」ってなっちゃうと中村さんがデカめのジェスチャー付きで説明している。昨日からこういうちょっと不思議な擬音語で喋っていることが多いなと感じる。その後も「ビスはいきなり”ギャー！”って打たないようにしましょう」とか「ここはこのまま”バギャー”って」とか言っていた。<mark class=\"hg\">ビ・ギ・ギャ・ビャ・ダ、みたいな濁音が多い</mark>。", "作業は結構難しそうで、みんな苦戦して、<mark class=\"hg\">ドゥルルルル音が聞こえてくる</mark>。特に椅子のようなサイズだと補助が必要で、大体みんな二人組で、一人が椅子を押さえて、ドライバーがビスに直角に当たるように保持したりする。", "ことはさんがいよいよトンカチでホルダーの穴をぶち抜こうとしている。みんなに見守られながら、腕を振り下ろす。高い天井の広い空間に、「バン、バン、バン」と音が響く。<mark class=\"hg\">3Fの学生たちは動じない</mark>。抜けた時に拍手が起こる。欲望の達成。", "ロビーに出ると、Ａ1ホールに響くインパクトドライバーの音や参加者さんたちの話し声、笑い声が遠くなって、<mark class=\"hg\">外の蝉の鳴き声と混じって聞こえる</mark>。「コンフリクション、コンフリクト、動詞だと矛盾するね」。テーブルで英語の勉強をしている学生さんたちもいる。ちょうどいい静けさ。"]},
+{"name": "うなずいたあと声が音に散る", "alts": ["説明の声が作業の音に変わる", "音楽だと思ったら声だった"], "relation": "一つの声か各所の音か×説明のあと部屋が多重になる", "bi": 3, "cards": ["422", "397", "543", "390"], "html": ["講師よりビスの説明。スタッフがホワイトボードに設計図を貼る。／<mark class=\"hg\">ビスの接続の説明を両手を使って例える</mark>。女の子のいすで実演。フジモトさん「すげえ！」と一言。", "<mark class=\"hg\">講師の例えに、みんな共感できてうなずく</mark>。", "ふとこの会場に流れている音楽は一体なんだろう…と思っていたら<mark class=\"hg\">「スケッチ楽しいんだよね～」という中村さんの声</mark>が聞こえた。", "<mark class=\"hg\">ドライバーを使う音が各所でひびく</mark>。"]},
+{"name": "仕切らないので、よその声を追ってしまう", "alts": ["筒抜けを許す建物", "追い出さずに見送る"], "relation": "差異＝声との距離が縮む／離れる×地＝吹き抜けで仕切れない館", "bi": 3, "cards": ["011", "226", "015", "423", "417", "151", "205"], "html": ["白田さんが最初話している間、<mark class=\"hg\">高校生の声が3Fからかなり大きくなってきた</mark>。何かしらのゲームをしている雰囲気で、中村さんのトークが始まってさらに大きくなる。", "邦生さんの自己紹介。３階にウェーイ学生がいる。邦生さんも気にしている様子。<mark class=\"hg\">空間は吹き抜け、お互いの言葉は筒抜け</mark>。", "トークの最中に、誰かネームカードを首にかけた女性の方が<mark class=\"hg\">3Fの高校生たちに話しかけているのが見えた</mark>。丁寧に話しかけているのがよくわかる。後頭部がよく見えて、こういう表情と言葉遣いなのだろう、とまで思えた。", "男子高校生、<mark class=\"hg\">帰っておらず、移動しただけで</mark>、外から楽しそうな声が聞こえる。", "<mark class=\"hg\">男子高校生、ついに帰る</mark>。", "若者たちが3階から降りてくる。帰るのかなと思ったら会場の外のロビーにあるカウンターに移動していた。<mark class=\"hg\">一緒にいるだけで1日過ごせるのっていいねえ</mark>と思う。私にとって文化創造館とはアートや学術っぽいイベント、個人が開催する「イベントの会場」として馴染みがあるので、特にああいう賑やかな若者のたむろする場所として選ばれているのがなんだか不思議な感じがする。でもひたすら勉強してる学生とかもいつもいる。不思議な場所。", "でも、外から会場内を見るとみんな楽しそうに何か作業していて、なんだろう？とちょっと様子を見たくなる感じもする。<mark class=\"hg\">そういえば会場の扉は閉められていない</mark>。文化創造館はこういう絶妙なつながりのある、ちょうどいい距離感がつくられている独特な場所だと思う。"]},
+{"name": "隔てないから覗き込まれる", "alts": ["お互い様の覗き見", "通りすがりが座る"], "relation": "差異＝向こうの近さ（音／上階／隣／並ぶ／問う）×地＝区切りのない館", "bi": 3, "cards": ["190", "254", "383", "533", "197", "315"], "html": ["同じフロアで別々のイベントをやっていても衝立などできっちり区切っている訳でもないし、<mark class=\"hg\">お互いの様子を自然に覗き見たりできる</mark>のが文化創造館のいいところだと思う。", "<mark class=\"hg\">AUの方から浮かれた音楽が聞こえる</mark>。お堀の方の芝生のベンチでビスが外れている部分がある。先ほどレクチャーのあった「半ビスが活かされる補修の場面」そのままで、シナプスが繋がった。さっきの練習の実践ができそう。", "<mark class=\"hg\">上では男子高校生がおしゃべり</mark>。前よりは静か。", "椅子をひっくり返しやすりやすりがけが終わったら、ブロアーで細かい木屑をとばし、雑巾で拭き取りをする。赤い塗料が雑巾に付着する。身体を拭いてあげている。手をかけてあげている。白田さんが「椅子が気持ちよさそう」と言う。おやさい隊の奥山さんが軒下の土を見にやってくる。こちら側が何をしているのかチラチラと様子を見ながら、春に肥料を加えて眠らせている土のグリーンシートを剥がしている。その様子を白田さんが何をしているんだろうと言う様子でみる。<mark class=\"hg\">お互い様やでと思う</mark>。", "会場内に文化創造館の常連さんが現れて、スタッフさんに声を掛けたりしながら様子を見学している。と思ったら、<mark class=\"hg\">いつの間にかラグをしいているところに津田さんと並んで腰かけて</mark>話をしている。津田さんの座り方はちょこん、とコンパクトで、両手でペットボトルをそっと持っている。常連さんはのびのび自由な感じで座って、身振りも交えながらお話していて、その姿がなんだか対照的。", "15時47分頃　もう一人の女性が戻ってきた。白田さんが声をかけて状況を聞いている。 <mark class=\"hg\">「これって（ここで）やってるんですか」と女性</mark>。「前の館長が『つくりましょう』、ていう方で…」と白田さんが説明。「だれがつくったのかわらない、みたいな」。"]},
+{"name": "揺れが症状から余地に変わる", "alts": ["グラグラが許されるまで", "揺れが悪いとは限らない", "緩みは使われた証拠"], "relation": "差異＝揺れの扱い（症状／原因／失敗／対策／許容／問い）×地＝揺れ", "bi": 4, "cards": ["347", "193", "358", "367", "276", "350"], "html": ["みんなメンテナンスのことだと「揺れてる」とか<mark class=\"hg\">「グラグラする」ことに関する発言が多い</mark>。", "屋外のDJイベントの準備で使用中の台車や、数学イベントで今使われているテーブルもガタガタしていたそうだが、使用中なので、ということで様子を見守りながら通り過ぎる。<mark class=\"hg\">みんながたくさん使っているからこそ、緩んでくる</mark>。", "なんとか板のビスを緩めていく。そしたらベンチの横揺れが再発。<mark class=\"hg\">緩めちゃいけない部分だったみたい</mark>。", "中村さん「『わたし』があれば揺れに強い」➡︎足と足の間に「わたし」があれば、<mark class=\"hg\">その方向の揺れに強くなるらしい</mark>。", "ナツキさんコハルさんチームが背もたれを補修する。角度を変えると背中に刺さるので、ちょっと不安定なグラグラするくらいがちょうど良いという結論に至っている。<mark class=\"hg\">「不安定」は個別への「適合の余地」と解釈が変換されて</mark>今許された。", "メンテナンスってなんだろうな。直すことなのかな？でもなんでも直すのは違うよな？直さないこともメンテナンスなのかな？<mark class=\"hg\">ベンチが揺れてたらダメなんだっけ？</mark>"]},
+{"name": "重さで押さえて、揺れは残す", "alts": ["重さで止める／揺れに乗る", "重さは正義、ただし頭は軽く", "揺れの向きを言い分ける"], "relation": "重さを足すか揺れを受けるか×ガタつきは消えず扱われる", "bi": 4, "cards": ["043", "441", "188", "249", "303", "063", "244", "153"], "html": ["1Fのフロアに行く。<mark class=\"hg\">「重さがガタつきなどを解決する」</mark>", "1階にきて、チラシ置き場の補強を観察。<mark class=\"hg\">「重さは正義ですねー」</mark>と講師。重くなるかららしい。", "ガタガタのアンケートBOXについて中村さん<mark class=\"hg\">「頭の方が重いとバランスが悪い」</mark>と説明。頭でっかちみたいな感じ？人間にも組織にも同じことが言えるなと思う。", "アンケートBOXの足もぐらついている。<mark class=\"hg\">どこにどういう材を入れたら良いか</mark>意見交換が沸く。", "15時27分頃　手前の女性がイスの背にさきほど選んでもってきた棒状の板を取り付けようと、ななめにビスをドライバーで打ち込んでいる。ななめに入れるのはむずかしそうだ。<mark class=\"hg\">「（イスが）横に揺れるので（板を）追加しようと…」</mark>と様子を見に来た中村さんに白田さんが説明。", "昨日見たものを中心に回る。コウキさんと出身地の話をしたりしながら、コウキさんは1Fの人たちに話しかけに行って、いろいろ見つけていく。机の「横揺れ」という表現が気になる。横揺れは水平の揺れで、縦揺れは上下の高さの揺れだと思うけれど、上下に揺れることはないので、<mark class=\"hg\">単に「揺れ」でいい</mark>。横揺れダンス・横揺れ界隈っていうミーム動画を思い出す。", "みんなで館内の什器を見にいく。探検隊みたいでワクワクする。A1を出て2歩で、グラグラの馬と天板のテーブルがある。揺らしてみたり、座ってみたりしている。<mark class=\"hg\">「既製品のテーブルの安定感」</mark>", "15:50メンテナンスクラブの活動まとめ 参加者が何をしたかの説明を聞きながら、中村さんはまだぐらつくイスに座っている。<mark class=\"hg\">中村さんがうなづいて揺れるとイスも揺れる</mark>。イスと中村さんが一体になって揺れている。"]},
+{"name": "押さえる手が足りたり余ったりする", "alts": ["二人目の手", "見守りは押さえない"], "relation": "差異＝手を出すか出さないか×地＝一人では立たない物", "bi": 4, "cards": ["030", "527", "552", "546", "034"], "html": ["作業は結構難しそうで、みんな苦戦して、ドゥルルルル音が聞こえてくる。特に椅子のようなサイズだと補助が必要で、大体みんな二人組で、<mark class=\"hg\">一人が椅子を押さえて</mark>、ドライバーがビスに直角に当たるように保持したりする。", "ことはさんが、角材を切ってもらうために、ペンで切断位置の指示を書いている。中村さんがスタイロフォームを被せた作業台に電動ノコギリを持ってきて、ことはさんから角材を受けとる。切って欲しい位置にの線の横に⚪︎、間違えた線の横に×が書いてあり、それを中村さんが褒める。実際、知り合いの大工さんも切断位置の指示を示す時にその方法をとっていたと思います。あて木を求めていたナツキさんも立ち会い、角材が切られる。ホームセンターの百円カットみたいだと誰かが言う。中村さんは「人の線を切るのは緊張する」と言う。<mark class=\"hg\">先端をさいとうさんが抑える</mark>。ブーン。", "③の人が戻ってきた。三角の棒2本を上と中くらいのところにわたしてみる。パネルを立てている。おっと、とたおれそうになる。<mark class=\"hg\">押さえたほうがよい？</mark> 脚を調整しているようす。たおれないかな？　フジモトさんも心配そうにながめている。", "14時37分頃　中央に位置するステージのようなひな壇のようなベンチを担当する④の人は、早くもビスを抜きはじめた。近くで記録していた男性が見守る。白田さんも近づいて見守る。<mark class=\"hg\">撮影のヤマギシさんも見守る</mark>。", "ふと、空調のパワーがものすごいなと思った。天井が高くて明るく、高低差もあるから暑い空気が降りてこないのかな、と思ったり。さっきの邦生さんのトーク写真のように、<mark class=\"hg\">軽くて、隙間が空いていて、ちょっと浮き上がって</mark>、風が吹いていくる感じ。"]},
+{"name": "グラグラは場所が許す", "alts": ["揺らしていいのは壊れてもいい時だけ", "不安定は不安定な所へ"], "relation": "差異＝誰が揺らすか（身体・手・芝・講師）×地＝なおグラつく什器", "bi": 4, "cards": ["174", "447", "252", "460", "278", "260"], "html": ["14:00　イベントスタート 前日の活動で1個だけ誰も手を付けなかった「明らかにボロい」イスがスクリーン前に戻されていたので座ってみる。身体を左右に揺らすと確かにグラグラするが、座っていて不安になるほどではない。しかし、ボロいイスに座って<mark class=\"hg\">あえて身体を揺らすことは普段ならしないだろう</mark>。壊れてもいいものなら、普段やらないような扱い方をするのは楽しいものだなと思う。", "グラついているベンチにみんな注目。逆に<mark class=\"hg\">こんなんでも椅子が成立する</mark>ということと講師。", "芝生の方にでる。置かれている椅子に腰掛けて「<mark class=\"hg\">下が芝だと、グラグラするのも許容できる</mark>」と話す。不安定な場所だと、什器としての成立条件も不安定で良いのか。", "１６：２０中村さん。<mark class=\"hg\">不真面目な椅子は場所を選ぶ</mark>🪑", "小松さんは足の部分に板を取り付ける。クランプでずれないように抑えながら、ビスで一つずつ止める。足の長さが左右で違って座面が傾くけど、<mark class=\"hg\">それも味としよう！ということで</mark>、片面の足を完成させる。ちょっとグラグラするけど、今日はここまでと決める。", "今日はコミュニティスペースで複数の催しがあって、心なしか子どもの姿が多い気がする。メンテナンスクラブのメンバーが、<mark class=\"hg\">什器をユサユサしながら館内を歩いている</mark>。探し物をしているような目つきで、覗き込んだり、立ち止まったり、うろうろしている。他の人からはどう見えているんだろう。"]},
+{"name": "座るのが信じること", "alts": ["真似して座る", "恐る恐るが信頼の形"], "relation": "差異＝座る対象（木材／直した椅子／ラグ）×地＝座り方が態度を露わにする", "bi": 4, "cards": ["092", "377", "214", "279", "197"], "html": ["クニオさんが<mark class=\"hg\">細い木材に腰掛けている。怖い！</mark>あとで自分も薄い板に座ってみる。", "中村さんが木の棒に座っている。すごいバランス力。木の棒に座ろうと思ったことがなかったし、<mark class=\"hg\">多分ちょっとコツがいる</mark>。", "中村さんのあとに津田さんがコメントを求められる。「津田さんすごいとこ座ってますね」という声。津田さんは横長のすごく大きいけれど比較的薄い板（木材置き場の棚に立てかけられている）の上に座っている。 <mark class=\"hg\">「中村さんが木材に座ってたので…」</mark>真似したということか。というか、中村さんには誰もつっこまなかったので、中村さんが木材に座っていたことはあまり注目されていなかったということか？　”っぽい”の真髄を見たかもしれない。", "小松さんが去ったあと、山岸さんや白田さんが恐る恐る座る。みんな恐る恐る座る。そ〜っと座るの面白い。壊さないように。<mark class=\"hg\">誰かのメンテナンスや作業を信じて身を預けること</mark>。既製品の椅子は信じられるけど、手作りのものの前では立ち止まる。", "会場内に文化創造館の常連さんが現れて、スタッフさんに声を掛けたりしながら様子を見学している。と思ったら、いつの間にかラグをしいているところに津田さんと並んで腰かけて話をしている。津田さんの座り方は<mark class=\"hg\">ちょこん、とコンパクトで</mark>、両手でペットボトルをそっと持っている。常連さんはのびのび自由な感じで座って、身振りも交えながらお話していて、その姿がなんだか対照的。"]},
+{"name": "宣言せずに選んでいる", "alts": ["黙って一対一になる", "譲り合いに見えて選んでいる"], "relation": "差異＝選択の見え方（沈黙／配置済／自発／一対一／孤立）×地＝誰も割り当てない", "bi": 5, "cards": ["475", "540", "262", "535", "064", "496"], "html": ["一通り紹介して、やりたいのを立候補制で集めていく。なので先着順でもあるが、<mark class=\"hg\">みんな全然言い出さないのが面白い</mark>。とりあえずなんでもいいけれど、という感じなのだろうか、それとも、これがいいんだけどな、、という気持ちがあるんだろうか。そもそも今日はメンテナンスクラブ要員はそんなに多いわけではなく、割と自由に自分のものが選べた。とりあえず与えられたものでやる、みたいな空気があるのだろうか、それとも、とりあえず譲り合っているか。", "次に今回もまたメンテナンスにとりかかる。こちらは引き続きそれを記録する。 メンテナンスコーナーに集められたそれぞれの家具のうち、どれをやるか、「手を挙げてください～」という呼びかけがあるが、なかなか手が挙がらない。お互い遠慮しているのか迷っているのか…と気が付くとそれぞれが<mark class=\"hg\">ちゃんとひとつずつメンテナンスする家具の前にいた</mark>。", "ことはちゃんも小松さんもメンテナンスポイントを探す時間を残して、早々にA1に帰ってきて、昨日まで作業していた椅子の補修に取り掛かる。<mark class=\"hg\">何を指示されるでもなく、やりたいからやる</mark>。手が動いている。", "塗り終わって、それぞれの作業に戻る。ことはさんは急いで階段を登っていく。小松さんは前回自分が補修した椅子の塗装をする。中村さんが赤いベンチの2度塗りをして、津田さんは四角い小さい椅子のやすりがけを始める。先ほどは共同作業だったけど、今は<mark class=\"hg\">一人につき一体の獲物</mark>。一対一で身体が向き合っている。", "みんなどこにいるかわからないけれど、それが気にならない。まず自分の手元にある要メンテナンスシール２枚をどうにかしようという気持ちで、家具を探すようになる。なので、ちょっとした探検気分でもあり、宝探しのような感覚があり、<mark class=\"hg\">他のメンバーがどこにいるか、はあんまり意識しない</mark>。", "僕も作業に加わる。やする最中に五社さんが始めたプーさんの話を、よく覚えている。<mark class=\"hg\">やする作業はあまりに個人作業</mark>、さっきの編み物のような感覚があり、手を動かしながら、どんどん耳が情報を求める感じがある。"]},
+{"name": "『自分の』が付くと時間が動く", "alts": ["こっちの椅子をまずやりたい", "持ち帰れるものだけが進む"], "relation": "頼まれるか自分でやるか×自分のものにした時だけ進む", "bi": 5, "cards": ["473", "096", "501", "486", "498", "313", "507"], "html": ["続いて、みんなでこれまでに集まった要望を確認しに行く。くにおさんが作った掲示板が丸くて可愛い。まず「卓球を作ってほしい」が５、６枚集まっていることに盛り上がる。「ゲーム性があるものを作ってほしい」という要望の中に、具体例で卓球もある。卓球部のやつがいたのかな？と想像する。多分小学校低学年の子が書いた、小さな椅子が欲しい、という要望も。<mark class=\"hg\">作って欲しい系が多い</mark>。", "最後に締めの時間。 白田さんが「なんとなくわかっていたけど、下のフロアの椅子よりも、こっちの椅子をまずやりたい、ってことですね。」という話をしていて、確かに<mark class=\"hg\">自分のものとしてやる、ということで、時間がドライブしていった</mark>感じがある。", "15:56。さっき藤本さんが「ニス塗りたて注意」と書かないとですね、と言って、今スタジオで紙に書いてそれを貼りに行こうとしている。小松さんは、荷物をまとめて外に出られた（と思ったら後で戻ってこられた。）シートの上では、<mark class=\"hg\">みんな自分の家具に向き合っている</mark>。それぞれやることが分かれて、自分のペースでやることをこなしていっている。", "それぞれの美意識が感じられる。仕上がりの基準のような。この前のことはさんのお母さんのヤスリがけもそうだし、小松さんがこういうタイプの椅子に取り組み、色々と足を足したりしたくなる感じだったり、菜月さんがかなりミニマムに、什器のシンプルさを汲んで、最低限のメンテナンスをする感じ。それぞれに、明確な基準があって、そこに向けて研ぎ澄ませていく、とかではなくて、都度都度自分と家具の癖というかこだわりを引き延ばして、探索していくような感じ？　みんなあまり周りを見ない。没頭するというか、<mark class=\"hg\">個人の空間にいる、という感じ</mark>がする。", "ニス塗りが終わって、元の作業に戻っていい、ということになる。僕は、その場にあった小さな椅子の塗装をやってみたくなり、<mark class=\"hg\">メンテナンスメンバーになった気分で取り組んでみる</mark>。細い木材が使われていて、やすりをかけるのが手間がかかる。気持ち早めに終わらせて、ざっくりやる。ニスの塗装も同様。ニスの箱が開かず、その場にあったセメントの足の金属を噛ませて開ける。ニスって、余らせないのが大事だよなきっと。最後、ちびちび使ったり、たっぷり使ったりを駆使して、みんなのニスのトレイを綺麗にしていく。", "「楽しい？」とお父さん（？）、<mark class=\"hg\">「楽しいよ～」と娘さん</mark>（たぶん）。", "小松さんは、家の中で億劫でやっていないことにこれを機に取り組んでみたい、とおっしゃる。確かにDIYや家のことって、後回しにしがち。<mark class=\"hg\">日々の中に持ち帰っていくこと</mark>。"]},
+{"name": "囲むと引っ張り合いが生まれる", "alts": ["真ん中がぽつんとしていると囲みたくなる", "覗く側も視線に捕まる"], "relation": "輪の内か外か×什器を真ん中に視線が張る", "bi": 5, "cards": ["345", "109", "281", "256", "104", "333", "556"], "html": ["<mark class=\"hg\">白田さんの呼びかけで、みんなが集まる</mark>。最初の説明を聞くために椅子に座る。クッションがいくつか乗っている板のような座るやつが人気な感じがする。", "途中で中村さんが会場の真ん中に置いてある壊れたイスの話をして、みんな一斉にそちらを振り向く。振り返るとシートの真ん中に、片方の脚が折れて、こてんと倒れたベンチといってもいいようなサイズのイスがあった。広々としたシートの真ん中で、多分それまであまり注目されていなくて<mark class=\"hg\">ぽつんと転がっていたイスにみんなの視線が集まる瞬間</mark>。面白い。", "メンテナンス作業をしている場の向こう側に記録しているスガヤさんが見える。魔法陣みたいな位置取り。テンションっていうか、引力？張力が生まれている感じ。引っ張り合ってる。<mark class=\"hg\">真ん中に什器、その周りにメンテナンスクラブ</mark>、の周りに記録のパーティ、の外側に撮影の山岸さん。", "2日目、1日目の振り返りから。白田さんが昨日の写真を投影しながら、起きた出来事を話す。什器を真ん中に、人が集っている様子の不思議な写真。囲まれる什器。浦島太郎の冒頭で、<mark class=\"hg\">カメをいじめる子供たちの図</mark>。", "14:00イベントスタート。司会者の話が始まるが、3階の学生らしきグループがカードゲームかなにかしているのか盛り上がっていて、大きな声がこちらまで響いてくる。文化創造館はA1ホールでイベントをしていても3階に立ち入れたりするからなあ、2階と3階は声も姿も伝わるという意味で<mark class=\"hg\">関係があって、でも関係がない</mark>、などと思う。", "そのテーブルの隣のブースには囲いがあり、その囲いに『HOME TOWN TRAVELER』と書かれた小ぶりのポスターが何枚も貼られている。その一角でゲームをしている人たちがいた。覗き込んでいたら<mark class=\"hg\">中にいる人の視線を感じたので</mark>、「あっ、違います」という感じで反射的に背を向けてしまった。一言なんか言えばよかったかな、とすこし反省。", "①の人は完成したので、記録のコーナー（木の屏風）で掲示された用紙をながめている、<mark class=\"hg\">と思ったらいなくなっていた</mark>。"]},
+{"name": "見守る目が増えすぎて、やりたくなる", "alts": ["傍観からニスへ", "見ている側は大所帯"], "relation": "差異＝見る位置（真横・カメラ越し・俯瞰ベンチ・手の中）×地＝作業する一人を囲む目", "bi": 5, "cards": ["546", "297", "201", "532", "504", "510"], "html": ["14時37分頃　中央に位置するステージのようなひな壇のようなベンチを担当する④の人は、早くもビスを抜きはじめた。<mark class=\"hg\">近くで記録していた男性が見守る。白田さんも近づいて見守る</mark>。撮影のヤマギシさんも見守る。", "15時06分頃　作業をしている4人のうち、会場入り口側からみて手前で釘を抜いていた女性を見ていた。<mark class=\"hg\">その様子を写真に撮っている男性はお父さん？</mark>", "カメラマンさんがシャッターを切る瞬間を撮ろうとするが、<mark class=\"hg\">案外ここぞというタイミングが少ない</mark>。構えたと思ったらカメラをすぐおろしたり(撮ったのか撮ってないのか)、周囲を歩き回っている時間や、それまでの写真を見返しているらしい時間が結構ある。", "紙やすりが配られ、一斉にやすり出しが始まる。介護みたいな、みんなで誰かの身体をふいているかのような。不思議な風景。ざらざらざらざらと音が響く。みんなの手が素早く動く。田中功起さんの映像作品みたいな、複数人で一つの作業に取り組む映像や舞台を鑑賞しているような。写真を撮りながら、<mark class=\"hg\">目の前で立ち上がっている行為を傍観者として見ている感覚</mark>になる。文化創造館の屋外の特に階段下の芝生の上ではそんなことが何度かあった。野菜栽培の土づくりの時、芋掘りの時、Aokidさんの自己紹介パフォーマンスの時。", "<mark class=\"hg\">観察疲れというべきか、多分作業やりたい、という気持ち</mark>からくる動きたさも相まって、ちょっと休憩がてら壁際のベンチに座ってみたりする。このベンチ、藤本さんはなぜここに置いたのだろうか、と今になって思う。座ったまま記録を見れるわけではなく、全体を俯瞰するための位置にあるさりげない椅子。", "僕は今日のニスの時間が面白かった。ニス作業の中で、自分一人で参加者気分でやってみたのだった。その結果、観察側の目線だと「我々は大所帯だな」などグループ意識を強く思っていたけれど、参加者（メンテナンスする側）からみると、<mark class=\"hg\">一人で作業に没頭し向き合う時間なのだと感じた</mark>。"]},
+{"name": "見守り役が入れ替わる", "alts": ["撮る父から教える先生へ", "一人にならない"], "relation": "差異＝見る人の距離（撮る／見守る／付き添う／助言／手伝う）×地＝一人で作業する娘", "bi": 5, "cards": ["431", "300", "302", "409", "412", "304", "310"], "html": ["<mark class=\"hg\">頑張る娘の姿をスマホで撮る父</mark>。", "15時13分頃　各々作業に取り組んでいる。15時15分頃、気がつくと、手前で作業中の娘さん（かな？）の写真を撮っていたお父さん（かな？）がどこかに行ったようだ。<mark class=\"hg\">一人でがんばっているところを白田さんが見守っている</mark>。中村さんも黙々を作業しているところを見回り「上手」と小声で声掛け。", "その呼びかけのすぐ後に手前の女性（娘さん？）が作業中のイスの背幅をメジャーで測ってから材料を選びにいった。<mark class=\"hg\">そこに白田さんが付き添う</mark>。", "女の子がメジャーと、横の木廃材を持って<mark class=\"hg\">スタッフと直す方法を考える</mark>。背もたれに廃材を追加しようとしている。", "女の子、<mark class=\"hg\">講師の助言でビスを斜めに入れる</mark>。", "「けっこう難易度高いぞー」と中村さんも<mark class=\"hg\">アドバイスをしながら見守りながら手伝う</mark>。", "15時40分頃　いつの間にか作業が終わってイスが片付けられていた男性が帰っていった。 <mark class=\"hg\">と同時にお父さんが復活！</mark> と同時に津田さんが近づいてこられ「記録チームも休み休みいきましょう」といわれる。 時計を見るが15時40分、同じ時間にいろいろ起こっている！　と書きながら思った。"]},
+{"name": "先生と呼んだ父が先に帰る", "alts": ["呼ぶから探すへ", "父が抜けて娘が残る"], "relation": "差異＝誰に頼るか（先生・父・自分）×地＝ことはさんの椅子一脚", "bi": 5, "cards": ["029", "430", "394", "403", "168", "500"], "html": ["小学生の親子の参加者、<mark class=\"hg\">お父さんが、中村さんを早速「先生」と呼ぶ</mark>。", "<mark class=\"hg\">こうきさんは津田先生に何やら相談中</mark>。", "親子、先生を呼ぶ。背もたれ部分をドライバーで解体。とれたクギをケースに入れる娘。<mark class=\"hg\">その後、1人でいすを観察し、取りたいクギを自分で探す</mark>。", "親子の父、いったん用事があるのか退出。／<mark class=\"hg\">娘は黙々とドライバーを使う</mark>。", "中村さんと津田さんが本日の簡単な感想と明日のスケジュールを説明して両メンバーはおつかれさまでした、と解散。でもメンテナンスクラブの<mark class=\"hg\">女の子が一人、中村さんと一緒にイスを前にして作業を続けていた</mark>。作業中も補強する木材の長さが足りないのを、別の板を噛ませて補ったりと工夫していたらしい。熱心だ。楽しそうで良いな。", "さて、完成したので、みんなで？スタジオに戻る。 小坂さんが、ことはさんの椅子を見て、古い家具の部分と、<mark class=\"hg\">新しい家具の部分で、木の色が変わるのいいですね</mark>、という。"]},
+{"name": "手際が役割を上書きする", "alts": ["その場で先生になる", "カメラマンが指示を出す"], "relation": "差異＝先生の根拠（講義／手際／熱心／指示出し／靴紐）×地＝肩書きでなく手で決まる", "bi": 5, "cards": ["309", "482", "191", "515", "036"], "html": ["<mark class=\"hg\">「ウンチクタ～イム！」という中村さんの呼びかけ</mark>で「半ネジ」と「全ネジ」の説明。", "硬いビスがあったかなにかで、中村さんがビスを抜いて見せる場面があった。<mark class=\"hg\">その手際が、おおお！という感じで、「先生！」と言われる</mark>。そういえば中村さんはこの日、12-13時をダンスの先生の仕事があったそうで、そんな風に「先生」を続けている。ちなみに山岸さんは、先日は朝夜私の家のエアコン工事をしてくれたり、今日は現場での展示設営に、翌日からインドネシアに滞在、と、現場仕事の忙しい日々を過ごしている。", "屋外に出る。「外でシール貼った人」という呼びかけに参加者さんが手を挙げると、<mark class=\"hg\">誰かが「ことは先生」と言う</mark>のが聞こえた。昨日の誰より熱心な取り組み姿勢から、そのように呼ばれているのかな。紙が貼られたイスが指されるとスタッフの藤本さんと白田さんが同時に「だよね～」と呟く。言われると思ってました、とほほ的な言い方も見事にシンクロしていた。", "昼食休憩の時に、屋外の塗装エリアの様子を見にいくと、外階段からカメラマンの山岸さん、中村さん、白田さん、津田さんが降りてくる。オーシャンズ11のポスターみたいな「意気込んだ感じ」が漂っている。墓場の大きいベンチを運ぶそう。5人でベンチを持ち上げ、外階段を使って運搬する。先頭をいく山岸さんが、「倒します、〇〇注意です」と指示出しをしてくれる。カメラマンでお願いしているのに<mark class=\"hg\">本当に多岐にわたる場面で活躍されるなと思う</mark>。", "どなただったか参加者の作業を教えながら、中村さんがささっと靴紐を結ぶ。<mark class=\"hg\">なんとなくそれが他の作業と似ている気もした</mark>。紐を結ぶっていう作業。きっちり２つを結び合わせてずれないようにする。"]},
+{"name": "一対一のあとに拍手で戻る", "alts": ["報告で群れに戻る", "拍手が認定"], "relation": "差異＝群れの反応（拍手／認定／シンクロ／うなづき）×地＝一人作業の後の合流", "bi": 5, "cards": ["553", "554", "282", "191", "321"], "html": ["「進捗報告」ということで各々報告。 ④     のコマツさんは<mark class=\"hg\">「脚を抜いて～」。一同拍手</mark>。①のナツキさんは「脚を補強～」。", "すると「メンテ完了！」と中村さんの声。③の人（この方ばかり見ていたのに名札がちょうど見えない位置にあり）は見ると脚ができていた！　「意外とむずかしい」「メンテあるある」「ディス・イズ・メンテナンス！！」という中村さんの声のあと、<mark class=\"hg\">パチパチパチと拍手！！</mark>　⑤の2人（今日もまた母娘）も進捗を報告。どうも昨日の映画から若い人に期待してしまう我がおばさん心。", "ナツキさんコハルさんチーム、ことはさんチームの椅子の補修が完了する。「ここまでできた」のゴールが達成されて晴れやかな様子。<mark class=\"hg\">「補修しました」のシールを貼ると「認定」な感じが沸く</mark>。お札みたいな、なんか宿る。", "屋外に出る。「外でシール貼った人」という呼びかけに参加者さんが手を挙げると、誰かが「ことは先生」と言うのが聞こえた。昨日の誰より熱心な取り組み姿勢から、そのように呼ばれているのかな。紙が貼られたイスが指されるとスタッフの藤本さんと白田さんが同時に<mark class=\"hg\">「だよね～」と呟く</mark>。言われると思ってました、とほほ的な言い方も見事にシンクロしていた。", "記録を読んで気になることがあるか、とみんなで掲示された昨日の記録の前で意見交換。「ハイ！　コウキです」と手を挙げたコウキさんが「くつが『ニューバランス』とか、って書いている人は、くつ（の記述）がまたでてくるのは、足元に注目しているんだな」と思う、という感想。<mark class=\"hg\">みんな、たしかに～とうなづく</mark>。"]},
+{"name": "記録する側が混ざっていく", "alts": ["外側の輪が崩れる", "記録係も先生に倣う"], "relation": "差異＝記録者の位置（外周／周遊／作業者扱い／雑談／真似）×地＝記録が場に溶ける", "bi": 5, "cards": ["518", "087", "310", "459", "214"], "html": ["メンテナンスリクエストボードへ移動する。今日もグリーンシートの上には破損した傷病者たちが並んでいて、さながら救急治療室だなと思う。ごしゃさんがブンカソウゾウくんの前に座っている。それぞれのグリーンシートの領域内にそれぞれの位置取りで立ったり座ったりしている様子が面白い。前回も思ったけれど、引力というか張力が働いている感じがする。中央にメンテナンスクラブの人たち、<mark class=\"hg\">それを記録する記録のパーティ</mark>、その外側にカメラマンの山岸さんとレビュアーの小坂さん。身体や意識の「向き」「距離」がフィールド上で観測できる気がする。", "あとの話だけれど、打ち合わせだったか、藤本さんが「引っ張りあっている」、緊張感という話をしていて、作業場の領域とその外側で見ている記録チーム、そしてカメラマンの山岸さんがいて。<mark class=\"hg\">でもそれぞれ分離しているわけでもない</mark>。中心から周辺へ、というよりも、手を入れたい椅子の周りに人が集まって、その間をいろんな役割を持った人が周遊している感じ。", "15時40分頃　いつの間にか作業が終わってイスが片付けられていた男性が帰っていった。 と同時にお父さんが復活！ と同時に津田さんが近づいてこられ<mark class=\"hg\">「記録チームも休み休みいきましょう」といわれる</mark>。 時計を見るが15時40分、同じ時間にいろいろ起こっている！　と書きながら思った。", "１６：１５津田さんの出身地を聞いた。（<mark class=\"hg\">館内巡りに飽きた訳でもない</mark>。出身地名を知ると仲良しになれる気がして。。。）中村さんは北海道のどちらの出身なのか、広すぎて想像できない。だから明日は必ずや聴こう！", "中村さんのあとに津田さんがコメントを求められる。「津田さんすごいとこ座ってますね」という声。津田さんは横長のすごく大きいけれど比較的薄い板（木材置き場の棚に立てかけられている）の上に座っている。 「中村さんが木材に座ってたので…」<mark class=\"hg\">真似したということか</mark>。というか、中村さんには誰もつっこまなかったので、中村さんが木材に座っていたことはあまり注目されていなかったということか？　”っぽい”の真髄を見たかもしれない。"]},
+{"name": "勝手に揃うのを数えてしまう", "alts": ["ミラクルが起きた気がする", "お揃いは3人まで"], "relation": "揃うか揃わないか×意図なしの一致に目が行く", "bi": 6, "cards": ["180", "368", "163", "397", "404", "545", "439"], "html": ["今日からメンテナンスクラブに参加する方が二人いて、新しく追加された二人掛けのデカいボロいベンチに一緒に取り掛かることになった。まずはベンチの構造をつかむためスケッチから開始するが、ひとりは立ったまま、ひとりは床にあぐらで座ってスケッチしていて高低差が出ている。しかし、ベンチのぐらつきを確かめるために座ってみようとなったときは<mark class=\"hg\">二人一緒に全く同じタイミングで座っていて</mark>面白かった。しかも二人の服装は上が白、下が青いデニムで、後ろから見ているとなんだかお揃いに見えたので余計に面白い。", "中村さんが右眉毛の上をポリポリかいた。そのあと白田さんも右眉毛の上をかいた。<mark class=\"hg\">ちょっとミラクルが起きた気がする</mark>。でも私はあまり眉毛の上をかくことがないのでなんで眉毛の上をかくのか不思議。でもその仕草に既視感があるので、多分一定数眉毛をかく人はいる。", "お堀の方の芝生に向かうと、なかいちの広場でやっているイベントの音がそこそこ大音量で聞こえてくる。ステージで誰かが郷ひろみを歌っている。メンテナンスクラブの参加者さんがそれに合わせてか、はたまたつられてか「エキゾチックジャパ～ン」と口ずさみながら私の前を通り過ぎていく。私も頭の中でちょっと口ずさんでいたので<mark class=\"hg\">謎の共感を覚える</mark>。", "講師の例えに、<mark class=\"hg\">みんな共感できてうなずく</mark>。", "見上げると男子高校生は4人。<mark class=\"hg\">お揃いのTシャツは3人</mark>", "『顔はめパネル』を担当している人（位置関係から『③の人』と定義）を見ていると、洋服（エリがピンク）と<mark class=\"hg\">パネルの色あいが似てる？</mark>　と思った。", "<mark class=\"hg\">こうきさんはいすに注目、お父さんは天井に注目</mark>。「ミルハスっぽい」と言う。"]},
+{"name": "ちょっとだけ違う所ばかり見てしまう", "alts": ["名札の位置で冒険する", "服が言っていることを疑う"], "relation": "差異＝違いを作るのが自分か他人か親子か×地＝普段着に貼られた名前", "bi": 6, "cards": ["339", "561", "012", "568", "023", "426"], "html": ["早めに文化創造館に到着／開始時間の5分前に会場へ。受付で保険のお金を払い、テープに名前を書いて服にはる。名札をつけるとき、みんな胸の左か右に貼るような〜といつも思う。<mark class=\"hg\">ちょっと冒険しようと、真ん中に貼ってみる</mark>。シャツの柄が派手で、名札が目立たず、名前を覚えてもらえないかもと思ったので、普通に胸元に貼り直す。", "開始時間2分前になり、五社さんと会場のスタジオAにいく。藤本さんが受付で立っている。テープに緑色のマジックで名前を書いて、服に貼る。五社さんがテープをどこに貼るか迷っていたが、<mark class=\"hg\">真ん中に貼ることに決めたらしい</mark>。", "白田さんの、館公式っぽいネームホルダーと腰のポーチが赤くて、<mark class=\"hg\">文化創造館のカラーってそういうばわからないなと思う</mark>。ホームページは薄い緑で、雰囲気的には薄いオレンジのような暖かい感じもある。", "女の子と親子で参加されているお母さんが着ているシャツに、アインシュタインの顔が結構大きめにプリントされていて、着ている人にとってはあまり強い意味はないかもしれないけど、<mark class=\"hg\">「なんでそれを着ているんだろう？」と思ってしまった</mark>。普通に服のデザインとして気に入っているのかもしれないけど、もしかしたらアインシュタインが好きなのかもと思ったり。", "親子参加の方が、<mark class=\"hg\">親子で同じ靴を履いている</mark>。", "戻ると女の子がイスに座って、ネジを外している。親子、<mark class=\"hg\">靴がニューバランス（赤）でも、微妙にデザインが違う</mark>。"]},
+{"name": "勝手にフィットしてしまう", "alts": ["意識せずにはまっている", "人も板もおさまりのいい所に入る"], "relation": "身体側か木側か×おさまりは意識せず起きる", "bi": 6, "cards": ["148", "179", "213", "545", "242", "153", "373"], "html": ["中村さんが津田さんと話していたのだけど、インパクトドライバーを股の間にすっぽりと挟んでいる。<mark class=\"hg\">おさまりがよくてすごく自然に見えるけど何故</mark>。それが普通なのか。", "前日、メンテナンスクラブの中村さんが立ち話中にインパクトドライバーを股の間に挟んでいた（しかもそれがむちゃくちゃ自然な姿だった）ことが改めて気になったのでご本人に聞いてみると、<mark class=\"hg\">あんまり意識していなかったらしい</mark>。「物を持ってるとよく”フィットしてるね”とか、棒を持ってても”っぽいね”と言われる」とのこと。棒が”っぽい”ってどういうことかよくわからないし、中村さんには昨日初めてお会いしたばかりなのに、何故かその様がすごくよく想像できる。不思議。", "ところで、コメントしている中村さんの足元に新しい木材が見えたので既製品のイスに座ってるのかと思ったらなんとイスくらいの高さ（長さ）の木材に腰かけていた。その辺に置かれていたんだろうけれど、同じくらいの距離に普通にイスもあるのに何故。しかもそれが<mark class=\"hg\">正に”フィットしている”ために違和感がない</mark>。", "『顔はめパネル』を担当している人（位置関係から『③の人』と定義）を見ていると、<mark class=\"hg\">洋服（エリがピンク）とパネルの色あいが似てる</mark>？　と思った。", "各自の作業進捗を聞く。ササクレを外す。グラグラするところに、<mark class=\"hg\">「シンデレラフィット」する板材</mark>を見つけてあてがってみた。ハズれかけの板を打ち付ける。観察して、考えて、やってみるの工程をふむふむと聞く。", "15:50メンテナンスクラブの活動まとめ 参加者が何をしたかの説明を聞きながら、中村さんはまだぐらつくイスに座っている。中村さんがうなづいて揺れるとイスも揺れる。<mark class=\"hg\">イスと中村さんが一体になって揺れている</mark>。", "中村さん「<mark class=\"hg\">木は（環境に？）柔軟な人たち</mark>」"]},
+{"name": "撫でるころには色の話になる", "alts": ["はちみつに見えるニス", "手の影が二重になる"], "relation": "椅子か部屋か影か×構造が終わると表面と光が主役になる", "bi": 6, "cards": ["494", "575", "495", "498", "415", "126"], "html": ["やする作業は結構大変。続いて、ブロワーで吹き、雑巾で拭いて、ニスを塗っていく。何重にも、椅子を撫でる作業。これはこれまでのビスを打ったり抜いたりする作業と違う。ツボ押し痛マッサージとオイルマッサージの違い、みたいなものだろうか？　作業をしながら、「喜んでそう」「病院」「アカスリ」みたいなワードも出てくる。<mark class=\"hg\">椅子の色がどんどん変わって、白くなる</mark>。全体的に均質で落ち着いた色味になる。", "みんなでやすりをしながらプーさんの話をした。話の始まりはあまり覚えてないけど、<mark class=\"hg\">ニスが（はちみつに見えて）美味しそう</mark>みたいな発言から始まったのかなと思う。五社さんがプーさんを好きという話になり、プーさんははちみつが大好きで、はちみつ食べたさに友達の家のはちみつを勝手に食べてしまうみたいな、ちょっとプーさんってかわっているよねという話になった。", "ことはさんが、マスク持ってくるべきだったー！と言っている。小松さんは、<mark class=\"hg\">帽子、マスク、エプロン完備</mark>で取り組んでいることに気づいた。準備がめちゃくちゃいい。", "ニス塗りが終わって、元の作業に戻っていい、ということになる。僕は、その場にあった小さな椅子の塗装をやってみたくなり、メンテナンスメンバーになった気分で取り組んでみる。細い木材が使われていて、やすりをかけるのが手間がかかる。気持ち早めに終わらせて、ざっくりやる。ニスの塗装も同様。ニスの箱が開かず、その場にあったセメントの足の金属を噛ませて開ける。<mark class=\"hg\">ニスって、余らせないのが大事だよなきっと</mark>。最後、ちびちび使ったり、たっぷり使ったりを駆使して、みんなのニスのトレイを綺麗にしていく。", "少し室内の明るさが抑えられてきた印象。<mark class=\"hg\">白から少しオレンジに部屋が色付く</mark>", "少し暖色がかったライトが会場の2方向から照らされているので、メモ用のノートに映る<mark class=\"hg\">自分の手の影が二重に見える</mark>。数日前にXで見かけた日食のときの影の写真を思い出した。光っていうものが見える瞬間が好きだ。"]},
+{"name": "手が塞がると耳が開く", "alts": ["みんなで一つをやする珍しさ", "隣と分け合って塗る"], "relation": "差異＝手の数（一人／隣／六人／全員／一対一／周遊）×地＝手が動くと口と耳が動く", "bi": 7, "cards": ["496", "534", "492", "574", "535", "087"], "html": ["僕も作業に加わる。やする最中に五社さんが始めたプーさんの話を、よく覚えている。やする作業はあまりに個人作業、さっきの編み物のような感覚があり、<mark class=\"hg\">手を動かしながら、どんどん耳が情報を求める感じがある</mark>。", "塗料をバケツにわけて、椅子をぬる。表面から塗ると裏面を塗る時に、せっかく塗った部分がブルーシートについてしまうので、裏面から塗る、と言う説明がされる。確かに合理的。塗料を塗るのが久しぶりで、ハケで椅子の隅々まで液を付着させていく感覚が楽しい。すいー、すいすいー。夢中になりながら、<mark class=\"hg\">隣の人がどこをぬって、自分がどこを塗るかを感覚的に分け合う</mark>ような共同作業。", "そして、ソファサイズの椅子を磨く作業になると、実は今回の参加者の多くが女性だったことに気づく。前回は、男性メンバーも数名いたけれど今回は来ていない。<mark class=\"hg\">六人くらいがソファを紙やすりで磨いていく</mark>。", "今回は時間があまりないので、ニスを全て剥がすことはできなかったけど、みんなでベンチを紙やすりでやすって、ベンチをひっくり返してまたやすってを数回繰り返して、なんか一体感というか、「作ってる！」感がすごかった。それは多分、やすっているときに話したこととか、話が弾んだことが少なくとも影響しているとも思う。みんなで一つのものをやすっていること、物理的に距離が近いこと、<mark class=\"hg\">手を動かしながら話したことが話を弾ませたのかな</mark>。メンテナンスクラブは自分がメンテナンスしたいものをメンテナンスするっていうスタイルだから、参加者みんなでこれをやるのは意外にも少ないのかな。", "塗り終わって、それぞれの作業に戻る。ことはさんは急いで階段を登っていく。小松さんは前回自分が補修した椅子の塗装をする。中村さんが赤いベンチの2度塗りをして、津田さんは四角い小さい椅子のやすりがけを始める。<mark class=\"hg\">先ほどは共同作業だったけど、今は一人につき一体の獲物</mark>。一対一で身体が向き合っている。", "あとの話だけれど、打ち合わせだったか、藤本さんが「引っ張りあっている」、緊張感という話をしていて、作業場の領域とその外側で見ている記録チーム、そしてカメラマンの山岸さんがいて。でもそれぞれ分離しているわけでもない。中心から周辺へ、というよりも、<mark class=\"hg\">手を入れたい椅子の周りに人が集まって</mark>、その間をいろんな役割を持った人が周遊している感じ。"]},
+{"name": "手を動かすと、よそから言葉が来る", "alts": ["連想が滑ったり滑らなかったり", "お菓子・地震・人間椅子"], "relation": "差異＝連想の着地（褒め・気まずい・素通り）×地＝解体中の椅子とビスを前にした口", "bi": 7, "cards": ["028", "261", "268", "443", "456", "448"], "html": ["そのあとで、コウキさんは、天板が剥がれた椅子を見て、ホームベースを思い出しますね、と言って、自分がキャッチャーだったこと、４点がそれぞれ１塁からホームベースの配置に見えることなどを話してくれた。<mark class=\"hg\">作業しながら、いろんなことを思い出す、というのはありそう</mark>。たとえば会話しながら編み物する、みたいに手先を動かしながらいろんなことを思い出したりするだろうか。", "A1に戻るとナツキさんとコハルさんが邦生さんに教わりながらベンチのビスを抜いている。<mark class=\"hg\">錆びついた茶色ビスをみてナツキさんがお菓子みたいという</mark>。ちょっとびっくりする。衛生的とは思えないものを食べ物みたいって発想できる脳の回路が柔らかくて良いなと思う。", "館内に戻ってきて、机が「横揺れ」することについて話す。よく使う机だから、直したいよねと話す。津田さんが<mark class=\"hg\">「横揺れ縦揺れって地震の用語ですよね」</mark>という。確かに。自然に使ってしまっていたけど。", "本棚に「コジコジ」あり、コジコジは宇宙の子という話が<mark class=\"hg\">「宇野千代」と「荒井注」の子という勘違いで終わるオチ</mark>。", "１５：３３中村さんの小話😊✨️半ねじと全ネジの話、インパクトビスの使いかた🤣！なぜか、江戸川乱歩の<mark class=\"hg\">『人間椅子」の話をしちゃった、ために若干気まずい雰囲気になる</mark>。撤退。作業に戻る。愛煙家（電子）と文学、そして何より野球がすき。", "なかいちでビールフェス、<mark class=\"hg\">なぞの紙ひろみの歌声聞こえる</mark>。日ざしが弱くなっている。"]},
+{"name": "言われた途端そう見える", "alts": ["名指されないと椅子でもない", "見立ては声に出したときだけ"], "relation": "差異＝何が何に見えるか×地＝口に出した一言で形が決まる", "bi": 7, "cards": ["253", "255", "525", "490", "515", "569"], "html": ["木枠に天板をくっつけて椅子にしているものがある。ひっくり返した時に椅子には思えない形状に見えて、椅子だよってわかる形で置いておいてもらえないと、それと思えないものだと思う。元駐輪場下にあるベンチを看板に見立てているものも、もともとベンチだったものと<mark class=\"hg\">言われないとベンチだとは思えないと思う</mark>。", "ホリエさんが元駐輪場を見て「バス停みたい」という。見慣れていてそんな風に考えてこともなかったけれど、屋根の下に椅子があって<mark class=\"hg\">座っている人たちを見るとバス停に見えてくる</mark>。屋根の高さや大きさがちょうどそう見える。誰かが発見した「〜に見立てる」のアイデアは面白い。", "それぞれが作業を進める。小松さんがベンチの座面をある程度外したところで、5分の1くらいの部分が取り外される。<mark class=\"hg\">中村さんと白田さんが背負子みたいという</mark>。", "さて、15:30。外でニス塗りに向かう。全員でピクニックする気分がちょっとあり、大きな青いビニールシートが嬉しい。<mark class=\"hg\">屋外プールみたい</mark>。", "昼食休憩の時に、屋外の塗装エリアの様子を見にいくと、外階段からカメラマンの山岸さん、中村さん、白田さん、津田さんが降りてくる。<mark class=\"hg\">オーシャンズ11のポスターみたいな</mark>「意気込んだ感じ」が漂っている。墓場の大きいベンチを運ぶそう。5人でベンチを持ち上げ、外階段を使って運搬する。先頭をいく山岸さんが、「倒します、〇〇注意です」と指示出しをしてくれる。カメラマンでお願いしているのに本当に多岐にわたる場面で活躍されるなと思う。", "会場の中央の作業スペースに、メンテナンス候補たちが集まっている。さらに、メンテナンスしてほしいものを書いて貼る掲示板には、「卓球をつくってください」という意見がたくさんあった。それをみて誰かが、「卓球台を作ってほしいとかではなくて、<mark class=\"hg\">卓球という概念を作ってほしいって言ってるみたい</mark>」とか「こんなに書いてるってことは卓球部でもきたんじゃない？」と言っていて、みんなの頭の中には多分、中学生とか小学生が数人で来て書いた様子とか、卓球部か卓球クラブの子供がみんなで書いている様子が浮かんだんじゃないかなと思う。"]},
+{"name": "なる途中に名前がつく", "alts": ["「前」の状態に名前がある", "なめらか前", "なる途中の言い方"], "relation": "差異＝誰の言葉か（中村／津田／藤本）×地＝途中を言い当てる語に記録者が反応する", "bi": 7, "cards": ["491", "229", "232", "099", "119"], "html": ["邦生さんが作業の説明に、<mark class=\"hg\">「なめらか前になるように」</mark>と表現する。", "<mark class=\"hg\">「連続で状態を作っていく」っていい言葉</mark>。", "「書く」の説明の時に「身に現れる」という言葉があった。「身に現れる」っていい言葉やと思う。訪れる、みたいな、<mark class=\"hg\">向こうからやってくる感じがある</mark>。ホーリー。「〜な気になってくる」とか「浮かび上がってくる」も、Become（〜な状態になる）な感じが目指されてて、非常に健やか。", "藤本さんからは、「判断に迷う時間が減った」とのこと。理想を描いてそこに向かう、というより、とりあえず目の前の状態を診断してあてがう、という作業だから、<mark class=\"hg\">常にボールが投げられている状態</mark>、という感じだろうか。", "「一見地味に見える取るに足らないような出来事」 「これ以外に参照しなくていい全体を作る」 「<mark class=\"hg\">この後ろ、背後に必ず何かある、という感覚</mark>」←これが11日に言っていた「世界を信頼すること」だそう。こういうものの見方をしたら、自分の特になんにもなかったような気がする毎日にも絶対なにかしら起きている感じがして、日々が面白くなりそうだなと思う。世界を信頼するってできてるようなできてないような、でもできたらいいことな感じがするので自分の日常でもやってみようかなと考える。"]},
+{"name": "渡しをわたしと聞く", "alts": ["足と呼ぶから命がある", "同音異義で命が入る"], "relation": "差異＝足→声→人→癖→命→わたし×地＝聞き取った語が物に入る", "bi": 7, "cards": ["365", "372", "072", "265", "379", "367", "172"], "html": ["みんな家具の『足』って言う。正式な呼び方なのかもしれないけど、<mark class=\"hg\">擬人化が起きてるし</mark>、「命があるもの」感が増す。", "藤本さん「キャスターが<mark class=\"hg\">きいきい『鳴っている』</mark>」➡︎擬人化？声みたいに捉えている感じ", "（あと、「<mark class=\"hg\">木って柔軟な人たちなんですね</mark>」という言葉もノートにメモしていたので、そういう擬人化が気になっている）", "コミュニティスペースの入り口看板の前。ソウゾウの木とアンケート台についてもシートが貼られている。アンケート台の足がなぜ内側に入っていってしまうのか、邦生さんが教えてくれる。「<mark class=\"hg\">癖ついて、内に入ってくる</mark>」。盛さんが「例えば、この位置にこの向きで渡したら良いってことですか？」と具体的な提案をする。見えていて、すごい。ことはちゃんのお母さんのTシャツがモナリザだと気づく。", "中村さん曰く「とりあえずメンテナンス」のデメリットは「クオリティが落ちてしまうこと」。メンテナンスするにも、とりあえずだと、一時的になおすことになるので、寿命が短いらしい。／（<mark class=\"hg\">「寿命」は命のこと</mark>。よく物に対して「寿命」と言ったりするけど、やっぱりみんなどこかで物に対して命っぽいものを感じている。これは日本語だけど、他の言語圏にもそういう言葉とか言葉の使い方はあるのかな？）", "中村さん「<mark class=\"hg\">『わたし』があれば揺れに強い</mark>」➡︎足と足の間に「わたし」があれば、その方向の揺れに強くなるらしい。", "とりあえず自分が書いたものを読んでみると、津田さんの「熱く書く」という発言をメモした横に「厚く」と書いてある。なんとそちらの厚く、だった。文化人類学には「厚く書く（自分が気になったことについて、いろいろな層が重なるように詳しく記述するというような意味）」の言い回しがあるらしい。それまでの津田さんの冷静沈着な語り口の中で突然熱血っぽい言葉が出てきたので違和感があったが、<mark class=\"hg\">なんと同音異義語だった</mark>。"]},
+{"name": "可愛いが大人の口から出る", "alts": ["剣と卓球の書き置き", "子どもが書いたに違いない"], "relation": "差異＝子どもの居場所（想像／名札／本人／大人の語彙）×地＝可愛さが場に許される", "bi": 8, "cards": ["133", "569", "572", "241", "084", "154"], "html": ["会場に用意されていた大量の木材の前に、剣の形に切り抜かれて簡単にマジックか何かで絵を描かれた「剣」があって、なんだろうこれ…と思っていたのだが、それがメンテナンスクラブのメンバーの目に留まって<mark class=\"hg\">おそらく娘さんのところに持っていく</mark>ところを目撃する。やっぱり気になるよな。", "会場の中央の作業スペースに、メンテナンス候補たちが集まっている。さらに、メンテナンスしてほしいものを書いて貼る掲示板には、「卓球をつくってください」という意見がたくさんあった。それをみて誰かが、「卓球台を作ってほしいとかではなくて、卓球という概念を作ってほしいって言ってるみたい」とか「こんなに書いてるってことは卓球部でもきたんじゃない？」と言っていて、みんなの頭の中には多分、中学生とか小学生が数人で来て書いた様子とか、<mark class=\"hg\">卓球部か卓球クラブの子供がみんなで書いている様子が浮かんだ</mark>んじゃないかなと思う。", "五社さんがメンテナンスしている顔はめパネルをみにいく。パネルには文化創造館の特徴的な屋根の形が頭の形になっている、灰色の毛の生き物が、飛び出し坊やみたいなポージングで描かれている。しかも、<mark class=\"hg\">小学校のときに使うような名札をつけていて</mark>「ぶんか　そうぞう」と書いていて、この子の名前は「ぶんかそうぞう」くんなんだ！と初めて知る。このパネルは文化創造館の2階のホールに置いてあるのをみたことがあるけど、このキャラクターに名前があることは知らなかった。しかもよく見たら、看板に絵が書いてあるんじゃなくて、スチレンボード（もしくはハレパネ）を切って色を塗ったものを木の板に貼っていて、そのやり方いいな〜と思った。", "ことはちゃんが、家具の補修に<mark class=\"hg\">「ユーモア入れていい？」</mark>と聞いてくれる。「もちろん！」と答える。補修作業にユーモアの発揮のしどころを見出せるなんてさすがっすね！と興奮する。", "この後、終盤になってもコウキさんは特に急ぐわけではなくて、どのような椅子を作りたいか、の完成イメージを話してくれる。<mark class=\"hg\">パーツについて「可愛い」という表現が繰り返し用いられて</mark>、実際ドーナツ型の背もたれはとても可愛い。ビスの時間はないので、マスキングテープで仮止めして、完成とする。", "私が結局座らなかったイスは背もたれがでこぼこの鍵盤のような見た目だったのだけど、中村さん曰く愛らしいイスらしい。<mark class=\"hg\">物を見て愛らしいって思うことはあんまりないな</mark>と思う。"]},
+{"name": "手当てすると宿る", "alts": ["傷病者がご神体になる", "拭いてやると気持ちよさそうになる"], "relation": "差異＝病人→身体→愛→神体×地＝手をかけた物への言い方", "bi": 8, "cards": ["518", "235", "533", "371", "154", "282", "077"], "html": ["メンテナンスリクエストボードへ移動する。今日もグリーンシートの上には<mark class=\"hg\">破損した傷病者たちが並んでいて</mark>、さながら救急治療室だなと思う。ごしゃさんがブンカソウゾウくんの前に座っている。それぞれのグリーンシートの領域内にそれぞれの位置取りで立ったり座ったりしている様子が面白い。前回も思ったけれど、引力というか張力が働いている感じがする。中央にメンテナンスクラブの人たち、それを記録する記録のパーティ、その外側にカメラマンの山岸さんとレビュアーの小坂さん。身体や意識の「向き」「距離」がフィールド上で観測できる気がする。", "緑のブルーシートの上に、<mark class=\"hg\">骨折した椅子が一脚</mark>。その上に他の什器と人が乗っかる。", "椅子をひっくり返しやすりやすりがけが終わったら、ブロアーで細かい木屑をとばし、雑巾で拭き取りをする。赤い塗料が雑巾に付着する。<mark class=\"hg\">身体を拭いてあげている</mark>。手をかけてあげている。白田さんが「椅子が気持ちよさそう」と言う。おやさい隊の奥山さんが軒下の土を見にやってくる。こちら側が何をしているのかチラチラと様子を見ながら、春に肥料を加えて眠らせている土のグリーンシートを剥がしている。その様子を白田さんが何をしているんだろうと言う様子でみる。お互い様やでと思う。", "以前一度メンテナンスした家具が、今回のツアーでメンテナンスの余地あり判定をされた。そのときの中村さん、藤本さん、白田さんが家具に「みんな見てるよ〜」<mark class=\"hg\">「気にかけてるよ〜」</mark>と言っていて、その物の機能だけを必要としているのではないような、なんか愛を感じる。", "私が結局座らなかったイスは背もたれがでこぼこの鍵盤のような見た目だったのだけど、<mark class=\"hg\">中村さん曰く愛らしいイス</mark>らしい。物を見て愛らしいって思うことはあんまりないなと思う。", "ナツキさんコハルさんチーム、ことはさんチームの椅子の補修が完了する。「ここまでできた」のゴールが達成されて晴れやかな様子。「補修しました」のシールを貼ると「認定」な感じが沸く。<mark class=\"hg\">お札みたいな、なんか宿る</mark>。", "そして、気付かれないところにサインも入れてokという話。こうして履歴が残っていくこと、つまり、公的なものがちょっと<mark class=\"hg\">私的な秘密を含んだものになる</mark>の、ってなんかいいなあ。"]},
+{"name": "世話を焼くうちにヒトになる", "alts": ["呼び名が先か手つきが先か", "擬人化しようとすら思ってない"], "relation": "名札か手つきか呼び方か×扱いがヒト扱いに滑る", "bi": 8, "cards": ["013", "142", "143", "494", "215", "216", "374", "432"], "html": ["参加者は８名、<mark class=\"hg\">養生テープに名前を書いて胸に貼っている</mark>。", "ゴーグル、耳栓、軍手などが置かれた棚を見る。受付で名札代わりに渡されたのと同じ養生テープにゴーグルとか耳栓とか軍手と書いて箱に貼ってある。<mark class=\"hg\">我々と同じ土俵で自己紹介されているようで</mark>、なんだか面白い。", "棚の側面には巻き尺などをかけるために丸い木材やペットボトルのキャップがビスで打ち込まれていた。あと、1ｍのアルミ製の定規のカバーに「アル助」と商品名が書かれていた。これは擬人化なんだろうか。大工道具みたいなものには、<mark class=\"hg\">名前を付けると愛着が湧いていいんだろうか</mark>。どういう意図があるのか、業界全体がそういう感じなのか、気になる。", "やする作業は結構大変。続いて、ブロワーで吹き、雑巾で拭いて、ニスを塗っていく。何重にも、椅子を撫でる作業。これはこれまでのビスを打ったり抜いたりする作業と違う。ツボ押し痛マッサージとオイルマッサージの違い、みたいなものだろうか？　作業をしながら、<mark class=\"hg\">「喜んでそう」「病院」「アカスリ」</mark>みたいなワードも出てくる。椅子の色がどんどん変わって、白くなる。全体的に均質で落ち着いた色味になる。", "クローズのあと 中村さんがイスを「ヒトたち」と表現していたことが気になったので聞いてみる。 以下回答。 無意識かもしれない／擬人化しようとすら思ってない／愛らしいもそういうとこだと思う (愛らしいからヒトっぽいのか、ヒトっぽいから愛らしいのか？と聞いてみるとしばらく考えて) このボロボロのヒトたちをメンテナンスする、しょーがないなーってやってあげる感じ。でもやりだすと楽しくなっちゃう／<mark class=\"hg\">おせっかいを焼きたくなる状態</mark>。だからヒトっぽいと感じるのかな？／遠くにポツンとイスが”いたら”なんか淋しそうって思う／モノとヒトとの境界が薄い", "(会場に置いてある木材とロープを組んだ大きなオブジェについても、ヒトと感じるのか追加で質問) 木材の部分は骨。ロープは少し有機的な、解剖図でみるような神経みたいなもの、肉がつく前のイメージ／どうあれ生き物。<mark class=\"hg\">”こいつ”とか言う。”これ”とは言わない</mark>", "一階の外に置いてある家具について カズさん「けっこう長い付き合いだからね」 藤本さん「開館当初から」 （この家具は藤先生が作ったんだよという話） 白田さん<mark class=\"hg\">「愛されているのかもしれない」</mark>", "こうきさん <mark class=\"hg\">江戸川乱歩の人間椅子の話</mark>を講師に話す。"]},
+{"name": "ヒト扱いすると、お手本は可愛くなくなる", "alts": ["生き物扱いは選別である", "愛らしさは不完全に宿る"], "relation": "差異＝呼び方（ヒト・頭・愛らしい・お手本）×地＝中村さんの家具への口ぶり", "bi": 8, "cards": ["127", "192", "366", "370", "039", "042", "243"], "html": ["メンテナンスクラブの活動開始 まずはインパクトドライバーの使い方の説明が始まる。でも結局、まずは使ってみるという話になる。中村さんの言うことはぶれない。そしてこれから解体されるイスたちのことを「最終的にばらばらにした方がいいヒトたちなので」と<mark class=\"hg\">「ヒト」と呼んでいたのが印象的だった</mark>。", "中村さんがイスの様子を見ながら「作ったときはいいんですけど、使っているうちに緩んでいく、そういう”ヒトたち”なので」と表現する。前日も同じように話していたので普段からそうなんだなと思う。修理に関して、木材を外して新しいものに入れ替えることを話しているときも<mark class=\"hg\">「元の身体どれだ…！？みたいな」</mark>という表現をしている。", "中村さんの家具の解説「4本の足に箱がのってる」 ➡︎「のってる」もこれは擬人化ではないんだけど、<mark class=\"hg\">なんか箱が生きてる感じがする</mark>。", "中村さん？が家具を解説「<mark class=\"hg\">『頭』のほうがでかい</mark>」➡︎擬人化", "中村さんは、車輪のシャフトみたいなパーツを足の補強に使っている家具を見て、「愛らしい」と言った。<mark class=\"hg\">メンテナンスって愛らしさや可愛さが含まれている</mark>感じがする。", "中村さんや経験者メンバーが、この椅子はすごいと言っていたエレベータ前の重たくてミニマムな椅子。あれはお手本のようなものだけれど、さっき言っていたような<mark class=\"hg\">「愛らしさ」とは少しズレるように思う</mark>。", "コウキさんが、椅子の強度を上げる。背もたれをつくるプランを話す。邦生さんが椅子に腰掛けて、佐藤さんの話を聞いている様子を見て、収まりが良い。<mark class=\"hg\">それぞれの人に似合う椅子があるなー</mark>と思う。"]},
+{"name": "完了と言わないで終わる", "alts": ["終わりを先延ばしにする印", "また見に来るための札"], "relation": "差異＝終わりの言い方（しました／更新／連続／再判定／完了！）×地＝同じ札", "bi": 9, "cards": ["076", "380", "229", "371", "554"], "html": ["スタジオに戻る。休憩は各自で取って作業を再開。「補修完了シール」ではなく「補修しましたシール」であることを白田さんが強調して説明する。<mark class=\"hg\">完了って言ってしまうと終わっちゃうけど</mark>、とりあえずやっておきましたという形。「補修しておきました」「補修やっちゃいました」シールはどうか。", "白田さん曰く、シールを「補修完了」ではなく「補修しました」にしたのは、これで完成にするのではなく、創造館の状況に合わせて<mark class=\"hg\">これからも更新していけるように</mark>と考えているからなのだそう。／物も変化できるのって素晴らしいな。その時代その時代で流行ったり、求められるものがあって、それで作られた物が誰からも必要とされなくなったり、捨てられるみたいな場面は少なくないけど、", "<mark class=\"hg\">「連続で状態を作っていく」</mark>っていい言葉。", "以前一度メンテナンスした家具が、今回のツアーで<mark class=\"hg\">メンテナンスの余地あり判定をされた</mark>。そのときの中村さん、藤本さん、白田さんが家具に「みんな見てるよ〜」「気にかけてるよ〜」と言っていて、その物の機能だけを必要としているのではないような、なんか愛を感じる。", "すると<mark class=\"hg\">「メンテ完了！」と中村さんの声</mark>。③の人（この方ばかり見ていたのに名札がちょうど見えない位置にあり）は見ると脚ができていた！　「意外とむずかしい」「メンテあるある」「ディス・イズ・メンテナンス！！」という中村さんの声のあと、パチパチパチと拍手！！　⑤の2人（今日もまた母娘）も進捗を報告。どうも昨日の映画から若い人に期待してしまう我がおばさん心。"]},
+{"name": "直したものは元からあったふりをする", "alts": ["シールがないと見分けられない", "見た目が時間を隠す"], "relation": "差異＝直した痕跡（見えない・シール・形で覚える）×地＝館に戻っていく什器", "bi": 9, "cards": ["141", "089", "224", "070", "376", "079"], "html": ["中村さん「<mark class=\"hg\">意外と前のを引き継いで直すって難しいんですよ</mark>」", "白田さんは、その椅子だったか、ソファだったか、「元からそうだったみたいな椅子ですね。」中村さんのメンテナンスが、トークの時に後付け、順番が逆、といった話があったけど、ところどころで、<mark class=\"hg\">こうして時間が逆転する現象がある</mark>。新しいものが、もともとそうだったみたいに見える、とか。", "カフェスペースに、前日の館内ツアー中に注目されていたシンプルなコの字型だけれど裏に支える木材が打ってあるから強度がしっかりしている、と言われていたのと同じ形のベンチが置かれていることに気付く。この様子なら、今日メンテナンスされたイスが<mark class=\"hg\">館内に散らばっていても見たら気付けそうだな</mark>と思う。", "2Fに戻って再集合。 再び、どんなメンテナンスを見つけたかのツアーに行く。スタジオAを出て<mark class=\"hg\">早速１歩目の木箱にシールがついていて</mark>、ことはさん小松さんが発表する。1Fへ。キッチンのIHのカバー。スタイロと木材が引っ付かない、みたいなのは僕もどこかで知ったけれど、美大関係者が多い文化創造館でそうであるのは、確かにすごいことだなと思う。", "<mark class=\"hg\">「補修しました」と書かれたシールを、メンテナンスした物に貼る</mark>。／丸くて半透明で、触りごごちの良いさらさらとツルツルのシール。ほしい。", "戻りxxっていいな。メンテナンスを見ていて、館内の不調の什器を<mark class=\"hg\">「預かって」きて、それを修理・治療して、また送り出す</mark>、というサイクルは、何か中心で披露する場所があって、それが自分たちの手元に戻って、という往復と、方向は逆に感じるけど少し重なる。"]},
+{"name": "前のものが後ろに居残って効く", "alts": ["元の文字が透けている", "剥がれても書ける"], "relation": "板か旗か建物か×置き換えの後ろに前のものが残る", "bi": 9, "cards": ["440", "157", "362", "124", "449", "363", "202", "156"], "html": ["黒板の話。最近は<mark class=\"hg\">黒板の前にホワイトボードがある</mark>とのこと。", "会場の出入口にある大きな黒板には、当初イベントの案内が書かれていたが、汚れてきたのと「黒板じゃなくてもよくない？」ということでホワイトボードに取って代わられたそう。でも何故か<mark class=\"hg\">ホワイトボードの背後に黒板は置かれたままになっている</mark>。しかもサイドの絵がたまに変わっているらしい。 藤本さん「昨日花火だったから花火描いてるのかな」", "黒板の表面が、みんなに使われすぎて緑の塗料が剥がれて黒くなっていた。黒板の緑って表面に塗っているものなのか！？という衝撃の事実。そして<mark class=\"hg\">緑が剥がれても普通に書けるこの黒板のタフさ</mark>。見習いたい。", "記録のパーティメンバーもメンテナンスクラブの方に移動する ホワイトボードの上にメンテナンスクラブと書かれた旗が設置されているが、それも何かのノボリをばらして作ったもののようで、<mark class=\"hg\">微妙に元の文字が入っているところがある</mark>。", "<mark class=\"hg\">ベンチが横になって看板になった</mark>らしい。", "階段を降りる。チラシがたくさん置いてある箱に注目した女性。箱には「べに」「さけ」「特」「カナダ」「８尾」「特撰」「船凍」などと書いてある。（文字はスタンプでおしているらしい）／この箱の模様をもっと魅せるようにできないか？という意見だった。素敵な視点。壊れている部分、足りない部分を直すだけでなく、<mark class=\"hg\">物のもつ魅力を生かそうというタイプのメンテナンス</mark>もあるんだな。", "イベントの参加者ではない人がまた会場に入ってくる。見学かと思ったら、スタッフの白田さんに「ここに昔、大きい絵があったよね」<mark class=\"hg\">「子どものころ来た。造りが同じだ」</mark>と話しかけている。白田さんが頷いて、県立美術館から文化創造館への変遷の説明をしている。文化創造館が出来てからそれなりに経つけれど、まだ初めて来たという人はいるんだなと思う。", "会場を出て一歩目でもうテーブルとイスはあるし（職人さんに作ってもらったイスとイケアのイスが一つのテーブルに混在している）、シンプルに見えてかなり作りがしっかりしたベンチはあるし、<mark class=\"hg\">前館長が作って置いて行った積み木のようなもの</mark>が大量に載ったテーブルがある。発見にことかかない文化創造館。"]},
+{"name": "前に作った人と揉める", "alts": ["打ち込みすぎた誰か", "作り手が見えないまま直す"], "relation": "差異＝前の作り手との距離（見える／謎／不明／自分も残す）×地＝物に残る手の履歴", "bi": 9, "cards": ["159", "357", "358", "315", "077", "022"], "html": ["1階の一番広いホールに向かう途中で先行していた中村さんの「あー…、あー…、あー…」という声が聞こえて、相当ガタが来ているものを発見したのかと思ったら本当にガッタガタしているアンケートBOXがあった。でも蓋の向きを変えるとアンケートの投入口を開けておくか閉めておくか選べる２WAYのBOX。<mark class=\"hg\">しかもちゃんとした人が作ったらしい</mark>。それでも使ってるうちにガッタガタになるものなんだなあ。", "揺れが治ってきたので、今度は背もたれの板を一度外すことに。しかしなかなか外れない。昔のビスが打ち込みすぎて埋もれてるので、外すのが難しい。<mark class=\"hg\">なんでこれを作った人はこんなに打ち込んだのか気になる</mark>。ほんとに打ち込みすぎ。", "なんとか板のビスを緩めていく。そしたらベンチの横揺れが再発。<mark class=\"hg\">緩めちゃいけない部分だったみたい</mark>。", "15時47分頃　もう一人の女性が戻ってきた。白田さんが声をかけて状況を聞いている。 「これって（ここで）やってるんですか」と女性。「前の館長が『つくりましょう』、ていう方で…」と白田さんが説明。<mark class=\"hg\">「だれがつくったのかわらない、みたいな」</mark>。", "そして、気付かれないところにサインも入れてokという話。<mark class=\"hg\">こうして履歴が残っていくこと</mark>、つまり、公的なものがちょっと私的な秘密を含んだものになるの、ってなんかいいなあ。", "<mark class=\"hg\">木が裂けるという現象</mark>。"]},
+{"name": "読み返すと別のことが書いてある", "alts": ["書いた翌日に他人になる", "気になる部分がみんな違う"], "relation": "差異＝誰の目で読むか（不在者／仲間／自分）×地＝飾られた昨日のノート", "bi": 9, "cards": ["341", "343", "257", "321", "172"], "html": ["荷物をテーブルに置いて、屏風の方に向かうと、昨日のフィールドノートが飾っていた。<mark class=\"hg\">昨日記録したのに、どうやって！？</mark>という疑問。", "飾っているフィールドノートを読んでみる。やはり昨日いなかったこともあり、<mark class=\"hg\">あまり読んでもわからないことが多く</mark>、仕方ないとは思いつつも、ちょっと悲しい。", "みんなで昨日のフィールドノートをみる。靴についての描写があること、邦生さんの「愛らしい」の言葉遣い、<mark class=\"hg\">みんな記録を読んでも気になる部分が違っていて</mark>、面白い。この時も頭の中で「エキゾチックジャパ～ン」がリフレインしている。", "記録を読んで気になることがあるか、とみんなで掲示された昨日の記録の前で意見交換。「ハイ！　コウキです」と手を挙げたコウキさんが「くつが『ニューバランス』とか、って書いている人は、くつ（の記述）がまたでてくるのは、<mark class=\"hg\">足元に注目しているんだな</mark>」と思う、という感想。みんな、たしかに～とうなづく。", "<mark class=\"hg\">とりあえず自分が書いたものを読んでみると</mark>、津田さんの「熱く書く」という発言をメモした横に「厚く」と書いてある。なんとそちらの厚く、だった。文化人類学には「厚く書く（自分が気になったことについて、いろいろな層が重なるように詳しく記述するというような意味）」の言い回しがあるらしい。それまでの津田さんの冷静沈着な語り口の中で突然熱血っぽい言葉が出てきたので違和感があったが、なんと同音異義語だった。"]},
+{"name": "書かれた側が翌日変わっている", "alts": ["記録が本人に戻って強くなる", "中心でないところから繋がる"], "relation": "差異＝記録の向き（書かれる・読み返す・並べ替える）×地＝張り出されたノート", "bi": 9, "cards": ["123", "085", "056", "177", "565", "517", "513"], "html": ["「自分の気になったところを熱く書いてもらって」と言われたが、<mark class=\"hg\">熱く書くってあんまりピンとこない</mark>。", "盛さんが難しそうな角度で木材を扱っている。話しかけると記録についていろいろとコメントをいただけた。「こういうものを作るのを書くにしても、僕には書けないけど、木の相（模様）とかビスとか、いろんなことが書くことができるって不思議ですよね」「僕なんかは<mark class=\"hg\">これまで記録される対象になったことがないので</mark>、こうやって、あ、自分のことが書かれているな、と思うのは印象深かった」といった話。", "あとは「<mark class=\"hg\">自分の活動が誰かの記録に残るってことは</mark>これまで全然なかったので嬉しいですね」。", "スタッフの藤本さんの発言。屋外に什器を見に出た時に音楽が聞こえてきたが、なんの曲やったっけ？くらいの印象だった。でも記録を印刷するときに歌詞の記載があるのを読んで、朝からそのフレーズが頭の中でリフレインしているという。<mark class=\"hg\">「昨日から引き継がれているもの」</mark>というような表現。自分の昨日の記録が他人の今日の脳内に引き継がれて、しかも朝からリフレインということは、なんだか強化されている感じがある。不思議な現象。", "そのあと、フィールドノートを展示している方へみんなで移動する。津田さんが「メンテナンスクラブというプロジェクトで、みんなで同じことをしているけど、同じことをしていてもその人にしか気づかないこと、みんななんとなく気づいていたり、目にはうつっていても<mark class=\"hg\">フィールドノートに記録しないことを記録する人がいる</mark>」というようなことをおっしゃっていて、人によって見えるものや見え方の違いが生まれることに、当然なんだけど「個々の意思を持った生物」って感じがする。", "皆で張り出したフィールドノートを眺める。津田さんが解説をする。テーブルの方に並べた並び替えワークの方をみて、「山岸さん」から繋がりは始まっていることに気づく。メンテナンスクラブの<mark class=\"hg\">中心ではないモノゴトで繋がっていくのも軽やか</mark>。ナツキさんと楽しかったよねと交わし合い、中村さんは「ずっとみちゃう」と言う。", "そうこうしているうちに津田さんがやってくる。ビニール袋を持っていて、お昼かなと思う。張り出したフィールドノートを確認してもらい、テーブルを出してきて、津田さんが持ってきた並び替えワークの紙片を並べる。今読み返すと「ああ、そんな繋げ方してたな」と思い出す。<mark class=\"hg\">ワーク中はちょっと違う脳の使い方をしていた</mark>から、その体感が呼び起こされる感覚。"]},
+{"name": "書かれたものを見に戻ると跳ぶ", "alts": ["名前が残ると人が残る", "瞬間移動してるみたい"], "relation": "書く側か読み返す側か×記録が見せ返されて別物になる", "bi": 9, "cards": ["144", "537", "054", "566", "472", "256", "556"], "html": ["記録のパーティメンバーが津田さんの話を聞いている間にメンテナンスクラブも<mark class=\"hg\">イスの「観察」をしていたらしく</mark>、床に置いてあるバインダーに茶色い紙が挟んであってイスの絵が描かれていたり、構造を文章で書いたりしているのを見つける。ホワイトボードにも貼ってあった。なんで白い紙じゃないんだろう。", "『記録のパーティ』のメンバーが書いた記録の用紙が木でできた屏風コーナーに掲示してあり、そこへみんなで移動。それぞれの記載分に津田さんのコメントが書かれたカードがつけてあった。 津田さんが改めて感想を。前回の2日間でだんだん<mark class=\"hg\">「するどさがきわだっていっているなと感じました」</mark>などと話した。", "すぐに14時になって、白田さんから挨拶。昨日の振り返り。すぐに記録の掲示板の方にみんなで読みにいく。続々と質問が出てきて、面白かった。盛さんの<mark class=\"hg\">「一人一人の名前が入っているのが印象的」</mark>という言葉。確かに不思議。全員の名前がギリギリ覚えられそうなこのサイズのコミュニティで、でも初対面でまだ覚えきらない中で、記録を書くときはある程度名前も丁寧に書こうとするからちゃんと残っている。", "前回8/16はフィールドノートをみるだけだったけど、今回はWSで並べたカードたちも置いてあって、その周りでみんなで少し話す。中村さんが、別の全く関係ない話題や場面をつなげるのが<mark class=\"hg\">「瞬間移動してるみたい」</mark>って表現していて、面白い見え方だなと思った。そういうふうに感じるのかとびっくりもした。", "前回同様、これまでの記録の掲示を振り返りに行く。そのままカードの配置の話。冒頭で山岸さんが愛というキーワードと共に登場したり、魚・マグロみたいなキーワードで繋がる話だったり。邦生さんが<mark class=\"hg\">「やばいことしている。瞬間移動みたいな」</mark>とおっしゃっていて、面白かった。", "2日目、1日目の振り返りから。白田さんが昨日の写真を投影しながら、起きた出来事を話す。<mark class=\"hg\">什器を真ん中に、人が集っている様子の不思議な写真</mark>。囲まれる什器。浦島太郎の冒頭で、カメをいじめる子供たちの図。", "①の人は完成したので、<mark class=\"hg\">記録のコーナー（木の屏風）で掲示された用紙をながめている</mark>、と思ったらいなくなっていた。"]},
+{"name": "もらわれてきて、余生が神々しい", "alts": ["市場の箱が館で余生を送る", "資材まで来歴で見てしまう"], "relation": "差異＝出どころ（市場の箱／木材の札／果樹めいた立体／資材／橋のブロック）×地＝館に持ち込まれた物が元いた場所ごと見られる", "bi": 9, "cards": ["071", "263", "020", "003", "125", "230"], "html": ["1Fのフライヤーペース（創造館のこのスペース、フライヤーを置く以外に、もっといい使い方があるのではと思う。）の什器に使われている荒巻鮭の木箱について。もう使われなくなったからもらってきた、という話から「<mark class=\"hg\">第二の人生、余生をここで送ってるんですね</mark>」みたいな話。", "みんなでみんなが貼ったメンテナンスポイントをみに行く。ことはちゃんの箱馬と小松さんの黒板。1階の総合案内前のチラシ置き場で、<mark class=\"hg\">市場の箱のスタンプが良いから注目したい</mark>と小松さんが貼ってくれている。「横手の出身だから、海のものが感じられるのが珍しい」という視点が面白い。そうか秋田って見全体で捉えると海ある感じがするけど、内陸の方だと縁遠いものなのか。広いもんね。", "中村さんがインパクトの使い方を教えている。木のサイズにテープが貼ってあって、そこにサイズが書いてある。書いてないものもあるので、書いてあるものは一種の基準として物差し的に準備しているのかな。<mark class=\"hg\">漁業とかの卸売市場の感じを思い出す</mark>。", "前方右側に、強風に吹かれた果樹みたいな木とロープの立体物があり、そのギリギリのバランスについて藤本さんが「<mark class=\"hg\">これもメンテナンスがいる</mark>」といったことを言って、面白かった。", "会場には角材やら塩ビ管やらが大量に用意されていたが、それも<mark class=\"hg\">照明の当たり方のためになんだか神々しく見えて</mark>不思議。", "津田さんの自己紹介の最初に、橋の写真が映される。橋の袂のどでかいコンクリブロックの写真と、さっき邦生さんが見せていた謎の円柱の写真。関連がある気がする。<mark class=\"hg\">二人とも構造物の写真撮ってんなー</mark>。増築MIX系と質量パワー系。"]}
+];
+/* 派生 */
+const cardById={}; CARDS.forEach(c=>cardById[c.id]=c);
+const seqsOf={}; CARDS.forEach(c=>seqsOf[c.id]=[]);
+SEQS.forEach((s,si)=>s.cards.forEach(id=>seqsOf[id].push(si)));
+const EDGES=[];
+SEQS.forEach((s,si)=>{ for(let i=0;i<s.cards.length-1;i++) EDGES.push({a:s.cards[i], b:s.cards[i+1], seq:si}); });
+const FAM_ORDER=[0,5,3,8,1,6,4,9,2,7];
+const famBig=bi=>FAMILIES[FAM_ORDER[bi%FAM_ORDER.length]];
+const fam=si=>famBig(SEQS[si].bi);
+const seqsOfBig=BIGS.map((b,bi)=>SEQS.map((s,si)=>[s,si]).filter(([s])=>s.bi===bi).map(([s,si])=>si));
+const totalAppear=SEQS.reduce((n,s)=>n+s.cards.length,0);
+const shared=CARDS.filter(c=>seqsOf[c.id].length>1).map(c=>c.id);
+const leftovers=CARDS.filter(c=>seqsOf[c.id].length===0).map(c=>c.id);
+
+/* 3Dレイアウト */
+let seed=42; const rnd=()=>{ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; };
+const nodes=CARDS.map((c,i)=>({
+  id:c.id,
+  x:Math.cos(i*2.399963)*Math.sqrt(i+1)*46 + (rnd()-0.5)*40,
+  y:(rnd()-0.5)*420,
+  z:Math.sin(i*2.399963)*Math.sqrt(i+1)*46 + (rnd()-0.5)*40,
+  vx:0,vy:0,vz:0, ph:i*0.73, bs:0.35+rnd()*0.4,
+  wr:(seqsOf[c.id].length? 8.5+seqsOf[c.id].length*3.2 : 5.2),
+  sx:0,sy:0,s:1,depth:0,alpha:1,
+}));
+const nodeById={}; nodes.forEach(n=>nodeById[n.id]=n);
+/* 大きな連なりごとに湖の別の場所へ寄せる（名が重ならないように） */
+const NB=BIGS.length;
+nodes.forEach(n=>{ const u=seqsOf[n.id]; if(!u.length) return; const bi=SEQS[u[0]].bi; const th=bi/NB*Math.PI*2; const R=330; n.anchor=[Math.cos(th)*R, Math.sin(th*2.3)*120, Math.sin(th)*R]; });
+function simStep(alpha){
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const a=nodes[i], b=nodes[j];
+      let dx=b.x-a.x, dy=b.y-a.y, dz=b.z-a.z;
+      let d2=dx*dx+dy*dy+dz*dz;
+      if(d2<25){d2=25; dx=rnd()-0.5; dy=rnd()-0.5; dz=rnd()-0.5;}
+      const d=Math.sqrt(d2);
+      const f=(30000/d2)*alpha;
+      a.vx-=dx/d*f; a.vy-=dy/d*f; a.vz-=dz/d*f;
+      b.vx+=dx/d*f; b.vy+=dy/d*f; b.vz+=dz/d*f;
+    }
+  }
+  EDGES.forEach(e=>{
+    const a=nodeById[e.a], b=nodeById[e.b];
+    const dx=b.x-a.x, dy=b.y-a.y, dz=b.z-a.z;
+    const d=Math.max(Math.sqrt(dx*dx+dy*dy+dz*dz),1);
+    const f=0.03*(d-110)*alpha;
+    a.vx+=dx/d*f; a.vy+=dy/d*f; a.vz+=dz/d*f;
+    b.vx-=dx/d*f; b.vy-=dy/d*f; b.vz-=dz/d*f;
+  });
+  nodes.forEach(n=>{
+    const g=seqsOf[n.id].length?1:0.55;
+    if(n.anchor){ n.vx+=(n.anchor[0]-n.x)*0.006*alpha; n.vy+=(n.anchor[1]-n.y)*0.006*alpha; n.vz+=(n.anchor[2]-n.z)*0.006*alpha; }
+    n.vx+=-n.x*0.0038*alpha*g; n.vy+=-n.y*0.009*alpha*g; n.vz+=-n.z*0.0055*alpha*g;
+    n.x+=Math.max(-14,Math.min(14,n.vx)); n.y+=Math.max(-14,Math.min(14,n.vy)); n.z+=Math.max(-14,Math.min(14,n.vz));
+    n.vx*=0.55; n.vy*=0.55; n.vz*=0.55;
+  });
+}
+for(let t=0;t<200;t++) simStep(1);
+{ let gx=0,gy=0,gz=0; nodes.forEach(n=>{gx+=n.x;gy+=n.y;gz+=n.z;}); gx/=nodes.length; gy/=nodes.length; gz/=nodes.length; nodes.forEach(n=>{n.x-=gx;n.y-=gy;n.z-=gz;}); }
+/* 大きな連なりの重心（浮かべる字の位置） */
+const bigCenter=BIGS.map((b,bi)=>{
+  const ids=new Set(); seqsOfBig[bi].forEach(si=>SEQS[si].cards.forEach(c=>ids.add(c)));
+  return {ids:[...ids]};
+});
+
+/* カメラ */
+const canvas=document.getElementById("lake"); const ctx=canvas.getContext("2d");
+let DPR=1, vw=0, vh=0;
+function resize(){ DPR=Math.min(2,devicePixelRatio||1); vw=innerWidth; vh=innerHeight; canvas.width=vw*DPR; canvas.height=vh*DPR; canvas.style.width=vw+"px"; canvas.style.height=vh+"px"; ctx.setTransform(DPR,0,0,DPR,0,0); zoomT=fitZoom()*1.12; }
+const CAMD=5200, FOV=3000;
+function fitZoom(){ const rs=nodes.map(n=>Math.hypot(n.x,n.y,n.z)*spreadT).sort((a,b)=>a-b); const R=rs[Math.floor(rs.length*0.85)]; const proj=R*FOV/CAMD; return Math.max(0.2,Math.min((vw*0.46)/proj,(vh*0.42)/proj,2.2)); }
+let spread=1, spreadT=1;
+try{ const sv=parseFloat(localStorage.getItem("cir0930_spread")); if(sv>=0.6&&sv<=2.6){ spread=spreadT=sv; } }catch(e){}
+const spreadEl=document.getElementById("spread"); ["pointerdown","pointerup","click","mousedown","mouseup"].forEach(ev=>document.getElementById("spread-box").addEventListener(ev,e=>e.stopPropagation())); spreadEl.value=spreadT; document.getElementById("spread-v").textContent=spreadT.toFixed(1);
+spreadEl.addEventListener("input",()=>{ spreadT=parseFloat(spreadEl.value); document.getElementById("spread-v").textContent=spreadT.toFixed(1); lastInteract=performance.now(); try{localStorage.setItem("cir0930_spread",String(spreadT));}catch(e){} });
+let rx=-0.22, ry=0.4, zoom=0.1; let rxT=rx, ryT=ry, zoomT=1; let ccx=0, ccy=0, ccxT=0, ccyT=0;
+addEventListener("resize",resize); resize();
+function rot3(x,y,z){ const cy=Math.cos(ry), sy=Math.sin(ry); const x1=x*cy - z*sy, z1=x*sy + z*cy; const cx=Math.cos(rx), sx=Math.sin(rx); const y2=y*cx - z1*sx, z2=y*sx + z1*cx; return [x1,y2,z2]; }
+function centerTargets(){ const lg=document.getElementById("legend"); const lw=(innerWidth>640&&!lg.classList.contains("closed"))?lg.offsetWidth+20:0; const rw=(innerWidth>640&&!document.getElementById("keys").classList.contains("closed"))?256:0; ccxT=lw+(vw-lw-rw)/2; ccyT=vh/2+18; }
+let selected=null, activeSeq=null, activeBig=null, hoverId=null; let lastInteract=0;
+function hexRGB(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
+function mixGround(h,k){ const [r,g,b]=hexRGB(h); return `rgb(${Math.round(r+(GROUND.r-r)*k)},${Math.round(g+(GROUND.g-g)*k)},${Math.round(b+(GROUND.b-b)*k)})`; }
+const offsets=[-42,42,-21,21,0];
+let maxR=1; nodes.forEach(n=>maxR=Math.max(maxR,Math.hypot(n.x,n.y,n.z)));
+let lastT=0;
+function tag(text,x,y,fs,color,al,bold){
+  ctx.font=`${bold?"600 ":""}${fs}px "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif`;
+  const w=ctx.measureText(text).width+fs*1.0, h=fs*1.6;
+  ctx.globalAlpha=al*0.92; ctx.fillStyle="#FAF8F5";
+  ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x-w/2,y-h/2,w,h,h/2); else ctx.rect(x-w/2,y-h/2,w,h); ctx.fill();
+  ctx.globalAlpha=al; ctx.fillStyle=color; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(text,x,y);
+}
+function frame(now){
+  const dt=Math.min(0.1,lastT?(now-lastT)/1000:0.016); lastT=now;
+  const k=1-Math.exp(-dt*5.5), k2=1-Math.exp(-dt*7);
+  rx+=(rxT-rx)*k; ry+=(ryT-ry)*k; zoom+=(zoomT-zoom)*k; spread+=(spreadT-spread)*k;
+  centerTargets(); ccx+=(ccxT-ccx)*k2; ccy+=(ccyT-ccy)*k2;
+  if(selected==null && activeSeq==null && activeBig==null && now-lastInteract>2600) ryT+=0.05*dt;
+  const t=now*0.001;
+  nodes.forEach(n=>{ const bob=Math.sin(t*n.bs+n.ph)*6; const [X,Y,Z]=rot3(n.x*spread, (n.y+bob)*spread, n.z*spread); const zc=Math.max(Z+CAMD,160); const s=FOV*zoom/zc; n.sx=ccx+X*s; n.sy=ccy+Y*s; n.s=s; n.depth=Z; const mR=maxR*spread; n.alpha=Math.max(0.3,Math.min(1,1.12-((Z+mR)/(2*mR))*0.75)); });
+  ctx.clearRect(0,0,vw,vh);
+  ctx.globalCompositeOperation="multiply"; ctx.lineCap="round";
+  const transferSeqs=(selected!=null&&activeSeq!=null)?new Set(seqsOf[selected]):null;
+  EDGES.forEach(e=>{
+    const a=nodeById[e.a], b=nodeById[e.b];
+    const on=activeSeq!=null&&e.seq===activeSeq;
+    const inBig=activeSeq==null&&activeBig!=null&&SEQS[e.seq].bi===activeBig;
+    const transfer=!on&&transferSeqs&&transferSeqs.has(e.seq);
+    const base=Math.min(a.alpha,b.alpha);
+    let al;
+    if(activeSeq!=null) al=on?0.88:(transfer?0.24:0.04);
+    else if(activeBig!=null) al=inBig?0.8*base:0.05;
+    else al=base*0.5;
+    if(al<0.02) return;
+    const sAvg=(a.s+b.s)/2; const mx=(a.sx+b.sx)/2, my=(a.sy+b.sy)/2; const dx=b.sx-a.sx, dy=b.sy-a.sy; const d=Math.max(Math.hypot(dx,dy),1);
+    const off=offsets[e.seq%offsets.length]*sAvg;
+    ctx.globalAlpha=al;
+    ctx.strokeStyle=(on||inBig)?fam(e.seq).hot:(transfer?mixGround(fam(e.seq).hot,0.25):mixGround(fam(e.seq).hot,(1-base)*0.5));
+    ctx.lineWidth=(on?4.6:(inBig?3.8:(transfer?3.4:2.6)))*sAvg;
+    ctx.beginPath(); ctx.moveTo(a.sx,a.sy); ctx.quadraticCurveTo(mx-dy/d*off, my+dx/d*off, b.sx, b.sy); ctx.stroke();
+  });
+  ctx.globalCompositeOperation="source-over";
+  const order=[...nodes].sort((p,q)=>q.depth-p.depth);
+  const inSeq=activeSeq!=null?new Set(SEQS[activeSeq].cards):null;
+  const inBigSet=(activeSeq==null&&activeBig!=null)?new Set(bigCenter[activeBig].ids):null;
+  order.forEach(n=>{
+    const uses=seqsOf[n.id]; const r=n.wr*n.s; const sel=n.id===selected, hov=n.id===hoverId;
+    let al=n.alpha;
+    if(inSeq&&!inSeq.has(n.id)) al*=0.16; else if(inBigSet&&!inBigSet.has(n.id)) al*=0.18;
+    if(!uses.length) al*=0.75;
+    if(sel||hov) al=1;
+    ctx.globalAlpha=al;
+    const onStrand=inSeq&&inSeq.has(n.id);
+    const f0=onStrand?fam(activeSeq):(uses.length?fam(uses[0]):NEUTRAL);
+    const fog=(1-n.alpha)*0.55;
+    if(sel||hov){ ctx.beginPath(); ctx.arc(n.sx,n.sy,r+8*n.s,0,7); ctx.strokeStyle=f0.glaze; ctx.lineWidth=4.5*n.s; ctx.globalAlpha=al*0.65; ctx.stroke(); ctx.globalAlpha=al; }
+    const g=ctx.createRadialGradient(n.sx-r*0.34,n.sy-r*0.38,r*0.1,n.sx,n.sy,r);
+    g.addColorStop(0,"#FDFCFB"); g.addColorStop(0.38,mixGround(f0.glaze,fog)); g.addColorStop(1,mixGround(f0.hot,fog));
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(n.sx,n.sy,r,0,7); ctx.fill();
+    if(uses.length>1){
+      const span=Math.PI*2/uses.length, gap=Math.min(0.24,span*0.22); ctx.lineWidth=3*n.s;
+      uses.forEach((si,kk)=>{ ctx.beginPath(); ctx.arc(n.sx,n.sy,r+4.5*n.s, kk*span-Math.PI/2+gap/2, (kk+1)*span-Math.PI/2-gap/2); ctx.strokeStyle=mixGround(fam(si).hot,fog*0.6); ctx.globalAlpha=al*0.85; ctx.stroke(); });
+      ctx.globalAlpha=al;
+    }
+    const near=(sel||hov||(zoom>1.05&&n.depth<-maxR*spread*0.3))&&al>0.3&&!onStrand;
+    if(near){ const fs=Math.max(9,10.5*n.s); ctx.font=`${sel||hov?"600 ":""}${fs}px -apple-system,"Hiragino Sans",sans-serif`; ctx.textAlign="center"; ctx.fillStyle="#4C4640"; ctx.globalAlpha=al*(sel||hov?0.95:0.5); ctx.fillText(cardById[n.id].label, n.sx, n.sy+r+fs+4); ctx.globalAlpha=al; }
+  });
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  /* 大きな連なりの名＝重心に浮かべる（何も選んでいないとき） */
+  if(activeSeq==null){
+    BIGS.forEach((b,bi)=>{
+      const ids=bigCenter[bi].ids; if(!ids.length) return;
+      let x=0,y=0,dep=0,alSum=0; ids.forEach(id=>{const n=nodeById[id]; x+=n.sx; y+=n.sy; dep+=n.depth; alSum+=n.alpha;}); x/=ids.length; y/=ids.length; dep/=ids.length; const base=alSum/ids.length;
+      const on=activeBig===bi; const al=activeBig==null?0.9*base:(on?0.98:0.12);
+      const fs=(on?17:14.5)*Math.max(0.8,Math.min(1.2,FOV*zoom/Math.max(dep+CAMD,160)));
+      tag(b.name,x,y,fs,mixGround(famBig(bi).deep,(1-base)*0.35),al,true);
+    });
+  }
+  /* 連なりの名＝その大きな連なりを選んだとき／連なりを選んだとき */
+  SEQS.forEach((s,si)=>{
+    const showBig=activeSeq==null&&activeBig!=null&&s.bi===activeBig;
+    const on=si===activeSeq;
+    if(!showBig&&!on) return;
+    const ids=s.cards; const mIdx=Math.floor((ids.length-1)/2);
+    const a=nodeById[ids[mIdx]], b=nodeById[ids[Math.min(mIdx+1,ids.length-1)]];
+    const base=Math.min(a.alpha,b.alpha);
+    const dx=b.sx-a.sx, dy=b.sy-a.sy; const d=Math.max(Math.hypot(dx,dy),1); const sAvg=(a.s+b.s)/2;
+    const off=(offsets[si%offsets.length]+(offsets[si%offsets.length]>=0?17:-17))*sAvg;
+    const x=(a.sx+b.sx)/2-dy/d*off, y=(a.sy+b.sy)/2+dx/d*off;
+    const fs=(on?12.5:10.5)*Math.max(0.8,Math.min(1.15,sAvg));
+    tag(s.name,x,y,fs,mixGround(fam(si).deep,(1-base)*0.4),on?0.96:0.85*base,on);
+  });
+  ctx.textBaseline="alphabetic";
+  if(activeSeq!=null){
+    const f=fam(activeSeq); const [dr,dg,db]=hexRGB(f.deep);
+    ctx.textAlign="left"; ctx.textBaseline="middle";
+    SEQS[activeSeq].cards.forEach((cid,i)=>{
+      if(cid===selected) return;
+      const n=nodeById[cid]; const label=cardById[cid].label;
+      ctx.font='10.5px -apple-system,"Hiragino Sans",sans-serif';
+      const numW=12, dotW=13, pad=8; const tw=ctx.measureText(label).width; const w=pad+numW+dotW+tw+pad, h=21;
+      const x=n.sx-w/2, y=n.sy-n.wr*n.s-h-9;
+      ctx.globalAlpha=0.97; ctx.shadowColor=`rgba(${dr},${dg},${db},0.28)`; ctx.shadowBlur=9; ctx.shadowOffsetY=2; ctx.fillStyle="#FAF8F5";
+      ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x,y,w,h,8); else ctx.rect(x,y,w,h); ctx.fill();
+      ctx.shadowColor="transparent"; ctx.shadowBlur=0; ctx.shadowOffsetY=0;
+      ctx.fillStyle="#4C464088"; ctx.font='600 9px "SF Mono",Menlo,monospace'; ctx.fillText(String(i+1), x+pad, y+h/2+0.5);
+      ctx.fillStyle=f.hot; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x+pad+numW, y+h/2-3.2, 9, 6.4, 3); else ctx.rect(x+pad+numW,y+h/2-3.2,9,6.4); ctx.fill();
+      ctx.fillStyle="#4C4640"; ctx.font='10.5px -apple-system,"Hiragino Sans",sans-serif'; ctx.fillText(label, x+pad+numW+dotW, y+h/2+0.5);
+    });
+    ctx.textBaseline="alphabetic"; ctx.textAlign="center";
+  }
+  ctx.globalAlpha=1; placeBubble(); requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* 入力 */
+let dragging=false, moved=false, px=0, py=0;
+canvas.addEventListener("pointerdown",e=>{ dragging=true; moved=false; px=e.clientX; py=e.clientY; canvas.setPointerCapture(e.pointerId); lastInteract=performance.now(); });
+canvas.addEventListener("pointermove",e=>{ lastInteract=performance.now(); if(dragging){ const dx=e.clientX-px, dy=e.clientY-py; if(Math.abs(dx)+Math.abs(dy)>3){ moved=true; canvas.classList.add("dragging"); } ryT+=dx*0.0048; rxT=Math.max(-1.15,Math.min(1.15,rxT+dy*0.0038)); px=e.clientX; py=e.clientY; }else{ hoverId=hitTest(e.clientX,e.clientY); canvas.style.cursor=hoverId?"pointer":"grab"; } });
+canvas.addEventListener("pointerup",e=>{ canvas.classList.remove("dragging"); if(dragging&&!moved){ const id=hitTest(e.clientX,e.clientY); if(id) select(id); else { deselect(); setBig(null); } } dragging=false; });
+canvas.addEventListener("wheel",e=>{ e.preventDefault(); lastInteract=performance.now(); zoomT=Math.max(0.3,Math.min(3.2,zoomT*(e.deltaY<0?1.09:1/1.09))); },{passive:false});
+function hitTest(x,y){ const sorted=[...nodes].sort((p,q)=>p.depth-q.depth); for(const n of sorted){ if(Math.hypot(x-n.sx,y-n.sy)<n.wr*n.s+5) return n.id; } return null; }
+function rotateTo(id){ const n=nodeById[id]; const ryDes=Math.atan2(n.x,-n.z); const h=Math.hypot(n.x,n.z); const rxDes=Math.atan2(-n.y,h); let dRy=(ryDes-ryT)%(Math.PI*2); if(dRy>Math.PI) dRy-=Math.PI*2; if(dRy<-Math.PI) dRy+=Math.PI*2; ryT+=dRy; rxT=Math.max(-1.15,Math.min(1.15,rxDes)); zoomT=Math.max(zoomT,Math.min(1.25,fitZoom()*1.5)); }
+
+/* 選択・吹き出し */
+const bubble=document.getElementById("bubble");
+function setHighlight(si){ activeSeq=si; document.body.classList.toggle("has-active",si!=null); syncLegend(); if(typeof syncKeys==="function") syncKeys(); }
+function setBig(bi){ activeBig=bi; document.body.classList.toggle("has-big",bi!=null); syncLegend(); }
+function select(id,keepSeq){
+  selected=id; const seqs=seqsOf[id];
+  if(!seqs.length){ activeSeq=null; setHighlight(null); renderBubble(); rotateTo(id); return; }
+  if(!(keepSeq&&activeSeq!=null&&seqs.includes(activeSeq))) activeSeq=seqs[0];
+  setBig(SEQS[activeSeq].bi); setHighlight(activeSeq); renderBubble(); rotateTo(id);
+}
+function deselect(){ selected=null; bubble.classList.remove("show"); setHighlight(null); if(typeof syncKeys==="function") syncKeys(); }
+function softClear(){ selected=null; bubble.classList.remove("show"); activeSeq=null; document.body.classList.remove("has-active"); syncLegend(); if(typeof syncKeys==="function") syncKeys(); }
+function renderBubble(){
+  const card=cardById[selected]; const seqs=seqsOf[selected];
+  bubble.classList.add("show");
+  const meta=document.getElementById("bb-meta"); meta.innerHTML="";
+  const both=document.getElementById("bb-both"); const nav=document.getElementById("bb-nav");
+  document.getElementById("bb-label").textContent=card.label;
+  if(!seqs.length){
+    bubble.style.boxShadow=`0 6px 26px ${NEUTRAL.deep}2E`;
+    document.getElementById("bb-accent").style.background=`linear-gradient(160deg, ${NEUTRAL.hot}, ${NEUTRAL.glaze})`;
+    const bt=document.getElementById("bb-text"); bt.style.setProperty("--c",NEUTRAL.glaze); bt.textContent=card.text;
+    const sn=document.createElement("span"); sn.textContent="落穂（どの連なりにも入っていない札）"; meta.appendChild(sn);
+    const src=document.createElement("span"); src.className="src"; src.textContent=`・ ${card.w}`; meta.appendChild(src);
+    both.classList.remove("show"); nav.classList.add("hide"); return;
+  }
+  nav.classList.remove("hide");
+  const si=activeSeq, s=SEQS[si], f=fam(si); const idx=s.cards.indexOf(selected);
+  bubble.style.boxShadow=`0 6px 26px ${f.deep}2E`;
+  document.getElementById("bb-accent").style.background=`linear-gradient(160deg, ${f.hot}, ${f.glaze})`;
+  const bt=document.getElementById("bb-text"); bt.style.setProperty("--c",f.glaze); bt.innerHTML=s.html[idx];
+  const sn=document.createElement("span"); sn.textContent=`${BIGS[s.bi].name} › 「${s.name}」`; meta.appendChild(sn);
+  const src=document.createElement("span"); src.className="src"; src.textContent=`・ ${card.w}`; meta.appendChild(src);
+  if(seqs.length>1){
+    const lbl=document.createElement("span"); lbl.textContent="・"; meta.appendChild(lbl);
+    seqs.forEach(kk=>{ const d=document.createElement("span"); d.className="dot"+(kk===si?" cur":""); d.style.background=`linear-gradient(160deg,${fam(kk).hot},${fam(kk).glaze})`; d.title=`「${SEQS[kk].name}」へ`; d.addEventListener("click",()=>{ activeSeq=kk; setBig(SEQS[kk].bi); setHighlight(kk); renderBubble(); }); meta.appendChild(d); });
+    const other=seqs.filter(kk=>kk!==si).map(kk=>`「${SEQS[kk].name}」では ${SEQS[kk].cards.indexOf(selected)+1}／${SEQS[kk].cards.length}枚目`).join("・");
+    both.textContent=`2本の連なりに入る札。${other}。↑↓ で乗り換えると、同じ本文の別の語句が塗られる。`; both.classList.add("show");
+  }else both.classList.remove("show");
+  document.getElementById("bb-pos").textContent=`${idx+1} / ${s.cards.length}`;
+  document.getElementById("nv-prev").disabled=idx<=0; document.getElementById("nv-next").disabled=idx>=s.cards.length-1;
+}
+function placeBubble(){ if(selected==null||!bubble.classList.contains("show")) return; const n=nodeById[selected]; const bw=bubble.offsetWidth, bh=bubble.offsetHeight; const r=n.wr*n.s+14; const rightLim=(innerWidth>640&&!document.getElementById("keys").classList.contains("closed"))?vw-268:vw-12; let x=n.sx+r+8, y=n.sy-bh*0.28; if(x+bw>rightLim) x=n.sx-r-8-bw; if(x<12){ x=Math.min(vw-bw-12,Math.max(12,n.sx-bw/2)); y=n.sy+r+8; if(y+bh>vh-12) y=n.sy-r-8-bh; } y=Math.max(68,Math.min(vh-bh-12,y)); bubble.style.left=x+"px"; bubble.style.top=y+"px"; }
+function navLR(dir){ if(selected==null||activeSeq==null) return; const s=SEQS[activeSeq]; const idx=s.cards.indexOf(selected); const ni=idx+dir; if(ni<0||ni>=s.cards.length) return; select(s.cards[ni],true); }
+function navUD(dir){ if(selected==null) return; const seqs=seqsOf[selected]; if(seqs.length<2) return; const kk=seqs.indexOf(activeSeq); activeSeq=seqs[(kk+dir+seqs.length)%seqs.length]; setBig(SEQS[activeSeq].bi); setHighlight(activeSeq); renderBubble(); }
+document.getElementById("nv-prev").addEventListener("click",()=>navLR(-1));
+document.getElementById("nv-next").addEventListener("click",()=>navLR(1));
+document.getElementById("bb-close").addEventListener("click",deselect);
+addEventListener("keydown",e=>{ if(e.key==="ArrowLeft"){ e.preventDefault(); navLR(-1); } else if(e.key==="ArrowRight"){ e.preventDefault(); navLR(1); } else if(e.key==="ArrowUp"){ e.preventDefault(); navUD(-1); } else if(e.key==="ArrowDown"){ e.preventDefault(); navUD(1); } else if(e.key==="Escape"){ deselect(); setBig(null); } });
+
+/* 左サイドバー：大きな連なり → 連なり → 落穂 */
+const lgBody=document.getElementById("lg-body"); const sqEls=[]; const bigEls=[]; const bigBlocks=[];
+const openBigs=new Set(), openSeqs=new Set();
+BIGS.forEach((b,bi)=>{
+  const f=famBig(bi);
+  const block=document.createElement("div"); block.className="big-block";
+  const bh=document.createElement("div"); bh.className="big-head";
+  const cnt=seqsOfBig[bi].length;
+  bh.innerHTML=`<div class="bn"><span class="car">▶</span><span class="sw" style="background:linear-gradient(160deg,${f.hot},${f.glaze})"></span><span>${b.name}</span><span class="n">${cnt}本</span></div>`+(b.relation?`<div class="br">${b.relation}</div>`:"");
+  bh.addEventListener("click",()=>{
+    lastInteract=performance.now();
+    if(openBigs.has(bi)){ openBigs.delete(bi); seqsOfBig[bi].forEach(si=>openSeqs.delete(si)); if(activeBig===bi){ softClear(); setBig(null); } else syncLegend(); return; }
+    openBigs.add(bi); if(selected&&SEQS[activeSeq]&&SEQS[activeSeq].bi!==bi) softClear(); else if(!selected) softClear(); setBig(bi);
+  });
+  block.appendChild(bh); bigEls[bi]=bh;
+  const body=document.createElement("div"); body.className="big-body";
+  seqsOfBig[bi].forEach(si=>{
+    const s=SEQS[si]; const sq=document.createElement("div"); sq.className="sq";
+    const head=document.createElement("div"); head.className="sq-head";
+    head.innerHTML=`<span class="car">▶</span><span class="sw" style="background:linear-gradient(160deg,${f.hot},${f.glaze})"></span><span>${s.name}</span><span class="n">${s.cards.length}</span>`;
+    head.addEventListener("click",()=>{
+      lastInteract=performance.now();
+      if(openSeqs.has(si)){ openSeqs.delete(si); if(activeSeq===si){ softClear(); } else syncLegend(); return; }
+      openSeqs.add(si); if(selected&&!seqsOf[selected].includes(si)){ selected=null; bubble.classList.remove("show"); } setBig(bi); setHighlight(si);
+    });
+    sq.appendChild(head);
+    const list=document.createElement("div"); list.className="sq-cards";
+    s.cards.forEach((cid,i)=>{ const row=document.createElement("div"); row.className="sq-card"; row.dataset.cid=cid; row.innerHTML=`<span class="no">${i+1}</span><span>${cardById[cid].label}</span>`; row.addEventListener("click",()=>{ activeSeq=si; select(cid,true); }); list.appendChild(row); });
+    sq.appendChild(list);
+    const nm=document.createElement("div"); nm.className="sq-names";
+    nm.innerHTML=(s.relation?`<b>関係</b> ${s.relation}<br>`:"")+(s.alts&&s.alts.length?`<b>名の候補</b> ${s.alts.join("／")}`:"");
+    sq.appendChild(nm);
+    body.appendChild(sq); sqEls[si]=sq;
+  });
+  block.appendChild(body); lgBody.appendChild(block); bigBlocks[bi]=block;
+});
+if(leftovers.length){
+  const lh=document.createElement("div"); lh.className="lo-head"; lh.textContent=`落穂 ${leftovers.length}枚 ▸`;
+  const ll=document.createElement("div"); ll.className="lo-list";
+  leftovers.forEach(cid=>{ const row=document.createElement("div"); row.className="sq-card"; row.dataset.cid=cid; row.innerHTML=`<span>${cardById[cid].label}</span>`; row.addEventListener("click",()=>select(cid)); ll.appendChild(row); });
+  lh.addEventListener("click",()=>{ ll.classList.toggle("open"); lh.textContent=`落穂 ${leftovers.length}枚 ${ll.classList.contains("open")?"▾":"▸"}`; });
+  lgBody.appendChild(lh); lgBody.appendChild(ll);
+}
+function syncLegend(){
+  if(activeSeq!=null){ openSeqs.add(activeSeq); openBigs.add(SEQS[activeSeq].bi); }
+  if(activeBig!=null) openBigs.add(activeBig);
+  bigEls.forEach((el,bi)=>{ el.classList.toggle("on",bi===activeBig); bigBlocks[bi].classList.toggle("open",openBigs.has(bi)); });
+  sqEls.forEach((el,si)=>{ if(!el) return; const on=si===activeSeq; el.classList.toggle("on",on); el.classList.toggle("open",openSeqs.has(si)); el.querySelectorAll(".sq-card").forEach(row=>{ row.classList.toggle("cur",on&&row.dataset.cid===selected); }); });
+  const cur=document.querySelector(".sq.on")||document.querySelector(".big-head.on"); if(cur) cur.scrollIntoView({block:"nearest"});
+}
+{ const lg=document.getElementById("legend"), h=document.getElementById("lg-resize"); let rs=false, sx0=0, w0=0;
+  try{ const w=parseInt(localStorage.getItem("cir0930_lgw")); if(w>=250) lg.style.width=w+"px"; }catch(e){}
+  h.addEventListener("pointerdown",e=>{ rs=true; sx0=e.clientX; w0=lg.offsetWidth; lg.classList.add("resizing"); h.setPointerCapture(e.pointerId); e.preventDefault(); e.stopPropagation(); });
+  h.addEventListener("pointermove",e=>{ if(!rs) return; const w=Math.max(250,Math.min(innerWidth*0.7,w0+e.clientX-sx0)); lg.style.width=w+"px"; });
+  h.addEventListener("pointerup",e=>{ if(!rs) return; rs=false; lg.classList.remove("resizing"); try{localStorage.setItem("cir0930_lgw",String(lg.offsetWidth));}catch(e){} e.stopPropagation(); });
+  h.addEventListener("click",e=>e.stopPropagation()); }
+document.getElementById("lg-count").textContent=`${BIGS.length}束・連なり ${SEQS.length}本`;
+document.getElementById("lg-toggle").addEventListener("click",()=>document.getElementById("legend").classList.toggle("closed"));
+document.getElementById("stats").textContent=`カード ${CARDS.length}枚 ・ 連なり ${SEQS.length}本 ・ 大きな連なり ${BIGS.length}束`;
+
+/* 右サイドバー：橋と核 */
+const kyBody=document.getElementById("ky-body"); const keyRows=[];
+KEYCARDS.forEach((g,gi)=>{
+  if(!g.cards.length) return;
+  const block=document.createElement("div"); block.className="key-block"+(gi===0?" open":"");
+  const head=document.createElement("div"); head.className="key-head";
+  head.innerHTML=`<div class="kn"><span class="car">▶</span><span>${g.title}</span><span class="n">${g.cards.length}</span></div><div class="ks">${g.sub}</div>`;
+  head.addEventListener("click",()=>block.classList.toggle("open"));
+  block.appendChild(head);
+  const list=document.createElement("div"); list.className="key-list";
+  g.cards.forEach(cid=>{
+    const row=document.createElement("div"); row.className="key-card"; row.dataset.cid=cid;
+    const u=seqsOf[cid]; const f=u.length?fam(u[0]):NEUTRAL;
+    row.innerHTML=`<span class="dot" style="background:linear-gradient(160deg,${f.hot},${f.glaze})"></span><span>${cardById[cid].label}</span><span class="id">${cid}</span>`;
+    row.addEventListener("click",()=>select(cid));
+    list.appendChild(row); keyRows.push(row);
+  });
+  block.appendChild(list); kyBody.appendChild(block);
+});
+document.getElementById("ky-toggle").addEventListener("click",()=>document.getElementById("keys").classList.toggle("closed"));
+function syncKeys(){ keyRows.forEach(r=>r.classList.toggle("cur",r.dataset.cid===selected)); }
+
+/* 初回ガイド */
+const guide=document.getElementById("guide"); const GUIDE_KEY="cir_yamafuda_lake_v1";
+function hideGuide(){ guide.classList.add("hide"); try{localStorage.setItem(GUIDE_KEY,"1");}catch(e){} }
+function showGuide(){ guide.classList.remove("hide"); }
+let guided=false; try{ guided=!!localStorage.getItem(GUIDE_KEY); }catch(e){}
+if(guided) guide.classList.add("hide");
+document.getElementById("gd-start").addEventListener("click",hideGuide);
+guide.addEventListener("click",e=>{ if(e.target===guide) hideGuide(); });
+document.getElementById("help").addEventListener("click",showGuide);
+addEventListener("keydown",e=>{ if(e.key==="Escape"&&!guide.classList.contains("hide")) hideGuide(); });
+</script>
+</body>
+</html>
