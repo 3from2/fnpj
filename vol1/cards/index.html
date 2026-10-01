@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="八郎潟FNPJ カード探索ビュー">
+<meta property="og:description" content="八郎潟フィールドノートPJ 第1回（はちプロ合宿）のカード51枚を、連なりでたどるビュー">
+<title>八郎潟FNPJ</title>
+<style>
+  :root{
+    --ground:#F6F4F3;
+    --ink:#4C4640;
+    --ink2:#4C464099;
+    --ink3:#4C464055;
+    --panel:#FAF8F5;
+    --serif:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+    --sans:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;
+    --mono:"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;overflow:hidden;}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);}
+
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:30;
+    display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+    padding:14px 20px 10px;
+    background:linear-gradient(#F6F4F3F2,#F6F4F3D8 70%,#F6F4F300);
+    pointer-events:none;
+  }
+  header *{pointer-events:auto;}
+  h1{font-family:var(--serif);font-size:1.15rem;letter-spacing:.14em;font-weight:600;}
+  h1 small{font-family:var(--sans);font-size:.62rem;letter-spacing:.08em;color:var(--ink2);font-weight:400;margin-left:.8em;}
+  .stats{font-size:.68rem;color:var(--ink2);letter-spacing:.05em;}
+  .hint{
+    margin-left:auto;font-size:.68rem;color:var(--ink2);letter-spacing:.04em;
+    background:#FAF8F5CC;border-radius:999px;padding:5px 14px;
+    box-shadow:0 2px 12px #8D603222;
+  }
+  kbd{font-family:var(--mono);font-size:.9em;background:#F0EDE8;border-radius:4px;padding:1px 5px;color:var(--ink);}
+
+  /* ── 左サイドバー：連なりのアコーディオン ── */
+  #legend{
+    position:fixed;left:16px;top:76px;bottom:20px;z-index:25;width:216px;
+    display:flex;flex-direction:column;
+  }
+  #legend .lg-head{
+    font-size:.66rem;letter-spacing:.16em;color:var(--ink2);margin-bottom:8px;
+    display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;
+  }
+  #legend .lg-head .tri{transition:transform .25s;font-size:.6rem;}
+  #legend.closed .tri{transform:rotate(-90deg);}
+  #legend .lg-body{
+    overflow-y:auto;overscroll-behavior:contain;
+    display:flex;flex-direction:column;gap:5px;padding-right:6px;
+    scrollbar-width:thin;
+  }
+  #legend.closed .lg-body{display:none;}
+  .sq{
+    background:#FAF8F5B8;border-radius:10px;
+    transition:background .2s, box-shadow .2s, opacity .3s;
+  }
+  .sq:hover{background:#FAF8F5;}
+  .sq.on{box-shadow:0 2px 10px #36428630;background:#FAF8F5;}
+  body.has-active .sq:not(.on){opacity:.45;}
+  .sq-head{
+    display:flex;align-items:center;gap:8px;
+    font-size:.7rem;line-height:1.35;letter-spacing:.02em;
+    padding:6px 9px;cursor:pointer;user-select:none;
+  }
+  .sq-head .sw{
+    width:22px;height:12px;border-radius:6px;flex:none;position:relative;overflow:hidden;
+  }
+  .sq-head .sw::after{content:"";position:absolute;inset:10% 55% 45% 8%;
+    background:radial-gradient(ellipse at 40% 35%,#ffffffA8,#ffffff00 70%);border-radius:50%;}
+  .sq-head .n{color:var(--ink3);font-size:.62rem;margin-left:auto;font-family:var(--mono);}
+  .sq-cards{display:none;flex-direction:column;gap:1px;padding:0 6px 7px;}
+  .sq.open .sq-cards{display:flex;}
+  .sq-card{
+    display:flex;align-items:baseline;gap:7px;
+    font-size:.67rem;line-height:1.5;color:var(--ink2);
+    padding:3px 6px 3px 14px;border-radius:7px;cursor:pointer;
+    transition:background .15s;
+  }
+  .sq-card:hover{background:#F0EDE8;}
+  .sq-card.cur{color:var(--ink);font-weight:600;background:#F0EDE8;}
+  .sq-card .no{font-family:var(--mono);font-size:.56rem;color:var(--ink3);width:1.3em;flex:none;}
+
+  #lake{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none;display:block;}
+  #lake.dragging{cursor:grabbing;}
+
+  /* ── 原文の吹き出し ── */
+  #bubble{
+    position:fixed;z-index:40;width:min(456px,88vw);
+    background:var(--panel);border-radius:14px;
+    padding:16px 17px 10px;
+    display:none;
+    box-shadow:0 6px 26px #36428626;
+  }
+  #bubble.show{display:block;}
+  #bb-accent{
+    position:absolute;top:0;left:0;right:0;height:5px;
+    border-radius:14px 14px 0 0;
+  }
+  #bb-close{
+    position:absolute;right:8px;top:11px;
+    width:22px;height:22px;border:none;border-radius:50%;cursor:pointer;
+    background:#F0EDE8;color:var(--ink2);font-size:12px;line-height:1;
+  }
+  #bb-label{
+    font-family:var(--serif);font-size:.95rem;font-weight:600;letter-spacing:.06em;
+    padding-right:26px;
+  }
+  #bb-text{
+    font-family:var(--serif);font-size:.82rem;line-height:2.05;
+    margin-top:9px;color:var(--ink);
+    max-height:44vh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;
+  }
+  #bb-meta{
+    display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+    margin-top:10px;font-size:.6rem;letter-spacing:.05em;color:var(--ink2);
+  }
+  #bb-meta .dot{width:9px;height:9px;border-radius:50%;flex:none;cursor:pointer;
+    box-shadow:0 0 0 1.5px #FAF8F5;}
+  #bb-meta .dot.cur{outline:2px solid var(--ink2);outline-offset:1.5px;}
+  #bb-nav{
+    display:flex;align-items:center;gap:6px;margin-top:8px;
+    border-top:1px solid #4C464018;padding-top:8px;
+  }
+  #bb-nav button{
+    border:none;cursor:pointer;font-family:var(--sans);color:var(--ink);
+    background:#F0EDE8;border-radius:9px;font-size:.66rem;letter-spacing:.03em;
+    padding:6px 10px;transition:background .15s;
+  }
+  #bb-nav button:hover{background:#E9E4DC;}
+  #bb-nav button:disabled{opacity:.3;cursor:default;}
+  #bb-nav .sp{flex:1;text-align:center;font-size:.58rem;color:var(--ink3);font-family:var(--mono);}
+
+  /* ── 初回ガイド ── */
+  #guide{
+    position:fixed;inset:0;z-index:50;
+    display:flex;align-items:center;justify-content:center;
+    background:#F6F4F3D6;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+    opacity:1;transition:opacity .45s;
+  }
+  #guide.hide{opacity:0;pointer-events:none;}
+  .gd-card{
+    width:min(440px,88vw);max-height:86vh;overflow-y:auto;overscroll-behavior:contain;
+    background:var(--panel);border-radius:20px;
+    padding:26px 28px 22px;
+    box-shadow:0 10px 44px #36428630;
+    position:relative;
+  }
+  .gd-card::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;
+    border-radius:20px 20px 0 0;
+    background:linear-gradient(90deg,#BC4931,#D28326,#CDBE27,#98BE2B,#46AE50,#2593B8,#3A55A7,#C0A8D4,#A84E92,#AF4771);
+    opacity:.75;}
+  .gd-card h2{
+    font-family:var(--serif);font-size:1.25rem;letter-spacing:.16em;font-weight:600;
+  }
+  .gd-lead{
+    font-size:.76rem;line-height:1.9;color:var(--ink2);margin-top:8px;letter-spacing:.03em;
+  }
+  .gd-step{
+    display:flex;gap:12px;margin-top:15px;align-items:flex-start;
+  }
+  .gd-ico{
+    width:24px;height:24px;border-radius:50%;flex:none;margin-top:2px;position:relative;
+  }
+  .gd-ico::after{content:"";position:absolute;inset:12% 48% 48% 12%;
+    background:radial-gradient(ellipse at 40% 35%,#ffffffB0,#ffffff00 70%);border-radius:50%;}
+  .gd-step b{font-size:.78rem;letter-spacing:.05em;}
+  .gd-step p{font-size:.72rem;line-height:1.75;color:var(--ink2);margin-top:2px;letter-spacing:.02em;}
+  #gd-start{
+    display:block;width:100%;margin-top:22px;
+    border:none;cursor:pointer;border-radius:13px;
+    padding:12px 0;font-family:var(--sans);font-size:.85rem;letter-spacing:.14em;
+    color:#FAF8F5;font-weight:600;
+    background:linear-gradient(160deg,#2593B8,#A2CEDB);
+    position:relative;overflow:hidden;
+    transition:box-shadow .2s;
+  }
+  #gd-start::after{content:"";position:absolute;inset:10% 55% 45% 6%;
+    background:radial-gradient(ellipse at 40% 35%,#ffffff80,#ffffff00 70%);border-radius:50%;}
+  #gd-start:hover{box-shadow:0 4px 18px #2B768A40;}
+  #help{
+    position:fixed;right:18px;bottom:18px;z-index:36;
+    width:34px;height:34px;border:none;border-radius:50%;cursor:pointer;
+    background:#FAF8F5;color:var(--ink2);font-size:15px;font-family:var(--serif);
+    box-shadow:0 2px 12px #8D603230;
+    transition:box-shadow .2s,color .2s;
+  }
+  #help:hover{color:var(--ink);box-shadow:0 4px 16px #8D603245;}
+
+  @media (max-width:640px){
+    #legend{display:none;}
+    .hint{display:none;}
+    header{padding:10px 14px 8px;gap:4px;flex-direction:column;}
+    h1{font-size:1rem;}
+    .stats{font-size:.6rem;}
+    #bb-text{max-height:32vh;}
+    .gd-card{padding:22px 20px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>八郎潟FNPJ<small>カード探索ビュー</small></h1>
+  <div class="stats" id="stats"></div>
+  <div class="hint">ドラッグで湖を回す／カードを選んで <kbd>←</kbd><kbd>→</kbd> たどる・<kbd>↑</kbd><kbd>↓</kbd> 乗り換える</div>
+</header>
+
+<div id="legend">
+  <div class="lg-head" id="lg-toggle"><span class="tri">▼</span>連なり <span id="lg-count"></span></div>
+  <div class="lg-body" id="lg-body"></div>
+</div>
+
+<canvas id="lake"></canvas>
+
+<div id="bubble">
+  <div id="bb-accent"></div>
+  <button id="bb-close">×</button>
+  <div id="bb-label"></div>
+  <div id="bb-text"></div>
+  <div id="bb-meta"></div>
+  <div id="bb-nav">
+    <button id="nv-prev">← 前</button>
+    <span class="sp" id="bb-pos"></span>
+    <button id="nv-next">次 →</button>
+  </div>
+</div>
+
+<div id="guide">
+  <div class="gd-card">
+    <h2>八郎潟FNPJ</h2>
+    <div class="gd-step">
+      <span class="gd-ico" style="background:linear-gradient(160deg,#D28326,#E7C9A7)"></span>
+      <div><b>ドラッグで湖を回す</b></div>
+    </div>
+    <div class="gd-step">
+      <span class="gd-ico" style="background:linear-gradient(160deg,#2593B8,#A2CEDB)"></span>
+      <div><b>カードを選ぶと、原文がひらく</b></div>
+    </div>
+    <div class="gd-step">
+      <span class="gd-ico" style="background:linear-gradient(160deg,#A84E92,#D4A0C7)"></span>
+      <div><b><kbd>←</kbd><kbd>→</kbd> でたどる・<kbd>↑</kbd><kbd>↓</kbd> で乗り換える</b></div>
+    </div>
+    <button id="gd-start">湖へ入る</button>
+  </div>
+</div>
+<button id="help" title="つかいかたを見る">?</button>
+
+<script>
+/* ════════ パレット（岡﨑乾二郎 v0.2 ジェリー） ════════ */
+const FAMILIES=[
+  {name:"珊瑚", hot:"#BC4931", glaze:"#E5AFA7", deep:"#883C32"},
+  {name:"琥珀", hot:"#D28326", glaze:"#E7C9A7", deep:"#8D6032"},
+  {name:"檸檬", hot:"#CDBE27", glaze:"#E3DCA2", deep:"#8A8632"},
+  {name:"若草", hot:"#98BE2B", glaze:"#C2D8A0", deep:"#6D863B"},
+  {name:"翡翠", hot:"#46AE50", glaze:"#A4D2AF", deep:"#358340"},
+  {name:"浅葱", hot:"#2593B8", glaze:"#A2CEDB", deep:"#2B768A"},
+  {name:"瑠璃", hot:"#3A55A7", glaze:"#A1B3DF", deep:"#364286"},
+  {name:"藤",   hot:"#C0A8D4", glaze:"#E4D8EE", deep:"#563676"},
+  {name:"菖蒲", hot:"#A84E92", glaze:"#D4A0C7", deep:"#833E77"},
+  {name:"躑躅", hot:"#AF4771", glaze:"#DBA3B6", deep:"#813B55"},
+];
+const GROUND={r:246,g:244,b:243};
+
+/* ════════ サンプルデータ（はちプロ合宿カードより・v1/v2と同一） ════════ */
+const CARDS=[
+{id:"c01",w:"A",label:"緑色の水",text:"緑色の水。地図で現地点を指すも、外れの人多い。かまへーさんが水に入り水深を説明。急に深くなる！ 水草がなくなって、栄養を植物プランクトンだけが消費している。"},
+{id:"c02",w:"A",label:"水草の植え付け",text:"地元の小学生が秋に水草を植え付けている。水位が低いから秋。水位は防潮水門の開閉で調整されている。管理計画に基づく。"},
+{id:"c03",w:"A",label:"コイの頭部",text:"コイの頭部。盛口くん、大興奮。解剖が好き。"},
+{id:"c04",w:"A",label:"カツ重と名前",text:"メニューが多く悩んだ末、カツ重に決定。五社さん富山、私新潟で談義。その後、津田さんのお子さんのお名前何だろう、になる。"},
+{id:"c05",w:"A",label:"ワインレッドの湯",text:"大潟村の温泉、面白い。昔の植物の成分が出てきて、ワインレッドを少し酸化させたみたいな色のアルカリ泉。透明な白湯、アブクの湯、サウナ。"},
+{id:"c06",w:"A",label:"朝食はブラックバス",text:"朝食は斗沢くんが釣ったブラックバス。支度してカヌー体験。"},
+{id:"c07",w:"A",label:"馴染むふたり",text:"水から上がった後、盛口さんが座ってスケッチをしていたり、五社さんと寝そべって生きものを観察したりしていた。既に馴染んできていた印象。"},
+{id:"c09",w:"A",label:"謎のモアイ像",text:"帰り際、すぐ近くに謎のモアイ像。なぜか土台には「萌」の文字。イースター島のモアイにあこがれる佐藤さんがハイテンションに。"},
+{id:"c10",w:"A",label:"トリゲモの新芽",text:"モグリウムの追加水槽に、トリゲモの新芽らしきものが生えていた！ うたせ館のバケツで育ててもなかなか増えなかったので、これは嬉しい。もう一つの水槽は濁っていて中が見えない。"},
+{id:"c12",w:"A",label:"酒と顕微鏡",text:"館内に戻った後。酒も回って記憶は朧げ。確か、顕微鏡観察組と、テキストを読み始める組に分かれていた。もう文字を読める状態ではなかったので、顕微鏡観察組に混じる。"},
+{id:"c13",w:"A",label:"ムニエルの朝",text:"朝食はブラックバスのムニエルと塩おにぎり。思った以上においしくて驚いた。学生部内ではなぜあんなに外来種食が人気なのだろうか（苦笑）。"},
+{id:"c17",w:"A",label:"白骨と連絡先",text:"植生再生地点でコイの白骨化死体を発見。盛口さん、咽頭歯など生き物の話で盛り上がり、連絡先を交換。"},
+{id:"c18",w:"A",label:"寒い造りの小屋",text:"寮へ。付近の小屋は美大を作った人と同じ人が作り、冬に寒い造りになっている。県立大大潟キャンパスは老朽化も激しく、雨漏り対策も行われている。"},
+{id:"c20",w:"A",label:"二日後の胃腸炎",text:"ちなみにこの2日後、感染性胃腸炎に罹患し、壮絶な戦いが待ち受けているとは知る由もなかった。"},
+{id:"c21",w:"A",label:"鳥のための道路",text:"まっすぐな道が多い。人為的に作られた道が真っ直ぐになるのって、すごく人間中心だよなあ。もし鳥が土地を開拓する権利を持っていて、鳥という種族のための道路を作るとしたら、何を作るんだろう。"},
+{id:"c22",w:"A",label:"歩いたことがない",text:"大潟村に何回か通ってるけど、そういえば車ばかりで、自発的にこの土地に足を踏み入れたことがない気がする。歩きたいなあ、あの道を。なんか、狸みたいに轢かれそうな気がするけど。"},
+{id:"c23",w:"A",label:"増えないミント",text:"観察中、いっぱいミントが生えていた。場を支配するはずの植物なのに、意外と増えていない。視点を近くにすると見えてくるものは、普段は脳が「全部見たら疲れるから」切り離しているのかもしれない。"},
+{id:"c24",w:"A",label:"ピコ、ピ、ピャア",text:"鳥の鳴き声はすごく言い当てが妙で、当て字できないし文字にもできない。ノートには「ピコ、ピ　ピャア」と書かれているけど、その文字を見ても私はもうあの声を思い出せない。書いたときも、いや違うなあと思った。"},
+{id:"c25",w:"A",label:"蜘蛛の巣ごめん",text:"蜘蛛の巣があって、主がいないものだと思って触って遊んでいたら、持ち主の蜘蛛がいたので、家を破壊してごめん〜〜と思った。"},
+{id:"c26",w:"A",label:"清竜くんの責任",text:"八郎湖水質保全キャラクターの清竜くんも見れた。ここ以外で見たことがあまりない。誰が作ってどこにいくんだろう。キャラクターの責任の所在を、清竜くんを見るたびに考えてしまう。"},
+{id:"c27",w:"A",label:"骨になった鯉",text:"プラスチックだと思ったら鯉の頭だった。綺麗に骨になっていて嬉しい。みんな大盛り上がりだった。骨を見ていると、自分もいつかはこうなるんだなあと思う。"},
+{id:"c28",w:"A",label:"水を蹴る後ろめたさ",text:"網で捕まえるために水を蹴るとき、爆弾を落としたみたいな暴力をしている感覚で後ろめたさがある。ヤゴがいた。イトトンボのヤゴと言われた気がする。形がかっこいい。"},
+{id:"c29",w:"A",label:"毛虫が可愛い",text:"ズボンに毛虫が付いていて、ふわふわで可愛かった。幼少期は怖いと思っていたのに。毛虫が身近な脅威ではなくなったことを指している気がする。"},
+{id:"c30",w:"A",label:"橋の名前メモ",text:"八竜橋を車で通った。最近、橋の名前をメモするのにハマっている。どうやら統人行事でヤマタノオロチを倒すやつをやる橋らしい。昔はここにどんな橋がかかってたんだろう。やっぱり木造かな。"},
+{id:"c36",w:"B",label:"行ってきますと喧嘩",text:"朝、急いで荷物をまとめる。集合時間に間に合いそうにないので、かまへーさんにLINEで数分遅れることを伝える。昨日喧嘩した父に、行ってきますと言って家を出る。"},
+{id:"c37",w:"B",label:"誰もいない集合場所",text:"集合場所に着いたのに、合流するはずの車がいない。LINEを確認してもそれらしきことは書かれていない。集合時間からすでに15分経過。とても焦り出す。"},
+{id:"c38",w:"B",label:"粘菌の人、実物",text:"初対面の盛口くんと互いに自己紹介する。粘菌研究クラブの活動記録写真でよく見かけるので、実物に会えて感動する。"},
+{id:"c39",w:"B",label:"ウェーダーの時間",text:"ウェーダーのサイズを選ぶ時間がきた。何回か着ているが、サイズがよくわかっていないので、この時間が少し苦手。"},
+{id:"c40",w:"B",label:"なぜヒツジグサ",text:"なんで水の中の生き物なのに『ヒツジ』グサという名前なんだろう？ かまへーさんに聞くが、答えを知らない模様。"},
+{id:"c42",w:"B",label:"ミジンコは光に集まる",text:"私がのぞいているところは光が当たる場所だったので、ミジンコたちがよく見える。斗沢さんによると「ミジンコは光に集まる習性がある」と言う。なんでだろう？ 暖かいからだろうか？"},
+{id:"c43",w:"B",label:"わからないと言えば",text:"チャットGPTは「わからない」を言わない。「間違える＆わからないことがある人間」のそばにいて、なぜそれを学ばないのか。わからないと言えば可愛げがあるものを。"},
+{id:"c44",w:"B",label:"ど〜こだクイズ",text:"かまへーさんの「ここはど〜こだ？」クイズ。道中まったく外を見ていなかったので困惑しながら指をさす。奇跡的に正解できたので、近所に住む人間としての謎の矜持と嬉しさを噛み締める。"},
+{id:"c45",w:"B",label:"膝から腰の住所",text:"ミジンコや浮葉植物は、人間の膝から腰くらいまでの高さに住むことを好む。その高さのエリアがない現湖岸には彼らがおらず、今はブラックバスたちの独壇場になっているそうだ。"},
+{id:"c46",w:"B",label:"安全のキーワード",text:"「現湖岸は急に深くなる」は、ただ生態系を知るキーワードではない。かまへーさんが見学に来る小学生たちに一番メモをとってもらっている言葉。急に深くなって危険なので、入らないように教えている。"},
+{id:"c47",w:"B",label:"オロナミンCの暗号",text:"湖の手前の植物にオロナミンCの空き瓶が刺さっている。バス釣りの人たちがつけた「ここは釣れる」の目印らしい。釣り人たちの共通言語、標識、暗号のようなものに見えて、なんだかとても面白い。"},
+{id:"c48",w:"B",label:"浮世絵の水面",text:"鏡のような穏やかな水面に、そだ小破堤が連なっている。その奥には湖と山々。この景色の浮世絵がありそうだと思った。それくらい胸に残るものがある。"},
+{id:"c49",w:"B",label:"カタヒロ感のなさ",text:"カタビロアメンボが気になる。カタが広いからそういう名前らしいが、ちっちゃくてあまりカタヒロ感がないのがとても愛らしい。足がガニ股みたいになっていて、泳ぎ方も好き。"},
+{id:"c50",w:"B",label:"名付けの重大さ",text:"「名前をつけるというのは、その子が一生呼ばれるものを決めるということだから、その方法はすごく大事になるよね」と五社さん。「やっぱりすごく悩んだよ」と名取先生。実際に名付けた人がいると、名付けの重大さが感じられる。"},
+{id:"c52",w:"B",label:"閉校とモグリウム",text:"払戸小学校の閉校に伴い、そこにあったモグリウムが船越小学校に持ってこられたらしい。よく知っている小学校なので、閉校したと聞いてとても悲しい。"},
+{id:"c53",w:"B",label:"いるねー、ミジンコ",text:"「実際、子供たちと仕事をしていて悪ガキはいるんですか？」という質問に、かまへーさんがモグリウムを覗き込みながら「いるねー、ミジンコ」。噛み合っていない会話に、合宿で一番の笑いが起こる。"},
+{id:"c54",w:"B",label:"ゲンゴロウの大ピンチ",text:"モグリウムにヒメゲンゴロウの子どもがいる。土の中に潜って成長するらしいので、潜る場所がないモグリウムにいるのは大大大ピンチだ。"},
+{id:"c55",w:"B",label:"日本人にとってのモアイ",text:"小さいモアイ像が乗っている台の部分に「萌」と刻まれている。文体はゆるい感じ。日本には本物ではないモアイ像が各地に存在する。「日本人にとってのモアイ像」について調べたくなった。"},
+{id:"c56",w:"B",label:"すっからかんの温室",text:"生態系公園は2年前の閉園間近に来て以来だ。温室のなかがすっからかんになっていて、少し寂しい気持ちになった。すごくいい空間なので、何か活用できないかなと思う。"},
+{id:"c57",w:"B",label:"緑の卵の名推理",text:"木の下に緑色の小さい卵が割れて落ちていた。「フンがまだ乾いていないので、おそらくこの木の上に鳥が住んでいるんだろう」と斗沢さん。証拠から答えを導く名推理に感動する。研究のプロセスは、こういうことの積み重ねなんだろう。"},
+{id:"c58",w:"B",label:"ビール腹ガエル",text:"帰り際、みんなでアマガエルを発見した。お腹が膨れていたので、五社さんが「ビール腹ガエル」と名付けていた。不名誉すぎる。"},
+{id:"c59",w:"B",label:"シロップたっぷり",text:"かき氷を作るところを目の前で見ていたら、カップの底にいちごシロップをたっぷり入れてから氷を入れた。店員さんが「いつもよりたっぷりかけますね」と言ってくれた。すごく嬉しかった。"},
+{id:"c60",w:"B",label:"人生初ビール",text:"人生初ビールを飲んだ。すごくまずいんだろうなと思っていたが、普通に美味しい。最近のビールはいろんな改良がされているんだろうと感じる。"},
+{id:"c61",w:"B",label:"動き回るミジンコ",text:"生き物が圧死しないタイプのプレパラートにしたら、ミジンコたちがすごい動き回っていた。こういう速さで、こういう動きで動くんだなと感動した。潰すタイプでは見たことがなかった。"},
+{id:"c62",w:"B",label:"スケッチの理由",text:"盛口くんはスケッチをしていた。「生物観察においてスケッチはとても重要なのだ」と斗沢さん。写真は撮れるけれど、スケッチすることで、その生物の特徴がはっきりわかってくるような気がする。"},
+{id:"c63",w:"B",label:"外来種のアプローチ",text:"外来種の問題を食という方向からアプローチするのはとても面白い。地域における「食」に今とても興味があるので、ブラックバスを食べたのはすごくいい体験だった。「斗沢さんがジビエ料理人になったら面白いかもね」。"},
+{id:"c64",w:"B",label:"手に馴染む不正円",text:"カヌーのパドルは秋田杉の手作り。触ってみると、ほぼ正円だけど完全な正円の円柱ではないことに気づく。「均等な形ではないけれど、そのほうが人間の手には馴染む」と、作っている方は言う。"},
+];
+
+const SEQS=[
+{name:"名は体に届かない",          session:"セッション #1", cards:["c40","c49","c58","c24","c50","c04"]},
+{name:"説明が景色を変える",        session:"セッション #1", cards:["c57","c47","c42","c45","c01","c23"]},
+{name:"合言葉は二度働く",          session:"セッション #2", cards:["c01","c45","c46","c02"]},
+{name:"死骸で仲良くなる",          session:"セッション #2", cards:["c03","c17","c27"]},
+{name:"敵を朝食にする",            session:"セッション #3", cards:["c06","c13","c63"]},
+{name:"はじめては体にくる",        session:"セッション #3", cards:["c36","c37","c39","c38","c60","c20"]},
+{name:"怖くなくなると可愛い",      session:"セッション #4", cards:["c25","c29","c54","c53"]},
+{name:"人間をいったん降りる",      session:"セッション #4", cards:["c22","c21","c28","c26"]},
+{name:"閉じても消えない",          session:"セッション #5", cards:["c52","c56","c18","c30"]},
+{name:"描くと見えてくる",          session:"セッション #5", cards:["c62","c61","c12","c07"]},
+{name:"土地の人になる一瞬",        session:"セッション #6", cards:["c44","c30","c48","c22"]},
+{name:"わからないままそばにいる",  session:"セッション #6", cards:["c43","c40","c42","c53"]},
+{name:"規格外がうれしい",          session:"セッション #7", cards:["c64","c05","c59"]},
+{name:"置物は誰のものでもない",    session:"セッション #7", cards:["c09","c55","c26"]},
+{name:"小さな世界を世話する",      session:"セッション #8", cards:["c10","c42","c54","c53","c23"]},
+];
+
+/* ════════ 派生データ ════════ */
+const cardById={}; CARDS.forEach(c=>cardById[c.id]=c);
+const seqsOf={};   CARDS.forEach(c=>seqsOf[c.id]=[]);
+SEQS.forEach((s,si)=>s.cards.forEach(id=>seqsOf[id].push(si)));
+const EDGES=[];
+SEQS.forEach((s,si)=>{ for(let i=0;i<s.cards.length-1;i++) EDGES.push({a:s.cards[i], b:s.cards[i+1], seq:si}); });
+const fam=si=>FAMILIES[si%FAMILIES.length];
+const totalAppear=SEQS.reduce((n,s)=>n+s.cards.length,0);
+
+/* ════════ 3Dレイアウト（力学配置） ════════ */
+let seed=42; const rnd=()=>{ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; };
+const nodes=CARDS.map((c,i)=>({
+  id:c.id,
+  x:Math.cos(i*2.399963)*Math.sqrt(i+1)*58 + (rnd()-0.5)*40,
+  y:(rnd()-0.5)*300,
+  z:Math.sin(i*2.399963)*Math.sqrt(i+1)*58 + (rnd()-0.5)*40,
+  vx:0,vy:0,vz:0,
+  ph:i*0.73, bs:0.35+rnd()*0.4,
+  wr:9+seqsOf[c.id].length*3.2,
+  sx:0,sy:0,s:1,depth:0,alpha:1,
+}));
+const nodeById={}; nodes.forEach(n=>nodeById[n.id]=n);
+
+function simStep(alpha){
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const a=nodes[i], b=nodes[j];
+      let dx=b.x-a.x, dy=b.y-a.y, dz=b.z-a.z;
+      let d2=dx*dx+dy*dy+dz*dz;
+      if(d2<25){d2=25; dx=rnd()-0.5; dy=rnd()-0.5; dz=rnd()-0.5;}
+      const d=Math.sqrt(d2);
+      const f=(52000/d2)*alpha;
+      a.vx-=dx/d*f; a.vy-=dy/d*f; a.vz-=dz/d*f;
+      b.vx+=dx/d*f; b.vy+=dy/d*f; b.vz+=dz/d*f;
+    }
+  }
+  EDGES.forEach(e=>{
+    const a=nodeById[e.a], b=nodeById[e.b];
+    const dx=b.x-a.x, dy=b.y-a.y, dz=b.z-a.z;
+    const d=Math.max(Math.sqrt(dx*dx+dy*dy+dz*dz),1);
+    const f=0.02*(d-165)*alpha;
+    a.vx+=dx/d*f; a.vy+=dy/d*f; a.vz+=dz/d*f;
+    b.vx-=dx/d*f; b.vy-=dy/d*f; b.vz-=dz/d*f;
+  });
+  nodes.forEach(n=>{
+    n.vx+=-n.x*0.0045*alpha;
+    n.vy+=-n.y*0.010*alpha;
+    n.vz+=-n.z*0.0065*alpha;
+    n.x+=Math.max(-14,Math.min(14,n.vx));
+    n.y+=Math.max(-14,Math.min(14,n.vy));
+    n.z+=Math.max(-14,Math.min(14,n.vz));
+    n.vx*=0.55; n.vy*=0.55; n.vz*=0.55;
+  });
+}
+for(let t=0;t<220;t++) simStep(1);
+/* 重心を原点へ＝自転の軸が雲の中心に来るように */
+{ let gx=0,gy=0,gz=0;
+  nodes.forEach(n=>{gx+=n.x;gy+=n.y;gz+=n.z;});
+  gx/=nodes.length; gy/=nodes.length; gz/=nodes.length;
+  nodes.forEach(n=>{n.x-=gx;n.y-=gy;n.z-=gz;});
+}
+
+/* ════════ カメラ・投影 ════════ */
+const canvas=document.getElementById("lake");
+const ctx=canvas.getContext("2d");
+let DPR=1, vw=0, vh=0;
+function resize(){
+  DPR=Math.min(devicePixelRatio||1,2);
+  vw=innerWidth; vh=innerHeight;
+  canvas.width=vw*DPR; canvas.height=vh*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  zoomT=fitZoom()*1.18;
+}
+const CAMD=1500, FOV=1050;
+function fitZoom(){
+  const rs=nodes.map(n=>Math.hypot(n.x,n.y,n.z)).sort((a,b)=>a-b);
+  const R=rs[Math.floor(rs.length*0.85)];
+  const proj=R*FOV/CAMD;
+  return Math.max(0.65,Math.min((vw*0.46)/proj,(vh*0.42)/proj,1.8));
+}
+let rx=-0.22, ry=0.4, zoom=0.1;
+let rxT=rx, ryT=ry, zoomT=1;
+let ccx=0, ccy=0, ccxT=0, ccyT=0;
+resize();
+addEventListener("resize",resize);
+
+function rot3(x,y,z){
+  const cy=Math.cos(ry), sy=Math.sin(ry);
+  let X=x*cy+z*sy, Z=-x*sy+z*cy;
+  const cx=Math.cos(rx), sx=Math.sin(rx);
+  let Y=y*cx-Z*sx; Z=y*sx+Z*cx;
+  return [X,Y,Z];
+}
+
+function centerTargets(){
+  const mobile=vw<=640;
+  const sel=selected!=null;
+  /* 選択時も湖の中心は動かさない（吹き出し側が左右に回り込む） */
+  ccxT=vw/2;
+  ccyT=(mobile&&sel)?vh*0.30:vh/2+8;
+}
+
+/* ════════ 状態 ════════ */
+let selected=null, activeSeq=null, hoverId=null;
+let lastInteract=0;
+
+/* ════════ 描画ループ ════════ */
+function hexRGB(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
+function mixGround(h,k){
+  const [r,g,b]=hexRGB(h);
+  return `rgb(${Math.round(r+(GROUND.r-r)*k)},${Math.round(g+(GROUND.g-g)*k)},${Math.round(b+(GROUND.b-b)*k)})`;
+}
+const offsets=[-42,-21,0,21,42];
+let maxR=1; nodes.forEach(n=>maxR=Math.max(maxR,Math.hypot(n.x,n.y,n.z)));
+
+let lastT=0;
+function frame(now){
+  const dt=Math.min(0.1,lastT?(now-lastT)/1000:0.016); lastT=now;
+  const k=1-Math.exp(-dt*5.5), k2=1-Math.exp(-dt*7);
+  rx+=(rxT-rx)*k; ry+=(ryT-ry)*k; zoom+=(zoomT-zoom)*k;
+  centerTargets();
+  ccx+=(ccxT-ccx)*k2; ccy+=(ccyT-ccy)*k2;
+  if(selected==null && now-lastInteract>2600) ryT+=0.066*dt;
+
+  const t=now*0.001;
+  nodes.forEach(n=>{
+    const bob=Math.sin(t*n.bs+n.ph)*7;
+    const [X,Y,Z]=rot3(n.x, n.y+bob, n.z);
+    const s=FOV*zoom/(Z+CAMD);
+    n.sx=ccx+X*s; n.sy=ccy+Y*s; n.s=s; n.depth=Z;
+    n.alpha=Math.max(0.32,Math.min(1,1.12-((Z+maxR)/(2*maxR))*0.75));
+  });
+
+  ctx.clearRect(0,0,vw,vh);
+
+  ctx.globalCompositeOperation="multiply";
+  ctx.lineCap="round";
+  /* 選択カードから乗り換えられる連なり＝うっすら見せる */
+  const transferSeqs=(selected!=null&&activeSeq!=null)?new Set(seqsOf[selected]):null;
+  EDGES.forEach(e=>{
+    const a=nodeById[e.a], b=nodeById[e.b];
+    const on=activeSeq!=null&&e.seq===activeSeq;
+    const transfer=!on&&transferSeqs&&transferSeqs.has(e.seq);
+    const base=Math.min(a.alpha,b.alpha);
+    const al=activeSeq==null?base*0.6:(on?0.88:(transfer?0.24:0.05));
+    if(al<0.02) return;
+    const sAvg=(a.s+b.s)/2;
+    const mx=(a.sx+b.sx)/2, my=(a.sy+b.sy)/2;
+    const dx=b.sx-a.sx, dy=b.sy-a.sy;
+    const d=Math.max(Math.hypot(dx,dy),1);
+    const off=offsets[e.seq%offsets.length]*sAvg;
+    ctx.globalAlpha=al;
+    ctx.strokeStyle=on?fam(e.seq).hot:(transfer?mixGround(fam(e.seq).hot,0.25):mixGround(fam(e.seq).hot,(1-base)*0.5));
+    ctx.lineWidth=(on?4.6:(transfer?3.4:3))*sAvg;
+    ctx.beginPath();
+    ctx.moveTo(a.sx,a.sy);
+    ctx.quadraticCurveTo(mx-dy/d*off, my+dx/d*off, b.sx, b.sy);
+    ctx.stroke();
+  });
+  ctx.globalCompositeOperation="source-over";
+
+  const order=[...nodes].sort((p,q)=>q.depth-p.depth);
+  const inSeq=activeSeq!=null?new Set(SEQS[activeSeq].cards):null;
+  order.forEach(n=>{
+    const uses=seqsOf[n.id];
+    const r=n.wr*n.s;
+    const sel=n.id===selected, hov=n.id===hoverId;
+    let al=n.alpha;
+    if(inSeq&&!inSeq.has(n.id)) al*=0.16;
+    if(sel||hov) al=1;
+    ctx.globalAlpha=al;
+
+    /* 連なり表示中は、その連なりの色に玉を染める */
+    const onStrand=inSeq&&inSeq.has(n.id);
+    const f0=onStrand?fam(activeSeq):fam(uses[0]);
+    const fog=(1-n.alpha)*0.55;
+
+    if(sel||hov){
+      ctx.beginPath();
+      ctx.arc(n.sx,n.sy,r+8*n.s,0,7);
+      ctx.strokeStyle=f0.glaze;
+      ctx.lineWidth=4.5*n.s;
+      ctx.globalAlpha=al*0.65;
+      ctx.stroke();
+      ctx.globalAlpha=al;
+    }
+
+    const g=ctx.createRadialGradient(n.sx-r*0.34,n.sy-r*0.38,r*0.1,n.sx,n.sy,r);
+    g.addColorStop(0,"#FDFCFB");
+    g.addColorStop(0.38,mixGround(f0.glaze,fog));
+    g.addColorStop(1,mixGround(f0.hot,fog));
+    ctx.fillStyle=g;
+    ctx.beginPath(); ctx.arc(n.sx,n.sy,r,0,7); ctx.fill();
+
+    if(uses.length>1){
+      const span=Math.PI*2/uses.length, gap=Math.min(0.24,span*0.22);
+      ctx.lineWidth=3*n.s;
+      uses.forEach((si,kk)=>{
+        ctx.beginPath();
+        ctx.arc(n.sx,n.sy,r+4.5*n.s, kk*span-Math.PI/2+gap/2, (kk+1)*span-Math.PI/2-gap/2);
+        ctx.strokeStyle=mixGround(fam(si).hot,fog*0.6);
+        ctx.globalAlpha=al*0.85;
+        ctx.stroke();
+      });
+      ctx.globalAlpha=al;
+    }
+
+    /* 連なり上のノードはミニ札で名前を出すので、素のラベルは省く */
+    const near=(n.depth<-maxR*0.18||sel||hov)&&al>0.3&&!onStrand;
+    if(near){
+      const fs=Math.max(9,10.5*n.s);
+      ctx.font=`${sel||hov?"600 ":""}${fs}px -apple-system,"Hiragino Sans",sans-serif`;
+      ctx.textAlign="center";
+      ctx.fillStyle="#4C4640";
+      ctx.globalAlpha=al*(sel||hov?0.95:0.55);
+      ctx.fillText(cardById[n.id].label, n.sx, n.sy+r+fs+4);
+      ctx.globalAlpha=al;
+    }
+  });
+
+  /* 連なりのタイトル＝糸の中間の辺のそばに書き込む */
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  SEQS.forEach((s,si)=>{
+    const ids=s.cards;
+    const mIdx=Math.floor((ids.length-1)/2);
+    const a=nodeById[ids[mIdx]], b=nodeById[ids[Math.min(mIdx+1,ids.length-1)]];
+    const on=si===activeSeq;
+    const base=Math.min(a.alpha,b.alpha);
+    const al=activeSeq==null?base*0.8:(on?0.96:0.05);
+    if(al<0.03) return;
+    const dx=b.sx-a.sx, dy=b.sy-a.sy;
+    const d=Math.max(Math.hypot(dx,dy),1);
+    const sAvg=(a.s+b.s)/2;
+    const off=(offsets[si%offsets.length]+(offsets[si%offsets.length]>=0?17:-17))*sAvg;
+    const x=(a.sx+b.sx)/2-dy/d*off, y=(a.sy+b.sy)/2+dx/d*off;
+    const fs=(on?12.5:10.5)*Math.max(0.8,Math.min(1.15,sAvg));
+    ctx.font=`${on?"600 ":""}${fs}px "Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif`;
+    ctx.globalAlpha=al;
+    ctx.strokeStyle="#F6F4F3"; ctx.lineWidth=3; ctx.lineJoin="round";
+    ctx.strokeText(s.name,x,y);                     /* 地の色の縁取り＝糸の上でも読める */
+    ctx.fillStyle=mixGround(fam(si).deep,(1-base)*0.4);
+    ctx.fillText(s.name,x,y);
+  });
+  ctx.textBaseline="alphabetic";
+  ctx.globalAlpha=1;
+
+  /* 連なり上の各ノードにミニ札＝連なっている感 */
+  if(activeSeq!=null){
+    const f=fam(activeSeq);
+    const [dr,dg,db]=hexRGB(f.deep);
+    ctx.textAlign="left"; ctx.textBaseline="middle";
+    SEQS[activeSeq].cards.forEach((cid,i)=>{
+      if(cid===selected) return;                       /* 選択中は大きな吹き出しがある */
+      const n=nodeById[cid];
+      const label=cardById[cid].label;
+      ctx.font='10.5px -apple-system,"Hiragino Sans",sans-serif';
+      const numW=12, dotW=11, pad=8;
+      const tw=ctx.measureText(label).width;
+      const w=pad+numW+dotW+tw+pad, h=21;
+      const x=n.sx-w/2, y=n.sy-n.wr*n.s-h-9;
+      ctx.globalAlpha=0.97;
+      ctx.shadowColor=`rgba(${dr},${dg},${db},0.28)`;
+      ctx.shadowBlur=9; ctx.shadowOffsetY=2;
+      ctx.fillStyle="#FAF8F5";
+      ctx.beginPath();
+      if(ctx.roundRect) ctx.roundRect(x,y,w,h,8); else ctx.rect(x,y,w,h);
+      ctx.fill();
+      ctx.shadowColor="transparent"; ctx.shadowBlur=0; ctx.shadowOffsetY=0;
+      ctx.fillStyle="#4C464088";
+      ctx.font='600 9px "SF Mono",Menlo,monospace';
+      ctx.fillText(String(i+1), x+pad, y+h/2+0.5);
+      ctx.fillStyle=f.hot;
+      ctx.beginPath(); ctx.arc(x+pad+numW+3, y+h/2, 3.2, 0, 7); ctx.fill();
+      ctx.fillStyle="#4C4640";
+      ctx.font='10.5px -apple-system,"Hiragino Sans",sans-serif';
+      ctx.fillText(label, x+pad+numW+dotW, y+h/2+0.5);
+    });
+    ctx.textBaseline="alphabetic"; ctx.textAlign="center";
+  }
+
+  ctx.globalAlpha=1;
+  placeBubble();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ════════ 入力 ════════ */
+let dragging=false, moved=false, px=0, py=0;
+canvas.addEventListener("pointerdown",e=>{
+  dragging=true; moved=false; px=e.clientX; py=e.clientY;
+  canvas.setPointerCapture(e.pointerId);
+  lastInteract=performance.now();
+});
+canvas.addEventListener("pointermove",e=>{
+  lastInteract=performance.now();
+  if(dragging){
+    const dx=e.clientX-px, dy=e.clientY-py;
+    if(Math.abs(dx)+Math.abs(dy)>3){ moved=true; canvas.classList.add("dragging"); }
+    ryT+=dx*0.0048; rxT=Math.max(-1.15,Math.min(1.15,rxT+dy*0.0038));
+    px=e.clientX; py=e.clientY;
+  }else{
+    hoverId=hitTest(e.clientX,e.clientY);
+    canvas.style.cursor=hoverId?"pointer":"grab";
+  }
+});
+canvas.addEventListener("pointerup",e=>{
+  canvas.classList.remove("dragging");
+  if(dragging&&!moved){
+    const id=hitTest(e.clientX,e.clientY);
+    if(id) select(id); else deselect();
+  }
+  dragging=false;
+});
+canvas.addEventListener("wheel",e=>{
+  e.preventDefault();
+  lastInteract=performance.now();
+  zoomT=Math.max(0.35,Math.min(2.8,zoomT*(e.deltaY<0?1.09:1/1.09)));
+},{passive:false});
+
+function hitTest(x,y){
+  const sorted=[...nodes].sort((p,q)=>p.depth-q.depth);
+  for(const n of sorted){
+    if(Math.hypot(x-n.sx,y-n.sy)<n.wr*n.s+5) return n.id;
+  }
+  return null;
+}
+
+function rotateTo(id){
+  const n=nodeById[id];
+  const ryDes=Math.atan2(n.x,-n.z);
+  const h=Math.hypot(n.x,n.z);
+  const rxDes=Math.atan2(-n.y,h);
+  let dRy=(ryDes-ryT)%(Math.PI*2);
+  if(dRy>Math.PI) dRy-=Math.PI*2;
+  if(dRy<-Math.PI) dRy+=Math.PI*2;
+  ryT+=dRy;
+  rxT=Math.max(-1.15,Math.min(1.15,rxDes));
+  zoomT=Math.max(zoomT,Math.min(1.15,fitZoom()*1.35));
+}
+
+/* ════════ 選択・吹き出し・ナビゲーション ════════ */
+const bubble=document.getElementById("bubble");
+
+function setHighlight(si){
+  activeSeq=si;
+  document.body.classList.toggle("has-active",si!=null);
+  syncLegend();
+}
+
+function select(id,keepSeq){
+  selected=id;
+  const seqs=seqsOf[id];
+  if(!(keepSeq&&activeSeq!=null&&seqs.includes(activeSeq))) activeSeq=seqs[0];
+  setHighlight(activeSeq);
+  renderBubble();
+  rotateTo(id);
+}
+
+function deselect(){
+  selected=null;
+  bubble.classList.remove("show");
+  setHighlight(null);
+}
+
+function renderBubble(){
+  const card=cardById[selected];
+  const seqs=seqsOf[selected];
+  const si=activeSeq, s=SEQS[si], f=fam(si);
+  const idx=s.cards.indexOf(selected);
+
+  bubble.classList.add("show");
+  bubble.style.boxShadow=`0 6px 26px ${f.deep}2E`;
+  document.getElementById("bb-accent").style.background=`linear-gradient(160deg, ${f.hot}, ${f.glaze})`;
+  document.getElementById("bb-label").textContent=card.label;
+  document.getElementById("bb-text").textContent=card.text;
+
+  /* メタ情報＝最小限：書き手・連なり名・（複数なら乗り換えの点） */
+  const meta=document.getElementById("bb-meta");
+  meta.innerHTML="";
+  const w=document.createElement("span");
+  w.textContent=`書き手${card.w}`;
+  meta.appendChild(w);
+  const sn=document.createElement("span");
+  sn.textContent=`・ 連なり「${s.name}」`;
+  meta.appendChild(sn);
+  if(seqs.length>1){
+    const lbl=document.createElement("span");
+    lbl.textContent="・";
+    meta.appendChild(lbl);
+    seqs.forEach(kk=>{
+      const d=document.createElement("span");
+      d.className="dot"+(kk===si?" cur":"");
+      d.style.background=`linear-gradient(160deg,${fam(kk).hot},${fam(kk).glaze})`;
+      d.title=`連なり「${SEQS[kk].name}」へ`;
+      d.addEventListener("click",()=>{ activeSeq=kk; setHighlight(kk); renderBubble(); });
+      meta.appendChild(d);
+    });
+  }
+
+  document.getElementById("bb-pos").textContent=`${idx+1} / ${s.cards.length}`;
+  document.getElementById("nv-prev").disabled=idx<=0;
+  document.getElementById("nv-next").disabled=idx>=s.cards.length-1;
+}
+
+/* 吹き出しをノードのそばに置く（毎フレーム追従） */
+function placeBubble(){
+  if(selected==null||!bubble.classList.contains("show")) return;
+  const n=nodeById[selected];
+  const bw=bubble.offsetWidth, bh=bubble.offsetHeight;
+  const r=n.wr*n.s+14;
+  let x=n.sx+r+8, y=n.sy-bh*0.28;
+  if(x+bw>vw-12) x=n.sx-r-8-bw;                       /* 右が詰まれば左へ */
+  if(x<12){                                           /* 左右とも無理なら上下へ */
+    x=Math.min(vw-bw-12,Math.max(12,n.sx-bw/2));
+    y=n.sy+r+8;
+    if(y+bh>vh-12) y=n.sy-r-8-bh;
+  }
+  y=Math.max(68,Math.min(vh-bh-12,y));
+  bubble.style.left=x+"px";
+  bubble.style.top=y+"px";
+}
+
+function navLR(dir){
+  if(selected==null) return;
+  const s=SEQS[activeSeq];
+  const idx=s.cards.indexOf(selected);
+  const ni=idx+dir;
+  if(ni<0||ni>=s.cards.length) return;
+  select(s.cards[ni],true);
+}
+function navUD(dir){
+  if(selected==null) return;
+  const seqs=seqsOf[selected];
+  if(seqs.length<2) return;
+  const kk=seqs.indexOf(activeSeq);
+  activeSeq=seqs[(kk+dir+seqs.length)%seqs.length];
+  setHighlight(activeSeq);
+  renderBubble();
+}
+
+document.getElementById("nv-prev").addEventListener("click",()=>navLR(-1));
+document.getElementById("nv-next").addEventListener("click",()=>navLR(1));
+document.getElementById("bb-close").addEventListener("click",deselect);
+
+addEventListener("keydown",e=>{
+  if(e.key==="ArrowLeft"){ e.preventDefault(); navLR(-1); }
+  else if(e.key==="ArrowRight"){ e.preventDefault(); navLR(1); }
+  else if(e.key==="ArrowUp"){ e.preventDefault(); navUD(-1); }
+  else if(e.key==="ArrowDown"){ e.preventDefault(); navUD(1); }
+  else if(e.key==="Escape") deselect();
+});
+
+/* ════════ 左サイドバー：連なりアコーディオン ════════ */
+const lgBody=document.getElementById("lg-body");
+const sqEls=SEQS.map((s,si)=>{
+  const f=fam(si);
+  const block=document.createElement("div");
+  block.className="sq";
+
+  const head=document.createElement("div");
+  head.className="sq-head";
+  head.innerHTML=`<span class="sw" style="background:linear-gradient(160deg,${f.hot},${f.glaze})"></span><span>${s.name}</span><span class="n">${s.cards.length}</span>`;
+  head.addEventListener("click",()=>{
+    if(activeSeq===si){ deselect(); return; }        /* 開いているものを再クリック＝閉じる */
+    if(selected&&!seqsOf[selected].includes(si)){ selected=null; bubble.classList.remove("show"); }
+    setHighlight(si);
+  });
+  block.appendChild(head);
+
+  const list=document.createElement("div");
+  list.className="sq-cards";
+  s.cards.forEach((cid,i)=>{
+    const row=document.createElement("div");
+    row.className="sq-card";
+    row.dataset.cid=cid;
+    row.innerHTML=`<span class="no">${i+1}</span><span>${cardById[cid].label}</span>`;
+    row.addEventListener("click",()=>{ activeSeq=si; select(cid,true); });
+    list.appendChild(row);
+  });
+  block.appendChild(list);
+  lgBody.appendChild(block);
+  return block;
+});
+
+function syncLegend(){
+  sqEls.forEach((el,si)=>{
+    const on=si===activeSeq;
+    el.classList.toggle("on",on);
+    el.classList.toggle("open",on);                  /* アコーディオン＝アクティブだけ開く */
+    el.querySelectorAll(".sq-card").forEach(row=>{
+      row.classList.toggle("cur",on&&row.dataset.cid===selected);
+    });
+  });
+  const cur=document.querySelector(".sq.on");
+  if(cur) cur.scrollIntoView({block:"nearest"});
+}
+
+document.getElementById("lg-count").textContent=`${SEQS.length}本`;
+document.getElementById("lg-toggle").addEventListener("click",()=>document.getElementById("legend").classList.toggle("closed"));
+document.getElementById("stats").textContent=`カード ${CARDS.length}枚 ・ 連なり ${SEQS.length}本 ・ のべ登場 ${totalAppear}回`;
+
+/* ════════ 初回ガイド ════════ */
+const guide=document.getElementById("guide");
+const GUIDE_KEY="hachipro_lake_guide_v2";
+function hideGuide(){ guide.classList.add("hide"); try{localStorage.setItem(GUIDE_KEY,"1");}catch(e){} }
+function showGuide(){ guide.classList.remove("hide"); }
+let guided=false;
+try{ guided=!!localStorage.getItem(GUIDE_KEY); }catch(e){}
+if(guided) guide.classList.add("hide");           /* 2回目以降は出さない */
+document.getElementById("gd-start").addEventListener("click",hideGuide);
+guide.addEventListener("click",e=>{ if(e.target===guide) hideGuide(); });
+document.getElementById("help").addEventListener("click",showGuide);
+addEventListener("keydown",e=>{ if(e.key==="Escape"&&!guide.classList.contains("hide")) hideGuide(); });
+</script>
+</body>
+</html>
